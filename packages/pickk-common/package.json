@@ -1,8 +1,37 @@
 {
   "name": "@pickk/common",
   "version": "0.0.1",
+  "description": "common files for pickk development",
+  "scripts": {
+    "build": "rimraf -rf dist && tsc -p tsconfig.json",
+    "prepublishOnly": "npm install && npm run build",
+    "format": "prettier --write \"lib/**/*.ts\"",
+    "lint": "eslint \"lib/**/*.ts\" --fix",
+    "tsc": "tsc --noEmit",
+    "test": "npm run format && npm run lint && npm run tsc",
+    "prepublish": "npm run format && npm run lint && npm run build",
+    "generate": "graphql-codegen --config codegen.yml"
+  },
+  "author": "THINKING MUGGLES",
+  "license": "UNLICENSED",
   "dependencies": {
     "cross-env": "5.0.5",
-    "@pickk/eslint-plugin": "0.0.1"
-  }
+    "@apollo/client": "^3.3.13",
+    "graphql": "^15.5.0",
+    "react": "^17.0.1"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.21.5",
+    "@graphql-codegen/typescript": "1.22.1",
+    "@graphql-codegen/typescript-operations": "1.18.0",
+    "@graphql-codegen/typescript-react-apollo": "2.2.5",
+    "@types/node": "^14.14.37",
+    "@types/react": "^17.0.1",
+    "apollo": "^2.32.5",
+    "rimraf": "^3.0.2",
+    "webpack": "^5.35.0"
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }
