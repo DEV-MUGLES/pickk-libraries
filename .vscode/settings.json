@@ -1,0 +1,6 @@
+{
+    "conventionalCommits.scopes": [
+        "pickk-common",
+        "pickk-eslint-plugin"
+    ]
+}
