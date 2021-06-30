@@ -1,0 +1,8 @@
+{
+  "name": "@pickk/common",
+  "version": "0.0.1",
+  "dependencies": {
+    "cross-env": "5.0.5",
+    "@pickk/eslint-plugin": "0.0.1"
+  }
+}
