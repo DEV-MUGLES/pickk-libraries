@@ -1,0 +1,13 @@
+overwrite: true
+schema: 'https://api.pickk.dev/graphql'
+generates:
+  lib/generated/graphql.ts:
+    hooks:
+      afterOneFileWrite:
+        - prettier --write
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-apollo'
+    config:
+      skipTypename: true
