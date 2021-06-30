@@ -1,13 +1,6 @@
-{
+{ 
+  "extends": "../../tsconfig",
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "esModuleInterop": true,
-    "target": "es2017",
-    "sourceMap": false,
     "rootDir": "./lib",
     "outDir": "./dist"
   }
