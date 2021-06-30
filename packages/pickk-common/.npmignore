@@ -1,0 +1,13 @@
+.github/
+.vscode
+.npm/
+
+node_modules/
+!node_modules/@apollo/client/
+!node_modules/graphql/
+!node_modules/react/
+
+lib/
+test/
+
+schema.json
