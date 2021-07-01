@@ -21,7 +21,7 @@ export default {
             node.init.type === 'ArrayExpression' &&
             node.id.type === 'Identifier'
           ) {
-            if (node.id.name[node.id.name.length - 1] !== 's') {
+            if (node.id.name[node.id.name.length - 1].toLowerCase() !== 's') {
               context.report({
                 node,
                 message:
