@@ -13,7 +13,7 @@ function createPackage(name: string) {
     return;
   }
 
-  const packageDir = `${ROOT_DIR}/${name}/`;
+  const packageDir = `${ROOT_DIR}/${name}`;
 
   if (fs.existsSync(packageDir)) {
     console.error(`Error: ${name} is already exists!`);
@@ -25,7 +25,7 @@ function createPackage(name: string) {
 
   const INIT_FILES = fs.readdirSync(TEMPLATE_ROOT_DIR);
   INIT_FILES.map((filePath) => {
-    console.info(`\tadded: ${filePath}`);
+    console.info(`\tadded: ${packageDir}/${filePath}`);
   });
 }
 
