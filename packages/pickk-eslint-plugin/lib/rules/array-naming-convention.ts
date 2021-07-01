@@ -16,18 +16,20 @@ export default {
   create(context: Rule.RuleContext): Rule.RuleListener {
     return {
       VariableDeclarator(node) {
-        if (
-          node.init.type == 'ArrayExpression' &&
-          node.id.type == 'Identifier'
-        ) {
-          if (node.id.name[node.id.name.length - 1] !== 's') {
-            context.report({
-              node,
-              message:
-                '배열 변수는 영문 복수형으로 명명합니다. (ex) const looks = []; const posts = [])',
-            });
+        try {
+          if (
+            node.init.type === 'ArrayExpression' &&
+            node.id.type === 'Identifier'
+          ) {
+            if (node.id.name[node.id.name.length - 1] !== 's') {
+              context.report({
+                node,
+                message:
+                  '배열 변수는 영문 복수형으로 명명합니다. (ex) const looks = []; const posts = [])',
+              });
+            }
           }
-        }
+        } catch {}
       },
     };
   },
