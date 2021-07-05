@@ -1,6 +1,6 @@
 {
   "name": "@pickk/common",
-  "version": "1.7.5",
+  "version": "1.7.6",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf -rf dist && tsc -p tsconfig.json",
