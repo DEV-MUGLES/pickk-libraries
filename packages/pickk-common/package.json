@@ -1,7 +1,7 @@
 {
   "name": "@pickk/common",
   "version": "1.7.5",
-  "description": "common files for pickk development",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rimraf -rf dist && tsc -p tsconfig.json",
     "prepublishOnly": "npm install && npm run build",
@@ -12,8 +12,6 @@
     "prepublish": "npm run format && npm run lint && npm run build",
     "generate": "graphql-codegen --config codegen.yml"
   },
-  "author": "THINKING MUGGLES",
-  "license": "UNLICENSED",
   "dependencies": {
     "@apollo/client": "^3.3.13",
     "cross-env": "5.0.5",
@@ -33,5 +31,8 @@
   },
   "files": [
     "dist/**/*"
-  ]
+  ],
+  "author": "THINKING MUGGLES",
+  "license": "UNLICENSED",
+  "description": "common files for pickk development"
 }
