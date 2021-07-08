@@ -1,0 +1,8 @@
+.github/
+.vscode
+.npm/
+
+node_modules/
+
+lib/
+test/

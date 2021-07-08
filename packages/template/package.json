@@ -1,6 +1,10 @@
 {
   "name": "",
   "version": "0.0.1",
+  "main": "dist/index.js",
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {},
+  "files": [
+    "dist/**/*"
+  ]
 }
