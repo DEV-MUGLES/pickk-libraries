@@ -10,7 +10,8 @@
     "format": "prettier --write \"lib/**/*.ts\"",
     "lint": "eslint \"lib/**/*.ts\" --fix",
     "tsc": "tsc --noEmit",
-    "prepublish": "npm run format && npm run lint && npm run build"
+    "prepublish": "npm run format && npm run lint && npm run build",
+    "test": "ts-mocha -p tsconfig.json test/**/*.spec.ts --diff false"
   },
   "dependencies": {
     "cross-env": "5.0.5"
@@ -18,6 +19,9 @@
   "devDependencies": {
     "@types/eslint": "^7.2.13",
     "@types/estree": "^0.0.48",
-    "@types/node": "^15.12.4"
-  }
+    "@types/node": "^15.12.4",
+    "ts-mocha": "^8.0.0",
+    "mocha": "^9.0.2"
+  },
+  "license": "MIT"
 }
