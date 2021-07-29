@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
@@ -65,6 +64,88 @@ export type AddItemUrlInput = {
   url: Scalars['String'];
 };
 
+/** 애플 로그인시 사용됩니다. [App, Web] */
+export enum AppleClientType {
+  App = 'App',
+  Web = 'Web',
+}
+
+/** 은행 식별 코드입니다. InicisBankCode와 값이 같습니다. */
+export enum BankCode {
+  AbnAmro = 'AbnAmro',
+  BcCard = 'BcCard',
+  Boa = 'Boa',
+  Busan = 'Busan',
+  ChBank = 'ChBank',
+  Chohung = 'Chohung',
+  Citi = 'Citi',
+  Commercial = 'Commercial',
+  Cu = 'Cu',
+  Daegu = 'Daegu',
+  Deutsche = 'Deutsche',
+  EPost = 'EPost',
+  ExShinhan = 'ExShinhan',
+  Hana = 'Hana',
+  Hanil = 'Hanil',
+  Hanmi = 'Hanmi',
+  Housing = 'Housing',
+  Hsbc = 'Hsbc',
+  Ibk = 'Ibk',
+  Jeju = 'Jeju',
+  Jeonbuk = 'Jeonbuk',
+  JpMorgan = 'JpMorgan',
+  KBank = 'KBank',
+  KakaoBank = 'KakaoBank',
+  KakaoMoney = 'KakaoMoney',
+  Kangwon = 'Kangwon',
+  Kb = 'Kb',
+  Kdb = 'Kdb',
+  Keb = 'Keb',
+  Kwangju = 'Kwangju',
+  Kyongnam = 'Kyongnam',
+  LPoint = 'LPoint',
+  MitsubishiTokyo = 'MitsubishiTokyo',
+  MutualSavings = 'MutualSavings',
+  NaverPoint = 'NaverPoint',
+  NhBank = 'NhBank',
+  Nonghyup = 'Nonghyup',
+  Payco = 'Payco',
+  Peace = 'Peace',
+  Sc = 'Sc',
+  Seoul = 'Seoul',
+  ShBank = 'ShBank',
+  Shinan = 'Shinan',
+  Shinhan = 'Shinhan',
+  Shinsegae = 'Shinsegae',
+  Sj = 'Sj',
+  SsgMoney = 'SsgMoney',
+  TossMoney = 'TossMoney',
+  Woori = 'Woori',
+}
+
+export type BaseOrderOutput = {
+  createdAt: Scalars['DateTime'];
+  failedAt?: Maybe<Scalars['DateTime']>;
+  /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
+  id: Scalars['String'];
+  /** 주문고유번호. PrimaryColumn입니다. YYMMDDHHmmssSSS + NN(00~99) 형식입니다. */
+  merchantUid: Scalars['String'];
+  paidAt?: Maybe<Scalars['DateTime']>;
+  payMethod?: Maybe<PayMethod>;
+  payingAt?: Maybe<Scalars['DateTime']>;
+  refundAccount?: Maybe<OrderRefundAccount>;
+  status: OrderStatus;
+  totalCouponDiscountAmount: Scalars['Int'];
+  totalItemFinalPrice: Scalars['Int'];
+  totalPayAmount: Scalars['Int'];
+  totalShippingFee: Scalars['Int'];
+  totalUsedPointAmount: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  userId?: Maybe<Scalars['Int']>;
+  vbankReadyAt?: Maybe<Scalars['DateTime']>;
+  withdrawnAt?: Maybe<Scalars['DateTime']>;
+};
+
 export type Brand = {
   createdAt: Scalars['DateTime'];
   description?: Maybe<Scalars['String']>;
@@ -82,6 +163,41 @@ export type BulkUpdateItemInput = {
   majorCategoryId?: Maybe<Scalars['Int']>;
   minorCategoryId?: Maybe<Scalars['Int']>;
 };
+
+export type Campaign = {
+  createdAt: Scalars['DateTime'];
+  endAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  items: Array<Item>;
+  /** 적용 정산률 (0~100) */
+  rate: Scalars['Int'];
+  startAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export enum CardCode {
+  Amex = 'Amex',
+  Bc = 'Bc',
+  Diners = 'Diners',
+  Hanask = 'Hanask',
+  Hanmi = 'Hanmi',
+  Hyundai = 'Hyundai',
+  Jcb = 'Jcb',
+  KakaoMoney = 'KakaoMoney',
+  Kb = 'Kb',
+  Keb = 'Keb',
+  LPoint = 'LPoint',
+  Lotte = 'Lotte',
+  Master = 'Master',
+  NaverPoint = 'NaverPoint',
+  Nh = 'Nh',
+  Payco = 'Payco',
+  Samsung = 'Samsung',
+  Shinhan = 'Shinhan',
+  SsgMoney = 'SsgMoney',
+  TossMoney = 'TossMoney',
+  Visa = 'Visa',
+}
 
 export type Cart = {
   /** CartItem들을 브랜드 단위로 묶은 단위입니다. */
@@ -107,16 +223,27 @@ export type CartItem = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type CheckPinInput = {
+  code: Scalars['String'];
+  phoneNumber: Scalars['String'];
+};
+
 /** 교환/반품 배송비 지불 방식. (Trans:계좌입금, Enclose:택배상자 동봉) */
 export enum ClaimFeePayMethod {
   Enclose = 'Enclose',
   Trans = 'Trans',
 }
 
+/** 컨텐츠 타입입니다. */
+export enum ContentType {
+  Look = 'Look',
+  Pickk = 'Pickk',
+}
+
 export type Coupon = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
-  spec: CouponSpecification;
+  spec?: Maybe<CouponSpecification>;
   specId: Scalars['Float'];
   status?: Maybe<CouponStatus>;
   updatedAt: Scalars['DateTime'];
@@ -177,6 +304,25 @@ export type CreateCartItemInput = {
   quantity: Scalars['Int'];
 };
 
+export type CreateCouponInput = {
+  specId: Scalars['Float'];
+};
+
+export type CreateCouponSpecificationInput = {
+  /** 이 값으로 클라이언트에서 필터링 해주세요. */
+  availableAt?: Maybe<Scalars['DateTime']>;
+  brandId?: Maybe<Scalars['Float']>;
+  discountAmount?: Maybe<Scalars['Int']>;
+  /** 1~99 정수만 입력 가능합니다. */
+  discountRate?: Maybe<Scalars['Int']>;
+  expireAt: Scalars['DateTime'];
+  maximumDiscountPrice?: Maybe<Scalars['Int']>;
+  minimumForUse?: Maybe<Scalars['Int']>;
+  /** 최대 30자까지 입력할 수 있습니다. */
+  name: Scalars['String'];
+  type: CouponType;
+};
+
 export type CreateCourierInput = {
   code: Scalars['String'];
   name: Scalars['String'];
@@ -197,8 +343,23 @@ export type CreateItemOptionSetInput = {
   options: Array<CreateItemOptionInput>;
 };
 
+export type CreateOrderVbankReceiptInput = {
+  bankCode: BankCode;
+  due: Scalars['DateTime'];
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number: Scalars['String'];
+  ownerName: Scalars['String'];
+};
+
+export type CreateRefundAccountInput = {
+  bankCode: BankCode;
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number: Scalars['String'];
+  ownerName: Scalars['String'];
+};
+
 export type CreateSellerClaimAccountInput = {
-  bankCode: InicisBankCode;
+  bankCode: BankCode;
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
   number: Scalars['String'];
   ownerName: Scalars['String'];
@@ -259,19 +420,22 @@ export type CreateSellerReturnAddressInput = {
 };
 
 export type CreateSellerSettleAccountInput = {
-  bankCode: InicisBankCode;
+  bankCode: BankCode;
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
   number: Scalars['String'];
   ownerName: Scalars['String'];
 };
 
 export type CreateSellerSettlePolicyInput = {
+  /** 정산 받을 계좌 */
   accountInput?: Maybe<CreateSellerSettleAccountInput>;
   /** 세금계산서 수령이메일 */
   email: Scalars['String'];
   /** 담당자 번호 */
   phoneNumber: Scalars['String'];
   picName: Scalars['String'];
+  /** 정산율 */
+  rate: Scalars['Int'];
 };
 
 export type CreateSellerShippingPolicyInput = {
@@ -307,62 +471,10 @@ export type FindSaleStrategyInput = {
   canUseMileage: Scalars['Boolean'];
 };
 
-/** 은행 코드입니다. KG Inicis와 관련 없는 일반 계좌를 저장할 때도 사용됩니다. */
-export enum InicisBankCode {
-  AbnAmro = 'AbnAmro',
-  BcCard = 'BcCard',
-  Boa = 'Boa',
-  Busan = 'Busan',
-  ChBank = 'ChBank',
-  Chohung = 'Chohung',
-  Citi = 'Citi',
-  Commercial = 'Commercial',
-  Cu = 'Cu',
-  Daegu = 'Daegu',
-  Deutsche = 'Deutsche',
-  EPost = 'EPost',
-  ExShinhan = 'ExShinhan',
-  Hana = 'Hana',
-  Hanil = 'Hanil',
-  Hanmi = 'Hanmi',
-  Housing = 'Housing',
-  Hsbc = 'Hsbc',
-  Ibk = 'Ibk',
-  Jeju = 'Jeju',
-  Jeonbuk = 'Jeonbuk',
-  JpMorgan = 'JpMorgan',
-  KBank = 'KBank',
-  KakaoBank = 'KakaoBank',
-  KakaoMoney = 'KakaoMoney',
-  Kangwon = 'Kangwon',
-  Kb = 'Kb',
-  Kdb = 'Kdb',
-  Keb = 'Keb',
-  Kwangju = 'Kwangju',
-  Kyongnam = 'Kyongnam',
-  LPoint = 'LPoint',
-  MitsubishiTokyo = 'MitsubishiTokyo',
-  MutualSavings = 'MutualSavings',
-  NaverPoint = 'NaverPoint',
-  NhBank = 'NhBank',
-  Nonghyup = 'Nonghyup',
-  Payco = 'Payco',
-  Peace = 'Peace',
-  Sc = 'Sc',
-  Seoul = 'Seoul',
-  ShBank = 'ShBank',
-  Shinan = 'Shinan',
-  Shinhan = 'Shinhan',
-  Shinsegae = 'Shinsegae',
-  Sj = 'Sj',
-  SsgMoney = 'SsgMoney',
-  TossMoney = 'TossMoney',
-  Woori = 'Woori',
-}
-
 export type Item = {
   brand: Brand;
   brandId: Scalars['Int'];
+  campaigns?: Maybe<Array<Campaign>>;
   createdAt: Scalars['DateTime'];
   description?: Maybe<Scalars['String']>;
   detailImages?: Maybe<Array<ItemDetailImage>>;
@@ -544,9 +656,13 @@ export type ItemUrl = {
 };
 
 export type JwtPayload = {
+  /** Seller 로그인인 경우에만 발급된다. */
+  brandId?: Maybe<Scalars['Float']>;
   exp: Scalars['Timestamp'];
   iat: Scalars['Timestamp'];
   nickname: Scalars['String'];
+  /** Seller 로그인인 경우에만 발급된다. */
+  sellerId?: Maybe<Scalars['Float']>;
   sub: Scalars['Int'];
 };
 
@@ -569,6 +685,11 @@ export type LoginByOauthInput = {
   oauthProvider?: Maybe<UserProviderType>;
 };
 
+export type LoginWithAppleInput = {
+  clientType: AppleClientType;
+  code: Scalars['String'];
+};
+
 export type Mutation = {
   activateItemPrice: Item;
   addItemDetailImages: Item;
@@ -576,15 +697,21 @@ export type Mutation = {
   addItemPrice: ItemPrice;
   addItemSizeCharts: Item;
   addItemUrl: ItemUrl;
+  addMyRefundAccount: RefundAccount;
   addMyShippingAddress: Array<ShippingAddress>;
   basifyPrice: Item;
   bulkUpdateItems: Scalars['Boolean'];
+  completeOrder: BaseOrderOutput;
+  createCoupon: Coupon;
+  createCouponSpecification: CouponSpecification;
   createCourier: Courier;
   createItemOptionSet: Item;
   createMyCartItem: CartItem;
   createSeller: Seller;
   createUser: User;
+  failOrder: BaseOrderOutput;
   modifyItemSizeCharts: Item;
+  registerOrder: BaseOrderOutput;
   removeCourierIssue: Courier;
   removeItemDetailImage: Item;
   removeItemNotice: Item;
@@ -592,7 +719,9 @@ export type Mutation = {
   removeItemSizeChartsAll: Item;
   removeMyAvatarImage: UserAvatarImage;
   removeMyCartItems: Scalars['Boolean'];
+  removeMyRefundAccount: User;
   removeMyShippingAddress: Array<ShippingAddress>;
+  startOrder: BaseOrderOutput;
   updateBrand: Brand;
   updateCourier: Courier;
   updateCourierIssue: CourierIssue;
@@ -606,6 +735,7 @@ export type Mutation = {
   updateMyCartItem: CartItem;
   /** (!) 예전 비밀번호와 현재 비밀번호를 입력해주세요. */
   updateMyPassword: User;
+  updateMyRefundAccount: RefundAccount;
   updateMySellerClaimPolicy: SellerClaimPolicy;
   updateMySellerCrawlPolicy: SellerCrawlPolicy;
   updateMySellerReturnAddress: SellerReturnAddress;
@@ -649,6 +779,10 @@ export type MutationAddItemUrlArgs = {
   itemId: Scalars['Int'];
 };
 
+export type MutationAddMyRefundAccountArgs = {
+  createRefundAccountInput: CreateRefundAccountInput;
+};
+
 export type MutationAddMyShippingAddressArgs = {
   createShippingAddressInput: CreateShippingAddressInput;
 };
@@ -661,6 +795,19 @@ export type MutationBasifyPriceArgs = {
 export type MutationBulkUpdateItemsArgs = {
   bulkUpdateItemInput: BulkUpdateItemInput;
   ids: Array<Scalars['Int']>;
+};
+
+export type MutationCompleteOrderArgs = {
+  createOrderVbankReceiptInput?: Maybe<CreateOrderVbankReceiptInput>;
+  merchantUid: Scalars['String'];
+};
+
+export type MutationCreateCouponArgs = {
+  createCouponInput: CreateCouponInput;
+};
+
+export type MutationCreateCouponSpecificationArgs = {
+  createCouponSpecificationInput: CreateCouponSpecificationInput;
 };
 
 export type MutationCreateCourierArgs = {
@@ -684,10 +831,18 @@ export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
 };
 
+export type MutationFailOrderArgs = {
+  merchantUid: Scalars['String'];
+};
+
 export type MutationModifyItemSizeChartsArgs = {
   itemId: Scalars['Int'];
   removedChartIds?: Maybe<Array<Scalars['Int']>>;
   updateItemSizeChartInput?: Maybe<Array<UpdateItemSizeChartInput>>;
+};
+
+export type MutationRegisterOrderArgs = {
+  registerOrderInput: RegisterOrderInput;
 };
 
 export type MutationRemoveCourierIssueArgs = {
@@ -718,6 +873,11 @@ export type MutationRemoveMyCartItemsArgs = {
 
 export type MutationRemoveMyShippingAddressArgs = {
   addressId: Scalars['Int'];
+};
+
+export type MutationStartOrderArgs = {
+  merchantUid: Scalars['String'];
+  startOrderInput: StartOrderInput;
 };
 
 export type MutationUpdateBrandArgs = {
@@ -777,6 +937,10 @@ export type MutationUpdateMyPasswordArgs = {
   oldPassword: Scalars['String'];
 };
 
+export type MutationUpdateMyRefundAccountArgs = {
+  updateRefundAccountInput: UpdateRefundAccountInput;
+};
+
 export type MutationUpdateMySellerClaimPolicyArgs = {
   updateSellerClaimPolicyInput: UpdateSellerClaimPolicyInput;
 };
@@ -816,11 +980,352 @@ export type MutationUploadMultipleImagesArgs = {
   uploadImageInput: UploadMultipleImageInput;
 };
 
+export type Order = {
+  buyer?: Maybe<OrderBuyer>;
+  createdAt: Scalars['DateTime'];
+  failedAt?: Maybe<Scalars['DateTime']>;
+  /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
+  id: Scalars['String'];
+  /** 주문고유번호. PrimaryColumn입니다. YYMMDDHHmmssSSS + NN(00~99) 형식입니다. */
+  merchantUid: Scalars['String'];
+  orderItems: Array<OrderItem>;
+  paidAt?: Maybe<Scalars['DateTime']>;
+  payMethod?: Maybe<PayMethod>;
+  payingAt?: Maybe<Scalars['DateTime']>;
+  receiver?: Maybe<OrderReceiver>;
+  refundAccount?: Maybe<OrderRefundAccount>;
+  status: OrderStatus;
+  totalCouponDiscountAmount: Scalars['Int'];
+  totalItemFinalPrice: Scalars['Int'];
+  totalPayAmount: Scalars['Int'];
+  totalShippingFee: Scalars['Int'];
+  totalUsedPointAmount: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+  vbankInfo?: Maybe<OrderVbankReceipt>;
+  vbankReadyAt?: Maybe<Scalars['DateTime']>;
+  withdrawnAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type OrderBuyer = {
+  createdAt: Scalars['DateTime'];
+  email: Scalars['String'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  phoneNumber: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type OrderBuyerInput = {
+  email: Scalars['String'];
+  name: Scalars['String'];
+  phoneNumber: Scalars['String'];
+};
+
+export type OrderItem = {
+  Order: Order;
+  brandNameKor: Scalars['String'];
+  cancelRequestedAt?: Maybe<Scalars['DateTime']>;
+  cancelledAt?: Maybe<Scalars['DateTime']>;
+  claimStatus?: Maybe<OrderItemClaimStatus>;
+  confirmedAt?: Maybe<Scalars['DateTime']>;
+  couponDiscountAmount: Scalars['Int'];
+  courier?: Maybe<Courier>;
+  courierId?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['DateTime'];
+  exchangeRequestedAt?: Maybe<Scalars['DateTime']>;
+  exchangedAt?: Maybe<Scalars['DateTime']>;
+  failedAt?: Maybe<Scalars['DateTime']>;
+  /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
+  id: Scalars['String'];
+  isConfirmed: Scalars['Boolean'];
+  isSettled: Scalars['Boolean'];
+  isShipReserved: Scalars['Boolean'];
+  item?: Maybe<Item>;
+  itemFinalPrice: Scalars['Int'];
+  itemId?: Maybe<Scalars['Int']>;
+  itemName: Scalars['String'];
+  /** 주문상품고유번호. PrimaryColumn입니다. order의 merchantUid + 숫자 1자리 형식입니다. */
+  merchantUid: Scalars['String'];
+  orderMerchantUid: Scalars['String'];
+  paidAt?: Maybe<Scalars['DateTime']>;
+  product?: Maybe<Product>;
+  productId?: Maybe<Scalars['Int']>;
+  productVariantName: Scalars['String'];
+  quantity: Scalars['Int'];
+  recommendContentItemId?: Maybe<Scalars['Int']>;
+  recommendContentType?: Maybe<ContentType>;
+  recommenderId?: Maybe<Scalars['Int']>;
+  recommenderNickname?: Maybe<Scalars['String']>;
+  refundRequestedAt?: Maybe<Scalars['DateTime']>;
+  refundedAt?: Maybe<Scalars['DateTime']>;
+  seller?: Maybe<Seller>;
+  sellerId?: Maybe<Scalars['Int']>;
+  settledAt?: Maybe<Scalars['DateTime']>;
+  shipReadyAt?: Maybe<Scalars['DateTime']>;
+  /** 예약발송 예정일 */
+  shipReservedAt?: Maybe<Scalars['DateTime']>;
+  shippedAt?: Maybe<Scalars['DateTime']>;
+  shippingAt?: Maybe<Scalars['DateTime']>;
+  status: OrderItemStatus;
+  trackCode?: Maybe<Scalars['String']>;
+  updatedAt: Scalars['DateTime'];
+  usedCoupon?: Maybe<Coupon>;
+  usedCouponId?: Maybe<Scalars['Int']>;
+  usedCouponName?: Maybe<Scalars['String']>;
+  usedPointAmount: Scalars['Int'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+  vbankReadyAt?: Maybe<Scalars['DateTime']>;
+  withdrawnAt?: Maybe<Scalars['DateTime']>;
+};
+
+/** 주문상품 클레임상태입니다. */
+export enum OrderItemClaimStatus {
+  CancelRequested = 'CancelRequested',
+  Cancelled = 'Cancelled',
+  ExchangeRequested = 'ExchangeRequested',
+  Exchanged = 'Exchanged',
+  RefundRequested = 'RefundRequested',
+  Refunded = 'Refunded',
+}
+
+/** 주문상품 상태입니다. 클레임상태와 무관하게 handling됩니다. */
+export enum OrderItemStatus {
+  Failed = 'Failed',
+  Paid = 'Paid',
+  Pending = 'Pending',
+  ShipPending = 'ShipPending',
+  ShipReady = 'ShipReady',
+  Shipped = 'Shipped',
+  Shipping = 'Shipping',
+  VbankReady = 'VbankReady',
+  Withdrawn = 'Withdrawn',
+}
+
+export type OrderReceiver = {
+  baseAddress: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  detailAddress: Scalars['String'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  phoneNumber: Scalars['String'];
+  postalCode: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type OrderReceiverInput = {
+  baseAddress: Scalars['String'];
+  detailAddress: Scalars['String'];
+  name: Scalars['String'];
+  phoneNumber: Scalars['String'];
+  postalCode: Scalars['String'];
+};
+
+/** 가상계좌 결제시 환불 받을 계좌 정보 */
+export type OrderRefundAccount = {
+  bankCode: BankCode;
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number: Scalars['String'];
+  ownerName: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type OrderRefundAccountInput = {
+  bankCode: BankCode;
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number: Scalars['String'];
+  ownerName: Scalars['String'];
+};
+
+export type OrderSheet = {
+  availablePointAmount: Scalars['Int'];
+  brands: Array<OrderSheetBrand>;
+  coupons: Array<Coupon>;
+  /** ApolloClient 최적화를 위한 필드입니다. order의 merchantUid와 같습니다. */
+  id: Scalars['String'];
+  order: Order;
+  refundAccount?: Maybe<RefundAccount>;
+  shippingAddresses: Array<ShippingAddress>;
+};
+
+export type OrderSheetBrand = {
+  items: Array<OrderItem>;
+  nameKor: Scalars['String'];
+  shippingFee: Scalars['Int'];
+  totalItemFinalPrice: Scalars['Int'];
+};
+
+/** 주문 상태입니다. 클라이언트에선 거의 사용되지 않을 값입니다. */
+export enum OrderStatus {
+  Failed = 'Failed',
+  Paid = 'Paid',
+  Paying = 'Paying',
+  Pending = 'Pending',
+  VbankReady = 'VbankReady',
+  Withdrawn = 'Withdrawn',
+}
+
+export type OrderVbankReceipt = {
+  bankCode: BankCode;
+  createdAt: Scalars['DateTime'];
+  due: Scalars['DateTime'];
+  id: Scalars['Int'];
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number: Scalars['String'];
+  ownerName: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type PageInput = {
   limit?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
   startId?: Maybe<Scalars['Int']>;
 };
+
+export enum PayEnviroment {
+  Mobile = 'Mobile',
+  Pc = 'Pc',
+}
+
+/** 결제수단입니다. */
+export enum PayMethod {
+  Booknlife = 'Booknlife',
+  Card = 'Card',
+  Chaipay = 'Chaipay',
+  Cultureland = 'Cultureland',
+  Happymoney = 'Happymoney',
+  Kakaopay = 'Kakaopay',
+  Kpay = 'Kpay',
+  Lpay = 'Lpay',
+  Naverpay = 'Naverpay',
+  Payco = 'Payco',
+  Phone = 'Phone',
+  Point = 'Point',
+  Samsungpay = 'Samsungpay',
+  Smartculture = 'Smartculture',
+  Ssgpay = 'Ssgpay',
+  Tosspay = 'Tosspay',
+  Trans = 'Trans',
+  Vbank = 'Vbank',
+}
+
+export type Payment = {
+  amount: Scalars['Int'];
+  applyNum?: Maybe<Scalars['String']>;
+  buyerAddr: Scalars['String'];
+  buyerEmail: Scalars['String'];
+  buyerName: Scalars['String'];
+  buyerPostalcode: Scalars['String'];
+  buyerTel: Scalars['String'];
+  cancellations: Array<PaymentCancellation>;
+  cancelledAt?: Maybe<Scalars['DateTime']>;
+  cardCode?: Maybe<CardCode>;
+  cardNum?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+  env: PayEnviroment;
+  failedAt?: Maybe<Scalars['DateTime']>;
+  failedReason?: Maybe<Scalars['String']>;
+  /** 주문고유번호. PrimaryColumn입니다. YYMMDDHHmmssSSS + NN(00~99) 형식입니다. */
+  merchantUid: Scalars['String'];
+  name: Scalars['String'];
+  origin: Scalars['String'];
+  paidAt?: Maybe<Scalars['DateTime']>;
+  payMethod: PayMethod;
+  pg: Pg;
+  pgTid?: Maybe<Scalars['String']>;
+  remainAmount: Scalars['Int'];
+  status: PaymentStatus;
+  updatedAt: Scalars['DateTime'];
+  vbankCode?: Maybe<BankCode>;
+  vbankDate?: Maybe<Scalars['String']>;
+  vbankHolder?: Maybe<Scalars['String']>;
+  vbankNum?: Maybe<Scalars['String']>;
+  vbankReadyAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type PaymentCancellation = {
+  amount: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  payment: Payment;
+  reason: Scalars['String'];
+  refundVbankCode: BankCode;
+  refundVbankHolder: Scalars['String'];
+  refundVbankNum: Scalars['String'];
+  taxFree: Scalars['Int'];
+  type: PaymentCancellationType;
+  updatedAt: Scalars['DateTime'];
+};
+
+export enum PaymentCancellationType {
+  Cancel = 'Cancel',
+  PatialCancel = 'PatialCancel',
+}
+
+export type PaymentFilter = {
+  buyerEmailSearch?: Maybe<Scalars['String']>;
+  buyerNameSearch?: Maybe<Scalars['String']>;
+  buyerTelSearch?: Maybe<Scalars['String']>;
+  createdAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  merchantUid?: Maybe<Scalars['String']>;
+  merchantUidSearch?: Maybe<Scalars['String']>;
+  payMethodIn?: Maybe<Array<PayMethod>>;
+  pgIn?: Maybe<Array<Pg>>;
+  pgTid?: Maybe<Scalars['String']>;
+  pgTidSearch?: Maybe<Scalars['String']>;
+  statusIn?: Maybe<Array<PaymentStatus>>;
+};
+
+export type PaymentListOutput = {
+  amounts: PaymentsListAmount;
+  payMethodCount: PaymentsListPayMethodCount;
+  payments: Array<Payment>;
+  pgCount: PaymentsListPgCount;
+  statusCount: PaymentsListStatusCount;
+};
+
+export enum PaymentStatus {
+  Cancelled = 'Cancelled',
+  Failed = 'Failed',
+  Paid = 'Paid',
+  PartialCancelled = 'PartialCancelled',
+  Pending = 'Pending',
+  VbankReady = 'VbankReady',
+}
+
+export type PaymentsListAmount = {
+  totalCancelledAmount: Scalars['Float'];
+  totalPaidAmount: Scalars['Float'];
+};
+
+export type PaymentsListPayMethodCount = {
+  card: Scalars['Float'];
+  kakaopay: Scalars['Float'];
+  trans: Scalars['Float'];
+  vbank: Scalars['Float'];
+};
+
+export type PaymentsListPgCount = {
+  inicis: Scalars['Float'];
+};
+
+export type PaymentsListStatusCount = {
+  cancelled: Scalars['Float'];
+  failed: Scalars['Float'];
+  paid: Scalars['Float'];
+  partial_cancelled: Scalars['Float'];
+  pending: Scalars['Float'];
+  vbank_ready: Scalars['Float'];
+};
+
+/** PG사입니다. */
+export enum Pg {
+  Inicis = 'Inicis',
+}
 
 export type PointEvent = {
   /** 적립/사용 금액. 적립인 경우 양수, 사용인 경우 음수입니다. */
@@ -828,7 +1333,8 @@ export type PointEvent = {
   content: Scalars['String'];
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
-  orderId: Scalars['Float'];
+  orderId?: Maybe<Scalars['Float']>;
+  orderItemId?: Maybe<Scalars['Float']>;
   /** 적립/사용 이후 잔고 */
   resultBalance: Scalars['Int'];
   title: Scalars['String'];
@@ -840,6 +1346,7 @@ export type PointEvent = {
 export type PointEventFilter = {
   createdAtLte?: Maybe<Scalars['DateTime']>;
   createdAtMte?: Maybe<Scalars['DateTime']>;
+  type?: Maybe<PointType>;
   userId?: Maybe<Scalars['Int']>;
 };
 
@@ -852,6 +1359,8 @@ export enum PointType {
 export type Product = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
+  /** 예약배송 적용 여부 */
+  isShipReserving: Scalars['Boolean'];
   item: Item;
   itemOptionValues: Array<ItemOptionValue>;
   shippingReservePolicy?: Maybe<ProductShippingReservePolicy>;
@@ -876,6 +1385,8 @@ export type Query = {
   brands: Array<Brand>;
   /** 중복이면 true, 아니면 false를 반환한다. */
   checkNicknameDuplicate: Scalars['Boolean'];
+  checkPin: Scalars['Boolean'];
+  checkoutOrder: OrderSheet;
   courier: Courier;
   couriers: Array<Courier>;
   genRandomNickname: Scalars['String'];
@@ -886,6 +1397,8 @@ export type Query = {
   items: Array<Item>;
   loginByCode: JwtToken;
   loginByOauth: JwtToken;
+  loginSellerByCode: JwtToken;
+  loginWithApple: JwtToken;
   me: User;
   meSeller: Seller;
   myCart: Cart;
@@ -897,8 +1410,11 @@ export type Query = {
   myPointEvents: Array<PointEvent>;
   myShippingAddress: ShippingAddress;
   myShippingAddresses: Array<ShippingAddress>;
+  /** [Admin] 결제 목록을 조회합니다. */
+  payments: PaymentListOutput;
   /** refresh token을 받아서 새로운 JwtToken을 생성합니다. */
   refreshJwtToken: JwtToken;
+  requestPin: Scalars['Boolean'];
   seller: Seller;
   sellers: Array<Seller>;
   user: User;
@@ -911,6 +1427,14 @@ export type QueryBrandArgs = {
 
 export type QueryCheckNicknameDuplicateArgs = {
   nickname: Scalars['String'];
+};
+
+export type QueryCheckPinArgs = {
+  checkPinInput: CheckPinInput;
+};
+
+export type QueryCheckoutOrderArgs = {
+  merchantUid: Scalars['String'];
 };
 
 export type QueryCourierArgs = {
@@ -934,6 +1458,14 @@ export type QueryLoginByOauthArgs = {
   loginByOauthInput: LoginByOauthInput;
 };
 
+export type QueryLoginSellerByCodeArgs = {
+  loginByCodeInput: LoginByCodeInput;
+};
+
+export type QueryLoginWithAppleArgs = {
+  getAppleProviderIdInput: LoginWithAppleInput;
+};
+
 export type QueryMyExpectedPointEventsArgs = {
   pageInput?: Maybe<PageInput>;
   pointEventFilter?: Maybe<PointEventFilter>;
@@ -948,6 +1480,14 @@ export type QueryMyShippingAddressArgs = {
   id: Scalars['Int'];
 };
 
+export type QueryPaymentsArgs = {
+  paymentFilter: PaymentFilter;
+};
+
+export type QueryRequestPinArgs = {
+  requestPinInput: RequestPinInput;
+};
+
 export type QuerySellerArgs = {
   id: Scalars['Int'];
 };
@@ -959,6 +1499,33 @@ export type QuerySellersArgs = {
 
 export type QueryUserArgs = {
   id: Scalars['Int'];
+};
+
+/** 가상계좌 결제시 환불 받을 계좌 정보 */
+export type RefundAccount = {
+  bankCode: BankCode;
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number: Scalars['String'];
+  ownerName: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type RegisterOrderInput = {
+  cartItemIds?: Maybe<Array<Scalars['Int']>>;
+  orderItemInputs?: Maybe<Array<RegisterOrderItemInput>>;
+};
+
+export type RegisterOrderItemInput = {
+  productId: Scalars['Int'];
+  quantity: Scalars['Int'];
+  recommendContentItemId?: Maybe<Scalars['Int']>;
+  recommendContentType?: Maybe<ContentType>;
+};
+
+export type RequestPinInput = {
+  phoneNumber?: Maybe<Scalars['String']>;
 };
 
 export type SaleStrategy = {
@@ -1000,7 +1567,7 @@ export type Seller = {
 
 /** 교환배송비 지불 계좌 */
 export type SellerClaimAccount = {
-  bankCode: InicisBankCode;
+  bankCode: BankCode;
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
@@ -1059,6 +1626,7 @@ export type SellerReturnAddress = {
 };
 
 export type SellerSettlePolicy = {
+  /** 정산 받을 계좌 */
   account: SellerClaimAccount;
   createdAt: Scalars['DateTime'];
   /** 세금계산서 수령이메일 */
@@ -1067,6 +1635,8 @@ export type SellerSettlePolicy = {
   /** 담당자 번호 */
   phoneNumber: Scalars['String'];
   picName: Scalars['String'];
+  /** 정산율 */
+  rate: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -1091,6 +1661,21 @@ export type ShippingAddress = {
   receiverName: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   userId: Scalars['Int'];
+};
+
+export type StartOrderInput = {
+  buyerInput: OrderBuyerInput;
+  orderItemInputs?: Maybe<Array<StartOrderItemInput>>;
+  payMethod?: Maybe<PayMethod>;
+  receiverInput: OrderReceiverInput;
+  refundAccountInput?: Maybe<OrderRefundAccountInput>;
+  usedPointAmount: Scalars['Int'];
+};
+
+export type StartOrderItemInput = {
+  /** 주문상품고유번호. PrimaryColumn입니다. order의 merchantUid + 숫자 1자리 형식입니다. */
+  merchantUid: Scalars['String'];
+  usedCouponId?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateBrandInput = {
@@ -1173,8 +1758,15 @@ export type UpdateProductInput = {
   stock: Scalars['Int'];
 };
 
+export type UpdateRefundAccountInput = {
+  bankCode?: Maybe<BankCode>;
+  /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
+  number?: Maybe<Scalars['String']>;
+  ownerName?: Maybe<Scalars['String']>;
+};
+
 export type UpdateSellerClaimAccountInput = {
-  bankCode?: Maybe<InicisBankCode>;
+  bankCode?: Maybe<BankCode>;
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
   number?: Maybe<Scalars['String']>;
   ownerName?: Maybe<Scalars['String']>;
@@ -1215,7 +1807,7 @@ export type UpdateSellerReturnAddressInput = {
 };
 
 export type UpdateSellerSettleAccountInput = {
-  bankCode?: Maybe<InicisBankCode>;
+  bankCode?: Maybe<BankCode>;
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
   number?: Maybe<Scalars['String']>;
   ownerName?: Maybe<Scalars['String']>;
@@ -1228,6 +1820,8 @@ export type UpdateSellerSettlePolicyInput = {
   /** 담당자 번호 */
   phoneNumber?: Maybe<Scalars['String']>;
   picName?: Maybe<Scalars['String']>;
+  /** 정산율 */
+  rate?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateSellerShippingPolicyInput = {
@@ -1279,6 +1873,8 @@ export type User = {
   nickname: Scalars['String'];
   oauthCode?: Maybe<Scalars['String']>;
   oauthProvider?: Maybe<UserProviderType>;
+  phoneNumber?: Maybe<Scalars['String']>;
+  refundAccount?: Maybe<RefundAccount>;
   role?: Maybe<UserRole>;
   shippingAddresses?: Maybe<Array<ShippingAddress>>;
   updatedAt: Scalars['DateTime'];
