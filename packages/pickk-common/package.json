@@ -1,7 +1,23 @@
 {
   "name": "@pickk/common",
   "version": "1.7.8",
+  "description": "common files for pickk development",
+  "keywords": [
+    "graphql",
+    "graphql-schema",
+    "graphql-codegen"
+  ],
+  "homepage": "https://github.com/DEV-MUGLES/pickk-libraries/tree/master/packages/pickk-common",
+  "license": "UNLICENSED",
+  "author": "THINKING MUGGLES <dev@mugles.com> (https://github.com/DEV-MUGLES)",
+  "files": [
+    "dist/**/*"
+  ],
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DEV-MUGLES/pickk-libraries/tree/master/packages/pickk-common"
+  },
   "scripts": {
     "format": "prettier --write \"lib/**/*.ts\"",
     "lint": "eslint \"lib/**/*.ts\" --fix",
@@ -9,7 +25,7 @@
     "test": "npm run format && npm run lint && npm run tsc",
     "build": "rimraf -rf dist && tsc -p tsconfig.json",
     "prepublishOnly": "npm run format && npm run lint && npm run build",
-    "publish:npm": "npm publish --access public",
+    "publish:npm": "npm publish --access=public",
     "generate": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
@@ -31,11 +47,5 @@
     "apollo": "^2.32.5",
     "rimraf": "^3.0.2",
     "webpack": "^5.35.0"
-  },
-  "files": [
-    "dist/**/*"
-  ],
-  "author": "THINKING MUGGLES",
-  "license": "UNLICENSED",
-  "description": "common files for pickk development"
+  }
 }
