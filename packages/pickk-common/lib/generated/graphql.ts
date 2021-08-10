@@ -134,6 +134,7 @@ export type BaseOrderOutput = {
   payMethod?: Maybe<PayMethod>;
   payingAt?: Maybe<Scalars['DateTime']>;
   refundAccount?: Maybe<OrderRefundAccount>;
+  refundRequests: Array<RefundRequest>;
   status: OrderStatus;
   totalCouponDiscountAmount: Scalars['Int'];
   totalItemFinalPrice: Scalars['Int'];
@@ -142,6 +143,7 @@ export type BaseOrderOutput = {
   totalUsedPointAmount: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
   userId?: Maybe<Scalars['Int']>;
+  vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
   withdrawnAt?: Maybe<Scalars['DateTime']>;
 };
@@ -173,6 +175,22 @@ export type Campaign = {
   rate: Scalars['Int'];
   startAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+};
+
+export type CancelOrderInput = {
+  /**
+   * 취소로 인해 환불되어야할 액수를 프론트에서 계산해서 넘겨주세요.
+   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
+   */
+  amount: Scalars['Int'];
+  /**
+   * 취소 후 남을 총 결제 금액을 프론트에서 계산해서 넘겨주세요.
+   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
+   */
+  checksum: Scalars['Int'];
+  orderItemMerchantUids: Array<Scalars['String']>;
+  /** 취소 사유 */
+  reason: Scalars['String'];
 };
 
 export enum CardCode {
@@ -369,6 +387,8 @@ export type CreateSellerClaimPolicyInput = {
   accountInput?: Maybe<CreateSellerClaimAccountInput>;
   fee: Scalars['Int'];
   feePayMethod: ClaimFeePayMethod;
+  isExchangable: Scalars['Boolean'];
+  isRefundable: Scalars['Boolean'];
   /** 담당자 번호 */
   phoneNumber: Scalars['String'];
   /** 담당자 이름 */
@@ -443,6 +463,11 @@ export type CreateSellerShippingPolicyInput = {
   minimumAmountForFree: Scalars['Int'];
 };
 
+export type CreateShipmentInput = {
+  courierId?: Maybe<Scalars['Int']>;
+  trackCode?: Maybe<Scalars['String']>;
+};
+
 export type CreateShippingAddressInput = {
   baseAddress: Scalars['String'];
   detailAddress: Scalars['String'];
@@ -465,6 +490,49 @@ export type CreateUserInput = {
   password?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Int']>;
 };
+
+export type ExchangeRequest = {
+  confirmedAt?: Maybe<Scalars['DateTime']>;
+  faultOf: RefundRequestFaultOf;
+  id: Scalars['Int'];
+  itemName: Scalars['String'];
+  orderItem: OrderItem;
+  orderItemMerchantUid: Scalars['String'];
+  pickShipment?: Maybe<Shipment>;
+  pickShipmentId?: Maybe<Scalars['Int']>;
+  /** 수거 완료 시점 */
+  pickedAt?: Maybe<Scalars['DateTime']>;
+  product?: Maybe<Product>;
+  productId?: Maybe<Scalars['Int']>;
+  productVariantName: Scalars['String'];
+  quantity: Scalars['Int'];
+  reShipment?: Maybe<Shipment>;
+  reShipmentId?: Maybe<Scalars['Int']>;
+  /** 255자 이내로 적어주세요 */
+  reason: Scalars['String'];
+  /** 255자 이내로 적어주세요 */
+  rejectReason?: Maybe<Scalars['String']>;
+  rejectedAt?: Maybe<Scalars['DateTime']>;
+  requestedAt: Scalars['DateTime'];
+  reshippedAt?: Maybe<Scalars['DateTime']>;
+  reshippingAt?: Maybe<Scalars['DateTime']>;
+  seller?: Maybe<Seller>;
+  sellerId?: Maybe<Scalars['Int']>;
+  /** 결제된 교환 배송비 */
+  shippingFee: Scalars['Int'];
+  status: ExchangeRequestStatus;
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+/** 교한신청 상태입니다. */
+export enum ExchangeRequestStatus {
+  Picked = 'Picked',
+  Rejected = 'Rejected',
+  Requested = 'Requested',
+  Reshipped = 'Reshipped',
+  Reshipping = 'Reshipping',
+}
 
 export type FindSaleStrategyInput = {
   canUseCoupon: Scalars['Boolean'];
@@ -701,6 +769,7 @@ export type Mutation = {
   addMyShippingAddress: Array<ShippingAddress>;
   basifyPrice: Item;
   bulkUpdateItems: Scalars['Boolean'];
+  cancelOrder: Order;
   completeOrder: BaseOrderOutput;
   createCoupon: Coupon;
   createCouponSpecification: CouponSpecification;
@@ -709,6 +778,7 @@ export type Mutation = {
   createMyCartItem: CartItem;
   createSeller: Seller;
   createUser: User;
+  dodgeVbankOrder: BaseOrderOutput;
   failOrder: BaseOrderOutput;
   modifyItemSizeCharts: Item;
   registerOrder: BaseOrderOutput;
@@ -721,6 +791,8 @@ export type Mutation = {
   removeMyCartItems: Scalars['Boolean'];
   removeMyRefundAccount: User;
   removeMyShippingAddress: Array<ShippingAddress>;
+  requestOrderItemExchange: OrderItem;
+  requestOrderRefund: Order;
   startOrder: BaseOrderOutput;
   updateBrand: Brand;
   updateCourier: Courier;
@@ -797,6 +869,11 @@ export type MutationBulkUpdateItemsArgs = {
   ids: Array<Scalars['Int']>;
 };
 
+export type MutationCancelOrderArgs = {
+  cancelOrderInput: CancelOrderInput;
+  merchantUid: Scalars['String'];
+};
+
 export type MutationCompleteOrderArgs = {
   createOrderVbankReceiptInput?: Maybe<CreateOrderVbankReceiptInput>;
   merchantUid: Scalars['String'];
@@ -829,6 +906,10 @@ export type MutationCreateSellerArgs = {
 
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
+};
+
+export type MutationDodgeVbankOrderArgs = {
+  merchantUid: Scalars['String'];
 };
 
 export type MutationFailOrderArgs = {
@@ -873,6 +954,16 @@ export type MutationRemoveMyCartItemsArgs = {
 
 export type MutationRemoveMyShippingAddressArgs = {
   addressId: Scalars['Int'];
+};
+
+export type MutationRequestOrderItemExchangeArgs = {
+  merchantUid: Scalars['String'];
+  requestOrderItemExchangeInput: RequestOrderItemExchangeInput;
+};
+
+export type MutationRequestOrderRefundArgs = {
+  merchantUid: Scalars['String'];
+  requestOrderRefundInput: RequestOrderRefundInput;
 };
 
 export type MutationStartOrderArgs = {
@@ -994,6 +1085,7 @@ export type Order = {
   payingAt?: Maybe<Scalars['DateTime']>;
   receiver?: Maybe<OrderReceiver>;
   refundAccount?: Maybe<OrderRefundAccount>;
+  refundRequests: Array<RefundRequest>;
   status: OrderStatus;
   totalCouponDiscountAmount: Scalars['Int'];
   totalItemFinalPrice: Scalars['Int'];
@@ -1003,6 +1095,7 @@ export type Order = {
   updatedAt: Scalars['DateTime'];
   user?: Maybe<User>;
   userId?: Maybe<Scalars['Int']>;
+  vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankInfo?: Maybe<OrderVbankReceipt>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
   withdrawnAt?: Maybe<Scalars['DateTime']>;
@@ -1024,7 +1117,6 @@ export type OrderBuyerInput = {
 };
 
 export type OrderItem = {
-  Order: Order;
   brandNameKor: Scalars['String'];
   cancelRequestedAt?: Maybe<Scalars['DateTime']>;
   cancelledAt?: Maybe<Scalars['DateTime']>;
@@ -1034,6 +1126,7 @@ export type OrderItem = {
   courier?: Maybe<Courier>;
   courierId?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
+  exchangeRequest: ExchangeRequest;
   exchangeRequestedAt?: Maybe<Scalars['DateTime']>;
   exchangedAt?: Maybe<Scalars['DateTime']>;
   failedAt?: Maybe<Scalars['DateTime']>;
@@ -1048,8 +1141,12 @@ export type OrderItem = {
   itemName: Scalars['String'];
   /** 주문상품고유번호. PrimaryColumn입니다. order의 merchantUid + 숫자 1자리 형식입니다. */
   merchantUid: Scalars['String'];
+  name: Scalars['String'];
+  order: Order;
   orderMerchantUid: Scalars['String'];
   paidAt?: Maybe<Scalars['DateTime']>;
+  /** itemFinalPrice - usedPointAmount - couponDiscountAmount */
+  payAmount: Scalars['Float'];
   product?: Maybe<Product>;
   productId?: Maybe<Scalars['Int']>;
   productVariantName: Scalars['String'];
@@ -1058,6 +1155,7 @@ export type OrderItem = {
   recommendContentType?: Maybe<ContentType>;
   recommenderId?: Maybe<Scalars['Int']>;
   recommenderNickname?: Maybe<Scalars['String']>;
+  refundRequest: RefundRequest;
   refundRequestedAt?: Maybe<Scalars['DateTime']>;
   refundedAt?: Maybe<Scalars['DateTime']>;
   seller?: Maybe<Seller>;
@@ -1066,6 +1164,8 @@ export type OrderItem = {
   shipReadyAt?: Maybe<Scalars['DateTime']>;
   /** 예약발송 예정일 */
   shipReservedAt?: Maybe<Scalars['DateTime']>;
+  shipment?: Maybe<Shipment>;
+  shipmentId?: Maybe<Scalars['Int']>;
   shippedAt?: Maybe<Scalars['DateTime']>;
   shippingAt?: Maybe<Scalars['DateTime']>;
   status: OrderItemStatus;
@@ -1077,6 +1177,7 @@ export type OrderItem = {
   usedPointAmount: Scalars['Int'];
   user?: Maybe<User>;
   userId?: Maybe<Scalars['Int']>;
+  vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
   withdrawnAt?: Maybe<Scalars['DateTime']>;
 };
@@ -1091,6 +1192,20 @@ export enum OrderItemClaimStatus {
   Refunded = 'Refunded',
 }
 
+export type OrderItemFilter = {
+  claimStatus?: Maybe<OrderItemClaimStatus>;
+  claimStatusIn?: Maybe<Array<OrderItemClaimStatus>>;
+  paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  /** 주문번호, 주문상품번호, 아이템 명으로 검색합니다. 구매자 번호를 검색할 땐 dash를 제거하고 보내주세요! */
+  search?: Maybe<Scalars['String']>;
+  sellerId?: Maybe<Scalars['Int']>;
+  shipReadyAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  shippedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  shippingAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  status?: Maybe<OrderItemStatus>;
+  statusIn?: Maybe<Array<OrderItemStatus>>;
+};
+
 /** 주문상품 상태입니다. 클레임상태와 무관하게 handling됩니다. */
 export enum OrderItemStatus {
   Failed = 'Failed',
@@ -1100,8 +1215,8 @@ export enum OrderItemStatus {
   ShipReady = 'ShipReady',
   Shipped = 'Shipped',
   Shipping = 'Shipping',
+  VbankDodged = 'VbankDodged',
   VbankReady = 'VbankReady',
-  Withdrawn = 'Withdrawn',
 }
 
 export type OrderReceiver = {
@@ -1165,8 +1280,8 @@ export enum OrderStatus {
   Paid = 'Paid',
   Paying = 'Paying',
   Pending = 'Pending',
+  VbankDodged = 'VbankDodged',
   VbankReady = 'VbankReady',
-  Withdrawn = 'Withdrawn',
 }
 
 export type OrderVbankReceipt = {
@@ -1362,6 +1477,7 @@ export type Product = {
   /** 예약배송 적용 여부 */
   isShipReserving: Scalars['Boolean'];
   item: Item;
+  itemId: Scalars['Int'];
   itemOptionValues: Array<ItemOptionValue>;
   shippingReservePolicy?: Maybe<ProductShippingReservePolicy>;
   stock: Scalars['Int'];
@@ -1401,6 +1517,7 @@ export type Query = {
   loginWithApple: JwtToken;
   me: User;
   meSeller: Seller;
+  meSellerOrderItems: Array<OrderItem>;
   myCart: Cart;
   myCartItemsCount: Scalars['Int'];
   myCoupons: Array<Coupon>;
@@ -1466,6 +1583,11 @@ export type QueryLoginWithAppleArgs = {
   getAppleProviderIdInput: LoginWithAppleInput;
 };
 
+export type QueryMeSellerOrderItemsArgs = {
+  orderItemFilter?: Maybe<OrderItemFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 export type QueryMyExpectedPointEventsArgs = {
   pageInput?: Maybe<PageInput>;
   pointEventFilter?: Maybe<PointEventFilter>;
@@ -1512,6 +1634,45 @@ export type RefundAccount = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type RefundRequest = {
+  amount: Scalars['Int'];
+  confirmedAt?: Maybe<Scalars['DateTime']>;
+  faultOf: RefundRequestFaultOf;
+  id: Scalars['Int'];
+  order: Order;
+  orderItems: Array<OrderItem>;
+  orderMerchantUid: Scalars['String'];
+  /** 수거 완료 시점 */
+  pickedAt?: Maybe<Scalars['DateTime']>;
+  /** 255자 이내로 적어주세요 */
+  reason: Scalars['String'];
+  /** 255자 이내로 적어주세요 */
+  rejectReason?: Maybe<Scalars['String']>;
+  rejectedAt?: Maybe<Scalars['DateTime']>;
+  requestedAt: Scalars['DateTime'];
+  seller?: Maybe<Seller>;
+  sellerId?: Maybe<Scalars['Int']>;
+  shipment?: Maybe<Shipment>;
+  shipmentId?: Maybe<Scalars['Int']>;
+  status: RefundRequestStatus;
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+/** 교환/반품 책임자?입니다. (구매자 or 판매자) */
+export enum RefundRequestFaultOf {
+  Customer = 'Customer',
+  Seller = 'Seller',
+}
+
+/** 반품요청 상태입니다. */
+export enum RefundRequestStatus {
+  Confirmed = 'Confirmed',
+  Picked = 'Picked',
+  Rejected = 'Rejected',
+  Requested = 'Requested',
+}
+
 export type RegisterOrderInput = {
   cartItemIds?: Maybe<Array<Scalars['Int']>>;
   orderItemInputs?: Maybe<Array<RegisterOrderItemInput>>;
@@ -1522,6 +1683,35 @@ export type RegisterOrderItemInput = {
   quantity: Scalars['Int'];
   recommendContentItemId?: Maybe<Scalars['Int']>;
   recommendContentType?: Maybe<ContentType>;
+};
+
+export type RequestOrderItemExchangeInput = {
+  faultOf: RefundRequestFaultOf;
+  productId?: Maybe<Scalars['Int']>;
+  /** 255자 이내로 적어주세요 */
+  reason: Scalars['String'];
+  shipmentInput?: Maybe<CreateShipmentInput>;
+  /** 결제된 교환 배송비 */
+  shippingFee: Scalars['Int'];
+};
+
+export type RequestOrderRefundInput = {
+  /**
+   * 반품로 인해 환불되어야할 액수를 프론트에서 계산해서 넘겨주세요.
+   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
+   */
+  amount: Scalars['Int'];
+  /**
+   * 반품 후 남을 총 결제 금액을 프론트에서 계산해서 넘겨주세요.
+   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
+   */
+  checksum: Scalars['Int'];
+  faultOf: RefundRequestFaultOf;
+  /** 반품처리할 OrderItem들. 같은 브랜드의 OrderItem들로만 신청할 수 있습니다. */
+  orderItemMerchantUids: Array<Scalars['String']>;
+  /** 255자 이내로 적어주세요 */
+  reason: Scalars['String'];
+  shipmentInput?: Maybe<CreateShipmentInput>;
 };
 
 export type RequestPinInput = {
@@ -1582,6 +1772,8 @@ export type SellerClaimPolicy = {
   fee: Scalars['Int'];
   feePayMethod: ClaimFeePayMethod;
   id: Scalars['Int'];
+  isExchangable: Scalars['Boolean'];
+  isRefundable: Scalars['Boolean'];
   /** 담당자 번호 */
   phoneNumber: Scalars['String'];
   /** 담당자 이름 */
@@ -1647,6 +1839,33 @@ export type SellerShippingPolicy = {
   minimumAmountForFree: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
 };
+
+export type Shipment = {
+  courier?: Maybe<Courier>;
+  courierId?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  lastTrackedAt?: Maybe<Scalars['DateTime']>;
+  ownerId?: Maybe<Scalars['Int']>;
+  ownerType?: Maybe<ShipmentOwnerType>;
+  status: ShipmentStatus;
+  trackCode?: Maybe<Scalars['String']>;
+};
+
+/** 배송 연관 객체 분류입니다. */
+export enum ShipmentOwnerType {
+  ExchangeRequestPick = 'ExchangeRequestPick',
+  ExchangeRequestReShip = 'ExchangeRequestReShip',
+  OrderItem = 'OrderItem',
+  RefundRequest = 'RefundRequest',
+}
+
+export enum ShipmentStatus {
+  Cancelled = 'Cancelled',
+  Failed = 'Failed',
+  Shipped = 'Shipped',
+  Shipping = 'Shipping',
+}
 
 export type ShippingAddress = {
   baseAddress: Scalars['String'];
@@ -1776,6 +1995,8 @@ export type UpdateSellerClaimPolicyInput = {
   accountInput?: Maybe<UpdateSellerClaimAccountInput>;
   fee?: Maybe<Scalars['Int']>;
   feePayMethod?: Maybe<ClaimFeePayMethod>;
+  isExchangable?: Maybe<Scalars['Boolean']>;
+  isRefundable?: Maybe<Scalars['Boolean']>;
   /** 담당자 번호 */
   phoneNumber?: Maybe<Scalars['String']>;
   /** 담당자 이름 */
