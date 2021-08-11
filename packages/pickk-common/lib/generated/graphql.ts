@@ -159,6 +159,10 @@ export type Brand = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type BulkShipOrderItemInput = {
+  shipOrderItemInputs: Array<ExtendedShipOrderItemInput>;
+};
+
 export type BulkUpdateItemInput = {
   isMdRecommended?: Maybe<Scalars['Boolean']>;
   isSellable?: Maybe<Scalars['Boolean']>;
@@ -175,6 +179,21 @@ export type Campaign = {
   rate: Scalars['Int'];
   startAt: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+};
+
+export type CancelMeSellerOrderItemInput = {
+  /**
+   * 취소로 인해 환불되어야할 액수를 프론트에서 계산해서 넘겨주세요.
+   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
+   */
+  amount: Scalars['Int'];
+  /**
+   * 취소 후 남을 총 결제 금액을 프론트에서 계산해서 넘겨주세요.
+   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
+   */
+  checksum: Scalars['Int'];
+  /** 취소 사유 */
+  reason: Scalars['String'];
 };
 
 export type CancelOrderInput = {
@@ -525,6 +544,20 @@ export type ExchangeRequest = {
   userId?: Maybe<Scalars['Int']>;
 };
 
+export type ExchangeRequestFilter = {
+  orderItem?: Maybe<ExchangeRequestOrderItemFilter>;
+  requestedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  /** 재배송 완료일 (기간). 교환 완료와 동일한 의미로 사용됩니다. */
+  reshippedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  /** 주문상품번호, 회수 운송장번호, 재배송 운송장번호로 검색할 수 있습니다. */
+  search?: Maybe<Scalars['String']>;
+  sellerId?: Maybe<Scalars['Int']>;
+};
+
+export type ExchangeRequestOrderItemFilter = {
+  paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+};
+
 /** 교한신청 상태입니다. */
 export enum ExchangeRequestStatus {
   Picked = 'Picked',
@@ -533,6 +566,29 @@ export enum ExchangeRequestStatus {
   Reshipped = 'Reshipped',
   Reshipping = 'Reshipping',
 }
+
+/** 생성일 기준 1달 이내의 건들만 count합니다. */
+export type ExchangeRequestsCountOutput = {
+  /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
+  id: Scalars['Int'];
+  lastUpdatedAt: Scalars['DateTime'];
+  /** 수거 완료 */
+  picked: Scalars['Int'];
+  /** 교환 거부 */
+  rejected: Scalars['Int'];
+  /** 교환 요청 (= 수거중) */
+  requested: Scalars['Int'];
+  /** 교환 배송 완료 */
+  reshipped: Scalars['Int'];
+  /** 교환 배송 중 */
+  reshipping: Scalars['Int'];
+};
+
+export type ExtendedShipOrderItemInput = {
+  courierId?: Maybe<Scalars['Int']>;
+  merchantUid: Scalars['String'];
+  trackCode?: Maybe<Scalars['String']>;
+};
 
 export type FindSaleStrategyInput = {
   canUseCoupon: Scalars['Boolean'];
@@ -768,7 +824,12 @@ export type Mutation = {
   addMyRefundAccount: RefundAccount;
   addMyShippingAddress: Array<ShippingAddress>;
   basifyPrice: Item;
+  bulkPickMeSellerExchangeRequests: Scalars['Boolean'];
+  bulkPickMeSellerRefundRequests: Scalars['Boolean'];
+  bulkShipMeSellerOrderItems: Scalars['Boolean'];
+  bulkShipReadyMeSellerOrderItems: Scalars['Boolean'];
   bulkUpdateItems: Scalars['Boolean'];
+  cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
   completeOrder: BaseOrderOutput;
   createCoupon: Coupon;
@@ -793,6 +854,7 @@ export type Mutation = {
   removeMyShippingAddress: Array<ShippingAddress>;
   requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
+  shipMeSellerOrderItem: OrderItem;
   startOrder: BaseOrderOutput;
   updateBrand: Brand;
   updateCourier: Courier;
@@ -864,9 +926,30 @@ export type MutationBasifyPriceArgs = {
   priceId: Scalars['Int'];
 };
 
+export type MutationBulkPickMeSellerExchangeRequestsArgs = {
+  ids: Array<Scalars['Int']>;
+};
+
+export type MutationBulkPickMeSellerRefundRequestsArgs = {
+  ids: Array<Scalars['Int']>;
+};
+
+export type MutationBulkShipMeSellerOrderItemsArgs = {
+  bulkShipOrderItemInput: BulkShipOrderItemInput;
+};
+
+export type MutationBulkShipReadyMeSellerOrderItemsArgs = {
+  merchantUids: Array<Scalars['String']>;
+};
+
 export type MutationBulkUpdateItemsArgs = {
   bulkUpdateItemInput: BulkUpdateItemInput;
   ids: Array<Scalars['Int']>;
+};
+
+export type MutationCancelMeSellerOrderItemArgs = {
+  cancelMeSellerOrderItemInput: CancelMeSellerOrderItemInput;
+  merchantUid: Scalars['String'];
 };
 
 export type MutationCancelOrderArgs = {
@@ -964,6 +1047,11 @@ export type MutationRequestOrderItemExchangeArgs = {
 export type MutationRequestOrderRefundArgs = {
   merchantUid: Scalars['String'];
   requestOrderRefundInput: RequestOrderRefundInput;
+};
+
+export type MutationShipMeSellerOrderItemArgs = {
+  merchantUid: Scalars['String'];
+  shipOrderItemInput: ShipOrderItemInput;
 };
 
 export type MutationStartOrderArgs = {
@@ -1169,6 +1257,8 @@ export type OrderItem = {
   shippedAt?: Maybe<Scalars['DateTime']>;
   shippingAt?: Maybe<Scalars['DateTime']>;
   status: OrderItemStatus;
+  /** 프론트엔드에서 보여주기 위한 status/claimStatus 표시값입니다. */
+  statusDisplayName: Scalars['String'];
   trackCode?: Maybe<Scalars['String']>;
   updatedAt: Scalars['DateTime'];
   usedCoupon?: Maybe<Coupon>;
@@ -1195,6 +1285,7 @@ export enum OrderItemClaimStatus {
 export type OrderItemFilter = {
   claimStatus?: Maybe<OrderItemClaimStatus>;
   claimStatusIn?: Maybe<Array<OrderItemClaimStatus>>;
+  merchantUidIn?: Maybe<Array<Scalars['String']>>;
   paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   /** 주문번호, 주문상품번호, 아이템 명으로 검색합니다. 구매자 번호를 검색할 땐 dash를 제거하고 보내주세요! */
   search?: Maybe<Scalars['String']>;
@@ -1218,6 +1309,46 @@ export enum OrderItemStatus {
   VbankDodged = 'VbankDodged',
   VbankReady = 'VbankReady',
 }
+
+/** 생성일 기준 1달 이내의 건들만 count합니다. */
+export type OrderItemsCountOutput = {
+  /**
+   * 취소 요청됨 (deprecated)
+   * @deprecated 현재 취소는 신청 즉시 완료됩니다.
+   */
+  cancel_requested: Scalars['Int'];
+  /** 취소 완료 */
+  cancelled: Scalars['Int'];
+  /** 교환 요청됨 */
+  exchange_requested: Scalars['Int'];
+  /** 교환 완료 */
+  exchanged: Scalars['Int'];
+  /** 결제 실패 */
+  failed: Scalars['Int'];
+  /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
+  id: Scalars['Int'];
+  lastUpdatedAt: Scalars['DateTime'];
+  /** 결제 완료 */
+  paid: Scalars['Int'];
+  /** 결제대기 (입금대기와 다릅니다.) */
+  pending: Scalars['Int'];
+  /** 반품 요청됨 */
+  refund_requested: Scalars['Int'];
+  /** 반품 완료 */
+  refunded: Scalars['Int'];
+  /** 배송 보류중(예약중) */
+  ship_pending: Scalars['Int'];
+  /** 배송 준비중 */
+  ship_ready: Scalars['Int'];
+  /** 배송 완료 */
+  shipped: Scalars['Int'];
+  /** 배송 중 */
+  shipping: Scalars['Int'];
+  /** 입금 전 취소 */
+  vbank_dodged: Scalars['Int'];
+  /** 입금 대기 */
+  vbank_ready: Scalars['Int'];
+};
 
 export type OrderReceiver = {
   baseAddress: Scalars['String'];
@@ -1517,7 +1648,12 @@ export type Query = {
   loginWithApple: JwtToken;
   me: User;
   meSeller: Seller;
+  meSellerExchangeRequests: Array<ExchangeRequest>;
+  meSellerExchangeRequestsCount: ExchangeRequestsCountOutput;
   meSellerOrderItems: Array<OrderItem>;
+  meSellerOrderItemsCount: OrderItemsCountOutput;
+  meSellerRefundRequests: Array<RefundRequest>;
+  meSellerRefundRequestsCount: RefundRequestsCountOutput;
   myCart: Cart;
   myCartItemsCount: Scalars['Int'];
   myCoupons: Array<Coupon>;
@@ -1583,9 +1719,31 @@ export type QueryLoginWithAppleArgs = {
   getAppleProviderIdInput: LoginWithAppleInput;
 };
 
+export type QueryMeSellerExchangeRequestsArgs = {
+  exchangeRequestFilter?: Maybe<ExchangeRequestFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeSellerExchangeRequestsCountArgs = {
+  forceUpdate?: Maybe<Scalars['Boolean']>;
+};
+
 export type QueryMeSellerOrderItemsArgs = {
   orderItemFilter?: Maybe<OrderItemFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeSellerOrderItemsCountArgs = {
+  forceUpdate?: Maybe<Scalars['Boolean']>;
+};
+
+export type QueryMeSellerRefundRequestsArgs = {
+  pageInput?: Maybe<PageInput>;
+  refundRequestFilter?: Maybe<RefundRequestFilter>;
+};
+
+export type QueryMeSellerRefundRequestsCountArgs = {
+  forceUpdate?: Maybe<Scalars['Boolean']>;
 };
 
 export type QueryMyExpectedPointEventsArgs = {
@@ -1665,6 +1823,22 @@ export enum RefundRequestFaultOf {
   Seller = 'Seller',
 }
 
+export type RefundRequestFilter = {
+  confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  order?: Maybe<RefundRequestOrderFilter>;
+  pickedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  requestedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  /** 주문번호, 운송장번호로 검색할 수 있습니다. */
+  search?: Maybe<Scalars['String']>;
+  sellerId?: Maybe<Scalars['Int']>;
+  status?: Maybe<RefundRequestStatus>;
+  statusIn?: Maybe<Array<RefundRequestStatus>>;
+};
+
+export type RefundRequestOrderFilter = {
+  paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+};
+
 /** 반품요청 상태입니다. */
 export enum RefundRequestStatus {
   Confirmed = 'Confirmed',
@@ -1672,6 +1846,21 @@ export enum RefundRequestStatus {
   Rejected = 'Rejected',
   Requested = 'Requested',
 }
+
+/** 생성일 기준 1달 이내의 건들만 count합니다. */
+export type RefundRequestsCountOutput = {
+  /** 반품 승인 */
+  confirmed: Scalars['Int'];
+  /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
+  id: Scalars['Int'];
+  lastUpdatedAt: Scalars['DateTime'];
+  /** 수거 완료 */
+  picked: Scalars['Int'];
+  /** 반품 거부 */
+  rejected: Scalars['Int'];
+  /** 반품 요청 (= 수거중) */
+  requested: Scalars['Int'];
+};
 
 export type RegisterOrderInput = {
   cartItemIds?: Maybe<Array<Scalars['Int']>>;
@@ -1840,13 +2029,18 @@ export type SellerShippingPolicy = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type ShipOrderItemInput = {
+  courierId?: Maybe<Scalars['Int']>;
+  trackCode?: Maybe<Scalars['String']>;
+};
+
 export type Shipment = {
   courier?: Maybe<Courier>;
   courierId?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   lastTrackedAt?: Maybe<Scalars['DateTime']>;
-  ownerId?: Maybe<Scalars['Int']>;
+  ownerPk?: Maybe<Scalars['String']>;
   ownerType?: Maybe<ShipmentOwnerType>;
   status: ShipmentStatus;
   trackCode?: Maybe<Scalars['String']>;
