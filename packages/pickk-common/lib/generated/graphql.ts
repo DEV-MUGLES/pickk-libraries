@@ -1819,6 +1819,8 @@ export type RefundRequest = {
   sellerId?: Maybe<Scalars['Int']>;
   shipment?: Maybe<Shipment>;
   shipmentId?: Maybe<Scalars['Int']>;
+  /** 부과된 반품 배송비 */
+  shippingFee: Scalars['Int'];
   status: RefundRequestStatus;
   user?: Maybe<User>;
   userId?: Maybe<Scalars['Int']>;
@@ -1908,6 +1910,8 @@ export type RequestOrderRefundInput = {
   /** 255자 이내로 적어주세요 */
   reason: Scalars['String'];
   shipmentInput?: Maybe<CreateShipmentInput>;
+  /** 부과된 반품 배송비 */
+  shippingFee: Scalars['Int'];
 };
 
 export type RequestPinInput = {
