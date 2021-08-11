@@ -854,6 +854,7 @@ export type Mutation = {
   removeMyShippingAddress: Array<ShippingAddress>;
   requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
+  reshipMeSellerExchangeRequest: ExchangeRequest;
   shipMeSellerOrderItem: OrderItem;
   startOrder: BaseOrderOutput;
   updateBrand: Brand;
@@ -1049,6 +1050,11 @@ export type MutationRequestOrderRefundArgs = {
   requestOrderRefundInput: RequestOrderRefundInput;
 };
 
+export type MutationReshipMeSellerExchangeRequestArgs = {
+  id: Scalars['Int'];
+  reshipExchangeRequestInput: ReshipExchangeRequestInput;
+};
+
 export type MutationShipMeSellerOrderItemArgs = {
   merchantUid: Scalars['String'];
   shipOrderItemInput: ShipOrderItemInput;
@@ -1211,8 +1217,6 @@ export type OrderItem = {
   claimStatus?: Maybe<OrderItemClaimStatus>;
   confirmedAt?: Maybe<Scalars['DateTime']>;
   couponDiscountAmount: Scalars['Int'];
-  courier?: Maybe<Courier>;
-  courierId?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
   exchangeRequest: ExchangeRequest;
   exchangeRequestedAt?: Maybe<Scalars['DateTime']>;
@@ -1259,7 +1263,6 @@ export type OrderItem = {
   status: OrderItemStatus;
   /** 프론트엔드에서 보여주기 위한 status/claimStatus 표시값입니다. */
   statusDisplayName: Scalars['String'];
-  trackCode?: Maybe<Scalars['String']>;
   updatedAt: Scalars['DateTime'];
   usedCoupon?: Maybe<Coupon>;
   usedCouponId?: Maybe<Scalars['Int']>;
@@ -1355,6 +1358,8 @@ export type OrderReceiver = {
   createdAt: Scalars['DateTime'];
   detailAddress: Scalars['String'];
   id: Scalars['Int'];
+  /** 베송 요청사항 (최대 50자) */
+  message?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
@@ -1364,6 +1369,8 @@ export type OrderReceiver = {
 export type OrderReceiverInput = {
   baseAddress: Scalars['String'];
   detailAddress: Scalars['String'];
+  /** 베송 요청사항 (최대 50자) */
+  message?: Maybe<Scalars['String']>;
   name: Scalars['String'];
   phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
@@ -1905,6 +1912,11 @@ export type RequestOrderRefundInput = {
 
 export type RequestPinInput = {
   phoneNumber?: Maybe<Scalars['String']>;
+};
+
+export type ReshipExchangeRequestInput = {
+  courierId?: Maybe<Scalars['Int']>;
+  trackCode?: Maybe<Scalars['String']>;
 };
 
 export type SaleStrategy = {
