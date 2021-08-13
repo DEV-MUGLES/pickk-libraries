@@ -569,13 +569,15 @@ export enum ExchangeRequestStatus {
   Reshipping = 'Reshipping',
 }
 
-/** 생성일 기준 1달 이내의 건들만 count합니다. */
+/** 생성일 기준 3달 이내의 건들만 count합니다. */
 export type ExchangeRequestsCountOutput = {
   /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
   id: Scalars['Int'];
   lastUpdatedAt: Scalars['DateTime'];
   /** 수거 완료 */
   picked: Scalars['Int'];
+  /** 교환 처리 지연 (지연중인 requested + picked) */
+  process_delayed: Scalars['Int'];
   /** 교환 거부 */
   rejected: Scalars['Int'];
   /** 교환 요청 (= 수거중) */
@@ -1325,7 +1327,7 @@ export enum OrderItemStatus {
   VbankReady = 'VbankReady',
 }
 
-/** 생성일 기준 1달 이내의 건들만 count합니다. */
+/** 생성일 기준 3달 이내의 건들만 count합니다. */
 export type OrderItemsCountOutput = {
   /**
    * 취소 요청됨 (deprecated)
@@ -1334,6 +1336,8 @@ export type OrderItemsCountOutput = {
   cancel_requested: Scalars['Int'];
   /** 취소 완료 */
   cancelled: Scalars['Int'];
+  /** 구매 확정 */
+  confirmed: Scalars['Int'];
   /** 교환 요청됨 */
   exchange_requested: Scalars['Int'];
   /** 교환 완료 */
@@ -1876,7 +1880,7 @@ export enum RefundRequestStatus {
   Requested = 'Requested',
 }
 
-/** 생성일 기준 1달 이내의 건들만 count합니다. */
+/** 생성일 기준 3달 이내의 건들만 count합니다. */
 export type RefundRequestsCountOutput = {
   /** 반품 승인 */
   confirmed: Scalars['Int'];
@@ -1885,6 +1889,8 @@ export type RefundRequestsCountOutput = {
   lastUpdatedAt: Scalars['DateTime'];
   /** 수거 완료 */
   picked: Scalars['Int'];
+  /** 반품 처리 지연 (지연중인 requested + picked) */
+  process_delayed: Scalars['Int'];
   /** 반품 거부 */
   rejected: Scalars['Int'];
   /** 반품 요청 (= 수거중) */
