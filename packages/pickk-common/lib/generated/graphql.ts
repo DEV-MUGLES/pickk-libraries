@@ -514,6 +514,7 @@ export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: RefundRequestFaultOf;
   id: Scalars['Int'];
+  isProcessDelaying: Scalars['Boolean'];
   itemName: Scalars['String'];
   orderItem: OrderItem;
   orderItemMerchantUid: Scalars['String'];
@@ -521,6 +522,7 @@ export type ExchangeRequest = {
   pickShipmentId?: Maybe<Scalars['Int']>;
   /** 수거 완료 시점 */
   pickedAt?: Maybe<Scalars['DateTime']>;
+  processDelayedAt: Scalars['DateTime'];
   product?: Maybe<Product>;
   productId?: Maybe<Scalars['Int']>;
   productVariantName: Scalars['String'];
@@ -1218,6 +1220,10 @@ export type OrderItem = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   couponDiscountAmount: Scalars['Int'];
   createdAt: Scalars['DateTime'];
+  /** 지연발송 전환 시점 */
+  delayedAt?: Maybe<Scalars['DateTime']>;
+  /** 지연발송 예정일 */
+  delayedShipExpectedAt?: Maybe<Scalars['DateTime']>;
   exchangeRequest: ExchangeRequest;
   exchangeRequestedAt?: Maybe<Scalars['DateTime']>;
   exchangedAt?: Maybe<Scalars['DateTime']>;
@@ -1225,6 +1231,8 @@ export type OrderItem = {
   /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
   id: Scalars['String'];
   isConfirmed: Scalars['Boolean'];
+  isDelaying: Scalars['Boolean'];
+  isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
   isShipReserved: Scalars['Boolean'];
   item?: Maybe<Item>;
@@ -1239,6 +1247,8 @@ export type OrderItem = {
   paidAt?: Maybe<Scalars['DateTime']>;
   /** itemFinalPrice - usedPointAmount - couponDiscountAmount */
   payAmount: Scalars['Float'];
+  /** 처리지연 전환 시점 */
+  processDelayedAt?: Maybe<Scalars['DateTime']>;
   product?: Maybe<Product>;
   productId?: Maybe<Scalars['Int']>;
   productVariantName: Scalars['String'];
@@ -1288,6 +1298,8 @@ export enum OrderItemClaimStatus {
 export type OrderItemFilter = {
   claimStatus?: Maybe<OrderItemClaimStatus>;
   claimStatusIn?: Maybe<Array<OrderItemClaimStatus>>;
+  isConfirmed?: Maybe<Scalars['Boolean']>;
+  isProcessDelaying?: Maybe<Scalars['Boolean']>;
   merchantUidIn?: Maybe<Array<Scalars['String']>>;
   paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   /** 주문번호, 주문상품번호, 아이템 명으로 검색합니다. 구매자 번호를 검색할 땐 dash를 제거하고 보내주세요! */
@@ -1335,6 +1347,12 @@ export type OrderItemsCountOutput = {
   paid: Scalars['Int'];
   /** 결제대기 (입금대기와 다릅니다.) */
   pending: Scalars['Int'];
+  /** 결제 완료 */
+  process_delayed_paid: Scalars['Int'];
+  /** 배송 보류중(예약중) */
+  process_delayed_ship_pending: Scalars['Int'];
+  /** 배송 준비중 */
+  process_delayed_ship_ready: Scalars['Int'];
   /** 반품 요청됨 */
   refund_requested: Scalars['Int'];
   /** 반품 완료 */
@@ -1804,11 +1822,13 @@ export type RefundRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: RefundRequestFaultOf;
   id: Scalars['Int'];
+  isProcessDelaying: Scalars['Boolean'];
   order: Order;
   orderItems: Array<OrderItem>;
   orderMerchantUid: Scalars['String'];
   /** 수거 완료 시점 */
   pickedAt?: Maybe<Scalars['DateTime']>;
+  processDelayedAt: Scalars['DateTime'];
   /** 255자 이내로 적어주세요 */
   reason: Scalars['String'];
   /** 255자 이내로 적어주세요 */
