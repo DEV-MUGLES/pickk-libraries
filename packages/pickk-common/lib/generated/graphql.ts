@@ -258,7 +258,7 @@ export type Comment = {
   ownerId: Scalars['Int'];
   ownerType: CommentOwnerType;
   parent?: Maybe<Comment>;
-  parentId: Scalars['Int'];
+  parentId?: Maybe<Scalars['Int']>;
   replies: Array<Comment>;
   updatedAt: Scalars['DateTime'];
   user?: Maybe<User>;
@@ -346,6 +346,14 @@ export type CourierIssue = {
 export type CreateCartItemInput = {
   productId: Scalars['Float'];
   quantity: Scalars['Int'];
+};
+
+export type CreateCommentInput = {
+  content: Scalars['String'];
+  mentionedUserId?: Maybe<Scalars['Int']>;
+  ownerId: Scalars['Int'];
+  ownerType: CommentOwnerType;
+  parentId?: Maybe<Scalars['Int']>;
 };
 
 export type CreateCouponInput = {
@@ -506,10 +514,12 @@ export type CreateShippingAddressInput = {
 };
 
 export type CreateUserInput = {
+  avatarUrl?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   height?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
+  /** 최대 11자 */
   nickname: Scalars['String'];
   oauthCode?: Maybe<Scalars['String']>;
   oauthProvider?: Maybe<UserProviderType>;
@@ -525,6 +535,11 @@ export type Digest = {
   hitCount: Scalars['Int'];
   id: Scalars['Int'];
   images: Array<DigestImage>;
+  /**
+   * read, list 호출 시 userId가 제공되면 liking 여부를 검사해 attach합니다.
+   * (true: 팔로잉, false: 팔로잉x, null: 유저정보 제공x)
+   */
+  isLiking?: Maybe<Scalars['Boolean']>;
   item?: Maybe<Item>;
   itemId?: Maybe<Scalars['Int']>;
   itemPropertyValues: Array<ItemPropertyValue>;
@@ -647,6 +662,15 @@ export type FindSaleStrategyInput = {
   canUseMileage: Scalars['Boolean'];
 };
 
+/** 조회수 누적 대상 객체 분류입니다. */
+export enum HitOwnerType {
+  Digest = 'Digest',
+  Item = 'Item',
+  Keyword = 'Keyword',
+  Look = 'Look',
+  Video = 'Video',
+}
+
 export type Item = {
   brand: Brand;
   brandId: Scalars['Int'];
@@ -654,6 +678,7 @@ export type Item = {
   createdAt: Scalars['DateTime'];
   description?: Maybe<Scalars['String']>;
   detailImages?: Maybe<Array<ItemDetailImage>>;
+  digestCount: Scalars['Int'];
   finalPrice: Scalars['Float'];
   id: Scalars['Int'];
   imageUrl: Scalars['String'];
@@ -667,7 +692,6 @@ export type Item = {
   minorCategory?: Maybe<ItemCategory>;
   minorCategoryId?: Maybe<Scalars['Float']>;
   name: Scalars['String'];
-  /** 상품 안내 메세지입니다. 파트너어드민에서 입력할 수 있습니다. */
   notice?: Maybe<ItemNotice>;
   options?: Maybe<Array<ItemOption>>;
   originalPrice: Scalars['Float'];
@@ -870,6 +894,14 @@ export type JwtToken = {
   refresh: Scalars['String'];
 };
 
+/** 좋아요 대상 객체 분류입니다. */
+export enum LikeOwnerType {
+  Comment = 'Comment',
+  Digest = 'Digest',
+  Look = 'Look',
+  Video = 'Video',
+}
+
 export type LoginByCodeInput = {
   code?: Maybe<Scalars['String']>;
   /** 로그인에 필요한 최소 권한입니다. (ex: Seller로 설정 시 Seller, Admin일때만 성공) */
@@ -936,6 +968,7 @@ export type Mutation = {
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
   completeOrder: BaseOrderOutput;
+  createComment: Comment;
   createCoupon: Coupon;
   createCouponSpecification: CouponSpecification;
   createCourier: Courier;
@@ -945,6 +978,9 @@ export type Mutation = {
   createUser: User;
   dodgeVbankOrder: BaseOrderOutput;
   failOrder: BaseOrderOutput;
+  follow: Scalars['Boolean'];
+  hit: Scalars['Boolean'];
+  like: Scalars['Boolean'];
   modifyItemSizeCharts: Item;
   registerOrder: BaseOrderOutput;
   removeCourierIssue: Courier;
@@ -952,7 +988,6 @@ export type Mutation = {
   removeItemNotice: Item;
   removeItemPrice: Item;
   removeItemSizeChartsAll: Item;
-  removeMyAvatarImage: UserAvatarImage;
   removeMyCartItems: Scalars['Boolean'];
   removeMyRefundAccount: User;
   removeMyShippingAddress: Array<ShippingAddress>;
@@ -961,7 +996,12 @@ export type Mutation = {
   reshipMeSellerExchangeRequest: ExchangeRequest;
   shipMeSellerOrderItem: OrderItem;
   startOrder: BaseOrderOutput;
+  /** 여러번 구독된 상태였다면 모두 삭제됩니다. */
+  unfollow: Scalars['Boolean'];
+  /** 여러번 좋아요한 상태였다면 모두 삭제됩니다. */
+  unlike: Scalars['Boolean'];
   updateBrand: Brand;
+  updateComment: Comment;
   updateCourier: Courier;
   updateCourierIssue: CourierIssue;
   updateItem: Item;
@@ -972,7 +1012,6 @@ export type Mutation = {
   updateMeSeller: Seller;
   /** 주문상품 단건 운송장 수정 */
   updateMeSellerOrderItemTrackCode: OrderItem;
-  updateMyAvatarImage: UserAvatarImage;
   updateMyCartItem: CartItem;
   /** (!) 예전 비밀번호와 현재 비밀번호를 입력해주세요. */
   updateMyPassword: User;
@@ -1068,6 +1107,10 @@ export type MutationCompleteOrderArgs = {
   merchantUid: Scalars['String'];
 };
 
+export type MutationCreateCommentArgs = {
+  input: CreateCommentInput;
+};
+
 export type MutationCreateCouponArgs = {
   createCouponInput: CreateCouponInput;
 };
@@ -1103,6 +1146,20 @@ export type MutationDodgeVbankOrderArgs = {
 
 export type MutationFailOrderArgs = {
   merchantUid: Scalars['String'];
+};
+
+export type MutationFollowArgs = {
+  targetId: Scalars['Int'];
+};
+
+export type MutationHitArgs = {
+  ownerId: Scalars['Float'];
+  ownerType: HitOwnerType;
+};
+
+export type MutationLikeArgs = {
+  ownerId: Scalars['Int'];
+  ownerType: LikeOwnerType;
 };
 
 export type MutationModifyItemSizeChartsArgs = {
@@ -1170,9 +1227,23 @@ export type MutationStartOrderArgs = {
   startOrderInput: StartOrderInput;
 };
 
+export type MutationUnfollowArgs = {
+  targetId: Scalars['Int'];
+};
+
+export type MutationUnlikeArgs = {
+  ownerId: Scalars['Int'];
+  ownerType: LikeOwnerType;
+};
+
 export type MutationUpdateBrandArgs = {
   id: Scalars['Int'];
   updateBrandInput: UpdateBrandInput;
+};
+
+export type MutationUpdateCommentArgs = {
+  id: Scalars['Int'];
+  input: UpdateCommentInput;
 };
 
 export type MutationUpdateCourierArgs = {
@@ -1216,10 +1287,6 @@ export type MutationUpdateMeSellerArgs = {
 export type MutationUpdateMeSellerOrderItemTrackCodeArgs = {
   merchantUid: Scalars['String'];
   trackCode: Scalars['String'];
-};
-
-export type MutationUpdateMyAvatarImageArgs = {
-  uploadSingleImageInput: UploadSingleImageInput;
 };
 
 export type MutationUpdateMyCartItemArgs = {
@@ -1767,6 +1834,8 @@ export type ProductShippingReservePolicy = {
 export type Query = {
   brand: Brand;
   brands: Array<Brand>;
+  checkFollowing: Scalars['Boolean'];
+  checkLiking: Scalars['Boolean'];
   /** 중복이면 true, 아니면 false를 반환한다. */
   checkNicknameDuplicate: Scalars['Boolean'];
   checkPin: Scalars['Boolean'];
@@ -1820,6 +1889,15 @@ export type Query = {
 
 export type QueryBrandArgs = {
   id: Scalars['Int'];
+};
+
+export type QueryCheckFollowingArgs = {
+  targetId: Scalars['Int'];
+};
+
+export type QueryCheckLikingArgs = {
+  ownerId: Scalars['Int'];
+  ownerType: LikeOwnerType;
 };
 
 export type QueryCheckNicknameDuplicateArgs = {
@@ -2285,6 +2363,10 @@ export type UpdateCartItemInput = {
   quantity: Scalars['Int'];
 };
 
+export type UpdateCommentInput = {
+  content: Scalars['String'];
+};
+
 export type UpdateCourierInput = {
   code?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
@@ -2440,10 +2522,12 @@ export type UpdateShippingAddressInput = {
 };
 
 export type UpdateUserInput = {
+  avatarUrl?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   height?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
+  /** 최대 11자 */
   nickname?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Int']>;
 };
@@ -2452,22 +2536,22 @@ export type UploadMultipleImageInput = {
   files: Array<Scalars['Upload']>;
 };
 
-export type UploadSingleImageInput = {
-  file: Scalars['Upload'];
-};
-
 export type User = {
   /** [ResolveField] 사용가능 포인트 잔고 */
   availablePoint: Scalars['Int'];
-  avatarImage?: Maybe<UserAvatarImage>;
+  avatarUrl?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   email?: Maybe<Scalars['String']>;
   /** [ResolveField] 적립예정 포인트 잔고 */
   expectedPoint: Scalars['Int'];
+  followCount: Scalars['Int'];
   height?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
+  /** [MODEL ONLY] */
+  isFollowing?: Maybe<Scalars['Boolean']>;
   name?: Maybe<Scalars['String']>;
+  /** 최대 11자 */
   nickname: Scalars['String'];
   oauthCode?: Maybe<Scalars['String']>;
   oauthProvider?: Maybe<UserProviderType>;
@@ -2475,15 +2559,9 @@ export type User = {
   refundAccount?: Maybe<RefundAccount>;
   role?: Maybe<UserRole>;
   shippingAddresses?: Maybe<Array<ShippingAddress>>;
+  styleTags: Array<StyleTag>;
   updatedAt: Scalars['DateTime'];
   weight?: Maybe<Scalars['Int']>;
-};
-
-export type UserAvatarImage = {
-  angle: Scalars['Int'];
-  createdAt: Scalars['DateTime'];
-  key: Scalars['String'];
-  url: Scalars['String'];
 };
 
 /** Oauth 제공 서비스입니다. */
