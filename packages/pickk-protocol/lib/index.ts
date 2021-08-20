@@ -14,9 +14,9 @@ type WebViewMessageKeyType = keyof typeof WebViewMessages;
 type WebViewMessageType = typeof WebViewMessages[WebViewMessageKeyType];
 
 export const postMessage = (message: WebViewMessageType) => {
-  window.ReactNativeWebView.postMessage(message);
+  window?.ReactNativeWebView?.postMessage(message);
 };
 
 export const postMessageJavascript = (message: WebViewMessageType) => {
-  return `window.ReactNativeWebView.postMessage(${message})`;
+  return `window?.ReactNativeWebView?.postMessage(${message})`;
 };
