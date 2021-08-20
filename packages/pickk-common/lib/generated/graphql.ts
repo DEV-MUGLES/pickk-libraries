@@ -15,6 +15,8 @@ export type Scalars = {
   Float: number;
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: any;
+  /** 별점을 나타냅니다. 클라이언트로부터 입력 받은 0~5 실수를 0~10 정수로 변환합니다. */
+  Rating: any;
   /** Date type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch. */
   Timestamp: any;
   /** The `Upload` scalar type represents a file upload. */
@@ -181,32 +183,7 @@ export type Campaign = {
   updatedAt: Scalars['DateTime'];
 };
 
-export type CancelMeSellerOrderItemInput = {
-  /**
-   * 취소로 인해 환불되어야할 액수를 프론트에서 계산해서 넘겨주세요.
-   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
-   */
-  amount: Scalars['Int'];
-  /**
-   * 취소 후 남을 총 결제 금액을 프론트에서 계산해서 넘겨주세요.
-   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
-   */
-  checksum: Scalars['Int'];
-  /** 취소 사유 */
-  reason: Scalars['String'];
-};
-
 export type CancelOrderInput = {
-  /**
-   * 취소로 인해 환불되어야할 액수를 프론트에서 계산해서 넘겨주세요.
-   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
-   */
-  amount: Scalars['Int'];
-  /**
-   * 취소 후 남을 총 결제 금액을 프론트에서 계산해서 넘겨주세요.
-   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
-   */
-  checksum: Scalars['Int'];
   orderItemMerchantUids: Array<Scalars['String']>;
   /** 취소 사유 */
   reason: Scalars['String'];
@@ -269,6 +246,36 @@ export type CheckPinInput = {
 export enum ClaimFeePayMethod {
   Enclose = 'Enclose',
   Trans = 'Trans',
+}
+
+export type Comment = {
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  likeCount: Scalars['Int'];
+  mentionedUser?: Maybe<User>;
+  mentionedUserId?: Maybe<Scalars['Int']>;
+  ownerId: Scalars['Int'];
+  ownerType: CommentOwnerType;
+  parent?: Maybe<Comment>;
+  parentId: Scalars['Int'];
+  replies: Array<Comment>;
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+export type CommentFilter = {
+  ownerId?: Maybe<Scalars['Int']>;
+  ownerType?: Maybe<CommentOwnerType>;
+  parentIdIsNull?: Maybe<Scalars['Boolean']>;
+};
+
+/** 댓글 연관 객체 분류입니다. */
+export enum CommentOwnerType {
+  Digest = 'Digest',
+  Look = 'Look',
+  Video = 'Video',
 }
 
 /** 컨텐츠 타입입니다. */
@@ -510,6 +517,44 @@ export type CreateUserInput = {
   weight?: Maybe<Scalars['Int']>;
 };
 
+export type Digest = {
+  commentCount: Scalars['Int'];
+  /** 최대 길이 2047 */
+  content?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+  hitCount: Scalars['Int'];
+  id: Scalars['Int'];
+  images: Array<DigestImage>;
+  item?: Maybe<Item>;
+  itemId?: Maybe<Scalars['Int']>;
+  itemPropertyValues: Array<ItemPropertyValue>;
+  likeCount: Scalars['Int'];
+  look?: Maybe<Look>;
+  rating?: Maybe<Scalars['Rating']>;
+  score: Scalars['Float'];
+  size: Scalars['String'];
+  timestampEndSecond?: Maybe<Scalars['Int']>;
+  timestampStartSecond?: Maybe<Scalars['Int']>;
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+  video?: Maybe<Video>;
+};
+
+export type DigestFilter = {
+  itemId?: Maybe<Scalars['Int']>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+export type DigestImage = {
+  angle: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  key: Scalars['String'];
+  url: Scalars['String'];
+};
+
 export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: RefundRequestFaultOf;
@@ -547,6 +592,7 @@ export type ExchangeRequest = {
 };
 
 export type ExchangeRequestFilter = {
+  isProcessDelaying?: Maybe<Scalars['Boolean']>;
   orderItem?: Maybe<ExchangeRequestOrderItemFilter>;
   requestedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   /** 재배송 완료일 (기간). 교환 완료와 동일한 의미로 사용됩니다. */
@@ -554,6 +600,8 @@ export type ExchangeRequestFilter = {
   /** 주문상품번호, 회수 운송장번호, 재배송 운송장번호로 검색할 수 있습니다. */
   search?: Maybe<Scalars['String']>;
   sellerId?: Maybe<Scalars['Int']>;
+  status?: Maybe<ExchangeRequestStatus>;
+  statusIn?: Maybe<Array<ExchangeRequestStatus>>;
 };
 
 export type ExchangeRequestOrderItemFilter = {
@@ -735,6 +783,29 @@ export enum ItemPriceUnit {
   Usd = 'USD',
 }
 
+export type ItemProperty = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  minorCategory: ItemCategory;
+  minorCategoryId: Scalars['Int'];
+  name: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  values: Array<ItemPropertyValue>;
+};
+
+export type ItemPropertyFilter = {
+  minorCategoryId?: Maybe<Scalars['Int']>;
+};
+
+export type ItemPropertyValue = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  /** 표시될 순서. 최소 0, 최대 255입니다. */
+  order: Scalars['Float'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type ItemSalePolicy = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
@@ -818,6 +889,34 @@ export type LoginWithAppleInput = {
   code: Scalars['String'];
 };
 
+export type Look = {
+  commentCount: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  digests: Array<Digest>;
+  hitCount: Scalars['Int'];
+  id: Scalars['Int'];
+  images: Array<LookImage>;
+  likeCount: Scalars['Int'];
+  score: Scalars['Float'];
+  styleTags: Array<StyleTag>;
+  /** 최대 길이 127 */
+  title: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+export type LookFilter = {
+  userId?: Maybe<Scalars['Int']>;
+};
+
+export type LookImage = {
+  angle: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  key: Scalars['String'];
+  url: Scalars['String'];
+};
+
 export type Mutation = {
   activateItemPrice: Item;
   addItemDetailImages: Item;
@@ -833,6 +932,7 @@ export type Mutation = {
   bulkShipMeSellerOrderItems: Scalars['Boolean'];
   bulkShipReadyMeSellerOrderItems: Scalars['Boolean'];
   bulkUpdateItems: Scalars['Boolean'];
+  /** 취소 사유는 "담당자 취소 처리"로 고정 */
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
   completeOrder: BaseOrderOutput;
@@ -870,6 +970,8 @@ export type Mutation = {
   updateItemPrice: ItemPrice;
   updateMe: User;
   updateMeSeller: Seller;
+  /** 주문상품 단건 운송장 수정 */
+  updateMeSellerOrderItemTrackCode: OrderItem;
   updateMyAvatarImage: UserAvatarImage;
   updateMyCartItem: CartItem;
   /** (!) 예전 비밀번호와 현재 비밀번호를 입력해주세요. */
@@ -953,7 +1055,6 @@ export type MutationBulkUpdateItemsArgs = {
 };
 
 export type MutationCancelMeSellerOrderItemArgs = {
-  cancelMeSellerOrderItemInput: CancelMeSellerOrderItemInput;
   merchantUid: Scalars['String'];
 };
 
@@ -1110,6 +1211,11 @@ export type MutationUpdateMeArgs = {
 
 export type MutationUpdateMeSellerArgs = {
   updateSellerInput: UpdateSellerInput;
+};
+
+export type MutationUpdateMeSellerOrderItemTrackCodeArgs = {
+  merchantUid: Scalars['String'];
+  trackCode: Scalars['String'];
 };
 
 export type MutationUpdateMyAvatarImageArgs = {
@@ -1517,6 +1623,7 @@ export type Payment = {
   updatedAt: Scalars['DateTime'];
   vbankCode?: Maybe<BankCode>;
   vbankDate?: Maybe<Scalars['String']>;
+  vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankHolder?: Maybe<Scalars['String']>;
   vbankNum?: Maybe<Scalars['String']>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
@@ -1569,6 +1676,7 @@ export enum PaymentStatus {
   Paid = 'Paid',
   PartialCancelled = 'PartialCancelled',
   Pending = 'Pending',
+  VbankDodged = 'VbankDodged',
   VbankReady = 'VbankReady',
 }
 
@@ -1663,18 +1771,23 @@ export type Query = {
   checkNicknameDuplicate: Scalars['Boolean'];
   checkPin: Scalars['Boolean'];
   checkoutOrder: OrderSheet;
+  comments: Array<Comment>;
   courier: Courier;
   couriers: Array<Courier>;
+  digest: Digest;
+  digests: Array<Digest>;
   genRandomNickname: Scalars['String'];
   item: Item;
   itemCategoryTree: Array<ItemCategory>;
   itemMajorCategories: Array<ItemCategory>;
   itemMinorCategories: Array<ItemCategory>;
+  itemProperties: Array<ItemProperty>;
   items: Array<Item>;
   loginByCode: JwtToken;
   loginByOauth: JwtToken;
   loginSellerByCode: JwtToken;
   loginWithApple: JwtToken;
+  looks: Array<Look>;
   me: User;
   meSeller: Seller;
   meSellerExchangeRequests: Array<ExchangeRequest>;
@@ -1699,8 +1812,10 @@ export type Query = {
   requestPin: Scalars['Boolean'];
   seller: Seller;
   sellers: Array<Seller>;
+  styleTags: Array<StyleTag>;
   user: User;
   users: Array<User>;
+  videos: Array<Video>;
 };
 
 export type QueryBrandArgs = {
@@ -1719,12 +1834,31 @@ export type QueryCheckoutOrderArgs = {
   merchantUid: Scalars['String'];
 };
 
+export type QueryCommentsArgs = {
+  filter?: Maybe<CommentFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 export type QueryCourierArgs = {
   id: Scalars['Int'];
 };
 
+export type QueryDigestArgs = {
+  id: Scalars['Int'];
+};
+
+export type QueryDigestsArgs = {
+  filter?: Maybe<DigestFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 export type QueryItemArgs = {
   id: Scalars['Int'];
+};
+
+export type QueryItemPropertiesArgs = {
+  itemPropertyFilter?: Maybe<ItemPropertyFilter>;
+  pageInput?: Maybe<PageInput>;
 };
 
 export type QueryItemsArgs = {
@@ -1746,6 +1880,11 @@ export type QueryLoginSellerByCodeArgs = {
 
 export type QueryLoginWithAppleArgs = {
   getAppleProviderIdInput: LoginWithAppleInput;
+};
+
+export type QueryLooksArgs = {
+  filter?: Maybe<LookFilter>;
+  pageInput?: Maybe<PageInput>;
 };
 
 export type QueryMeSellerExchangeRequestsArgs = {
@@ -1810,6 +1949,11 @@ export type QueryUserArgs = {
   id: Scalars['Int'];
 };
 
+export type QueryVideosArgs = {
+  filter?: Maybe<VideoFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 /** 가상계좌 결제시 환불 받을 계좌 정보 */
 export type RefundAccount = {
   bankCode: BankCode;
@@ -1858,6 +2002,7 @@ export enum RefundRequestFaultOf {
 
 export type RefundRequestFilter = {
   confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  isProcessDelaying?: Maybe<Scalars['Boolean']>;
   order?: Maybe<RefundRequestOrderFilter>;
   pickedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   requestedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
@@ -1911,33 +2056,20 @@ export type RegisterOrderItemInput = {
 
 export type RequestOrderItemExchangeInput = {
   faultOf: RefundRequestFaultOf;
-  productId?: Maybe<Scalars['Int']>;
+  /** 교환 대상 product */
+  productId: Scalars['Int'];
   /** 255자 이내로 적어주세요 */
   reason: Scalars['String'];
   shipmentInput?: Maybe<CreateShipmentInput>;
-  /** 결제된 교환 배송비 */
-  shippingFee: Scalars['Int'];
 };
 
 export type RequestOrderRefundInput = {
-  /**
-   * 반품로 인해 환불되어야할 액수를 프론트에서 계산해서 넘겨주세요.
-   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
-   */
-  amount: Scalars['Int'];
-  /**
-   * 반품 후 남을 총 결제 금액을 프론트에서 계산해서 넘겨주세요.
-   * 서버에서 계산한 값과 입력된 값이 같은지 검증합니다.
-   */
-  checksum: Scalars['Int'];
   faultOf: RefundRequestFaultOf;
   /** 반품처리할 OrderItem들. 같은 브랜드의 OrderItem들로만 신청할 수 있습니다. */
   orderItemMerchantUids: Array<Scalars['String']>;
   /** 255자 이내로 적어주세요 */
   reason: Scalars['String'];
   shipmentInput?: Maybe<CreateShipmentInput>;
-  /** 부과된 반품 배송비 */
-  shippingFee: Scalars['Int'];
 };
 
 export type RequestPinInput = {
@@ -2131,6 +2263,15 @@ export type StartOrderItemInput = {
   /** 주문상품고유번호. PrimaryColumn입니다. order의 merchantUid + 숫자 1자리 형식입니다. */
   merchantUid: Scalars['String'];
   usedCouponId?: Maybe<Scalars['Int']>;
+};
+
+export type StyleTag = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  /** 최대 길이 30 */
+  name: Scalars['String'];
+  order: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type UpdateBrandInput = {
@@ -2359,3 +2500,24 @@ export enum UserRole {
   Seller = 'Seller',
   User = 'User',
 }
+
+export type Video = {
+  commentCount: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  digests: Array<Digest>;
+  hitCount: Scalars['Int'];
+  id: Scalars['Int'];
+  likeCount: Scalars['Int'];
+  score: Scalars['Float'];
+  /** 최대 길이 127 */
+  title: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+  /** 최대 길이 40 */
+  youtubeCode: Scalars['String'];
+};
+
+export type VideoFilter = {
+  userId?: Maybe<Scalars['Int']>;
+};
