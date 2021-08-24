@@ -678,8 +678,10 @@ export type Item = {
   createdAt: Scalars['DateTime'];
   description?: Maybe<Scalars['String']>;
   detailImages?: Maybe<Array<ItemDetailImage>>;
+  digestAverageRating: Scalars['Float'];
   digestCount: Scalars['Int'];
   finalPrice: Scalars['Float'];
+  hitCount: Scalars['Int'];
   id: Scalars['Int'];
   imageUrl: Scalars['String'];
   isInfiniteStock: Scalars['Boolean'];
@@ -881,7 +883,9 @@ export type ItemUrl = {
 export type JwtPayload = {
   /** Seller 로그인인 경우에만 발급된다. */
   brandId?: Maybe<Scalars['Float']>;
+  /** 만료 시점 timestamp */
   exp: Scalars['Timestamp'];
+  /** 발급 시점 timestamp */
   iat: Scalars['Timestamp'];
   nickname: Scalars['String'];
   /** Seller 로그인인 경우에만 발급된다. */
@@ -894,10 +898,63 @@ export type JwtToken = {
   refresh: Scalars['String'];
 };
 
-/** 좋아요 대상 객체 분류입니다. */
+export type Keyword = {
+  classes: Array<KeywordClass>;
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  digests: Array<Digest>;
+  hitCount: Scalars['Int'];
+  id: Scalars['Int'];
+  imageUrl: Scalars['String'];
+  isVisible: Scalars['Boolean'];
+  likeCount: Scalars['Int'];
+  looks: Array<Look>;
+  matchTags: Array<KeywordMatchTag>;
+  name: Scalars['String'];
+  score: Scalars['Float'];
+  styleTags: Array<StyleTag>;
+  /** 스타일팁 줄글 */
+  stylingTip: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  /** 0~100 정수. 필수템에 표시될 녀석들한테만 존재 */
+  usablityRate: Scalars['Int'];
+};
+
+export type KeywordClass = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  isVisible: Scalars['Boolean'];
+  name: Scalars['String'];
+  /** 0~255 정수 */
+  order: Scalars['Int'];
+  type: KeywordClassType;
+  updatedAt: Scalars['DateTime'];
+};
+
+export enum KeywordClassType {
+  Essential = 'Essential',
+  Trending = 'Trending',
+}
+
+export type KeywordFilter = {
+  isVisible?: Maybe<Scalars['Boolean']>;
+};
+
+export type KeywordMatchTag = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  isVisible: Scalars['Boolean'];
+  name: Scalars['String'];
+  /** 0~255 정수 */
+  order: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+};
+
+/** 좋아요 대상 객체 분류입니다. (Digest, Look, Video, Comment, Keyword) */
 export enum LikeOwnerType {
   Comment = 'Comment',
   Digest = 'Digest',
+  Keyword = 'Keyword',
   Look = 'Look',
   Video = 'Video',
 }
@@ -982,8 +1039,10 @@ export type Mutation = {
   hit: Scalars['Boolean'];
   like: Scalars['Boolean'];
   modifyItemSizeCharts: Item;
+  own: Scalars['Boolean'];
   registerOrder: BaseOrderOutput;
   removeCourierIssue: Courier;
+  removeDigest: Scalars['Boolean'];
   removeItemDetailImage: Item;
   removeItemNotice: Item;
   removeItemPrice: Item;
@@ -1000,6 +1059,7 @@ export type Mutation = {
   unfollow: Scalars['Boolean'];
   /** 여러번 좋아요한 상태였다면 모두 삭제됩니다. */
   unlike: Scalars['Boolean'];
+  unown: Scalars['Boolean'];
   updateBrand: Brand;
   updateComment: Comment;
   updateCourier: Courier;
@@ -1168,12 +1228,20 @@ export type MutationModifyItemSizeChartsArgs = {
   updateItemSizeChartInput?: Maybe<Array<UpdateItemSizeChartInput>>;
 };
 
+export type MutationOwnArgs = {
+  keywordId: Scalars['Int'];
+};
+
 export type MutationRegisterOrderArgs = {
   registerOrderInput: RegisterOrderInput;
 };
 
 export type MutationRemoveCourierIssueArgs = {
   courierId: Scalars['Int'];
+};
+
+export type MutationRemoveDigestArgs = {
+  id: Scalars['Int'];
 };
 
 export type MutationRemoveItemDetailImageArgs = {
@@ -1234,6 +1302,10 @@ export type MutationUnfollowArgs = {
 export type MutationUnlikeArgs = {
   ownerId: Scalars['Int'];
   ownerType: LikeOwnerType;
+};
+
+export type MutationUnownArgs = {
+  keywordId: Scalars['Int'];
 };
 
 export type MutationUpdateBrandArgs = {
@@ -1628,6 +1700,16 @@ export type OrderVbankReceipt = {
   updatedAt: Scalars['DateTime'];
 };
 
+/** 키워드 보유중 여부와 관련된 개수들입니다. */
+export type OwnsCountOutput = {
+  /** '`user:<userId>:keywordClassId:<keywordClassId>`와 동일 */
+  id: Scalars['String'];
+  /** 해당 클래스의 키워드 중 내가 보유한 수 */
+  owning: Scalars['Int'];
+  /** 해당 클래스의 키워드 수 */
+  total: Scalars['Int'];
+};
+
 export type PageInput = {
   limit?: Maybe<Scalars['Int']>;
   offset?: Maybe<Scalars['Int']>;
@@ -1838,6 +1920,7 @@ export type Query = {
   checkLiking: Scalars['Boolean'];
   /** 중복이면 true, 아니면 false를 반환한다. */
   checkNicknameDuplicate: Scalars['Boolean'];
+  checkOwning: Scalars['Boolean'];
   checkPin: Scalars['Boolean'];
   checkoutOrder: OrderSheet;
   comments: Array<Comment>;
@@ -1852,12 +1935,14 @@ export type Query = {
   itemMinorCategories: Array<ItemCategory>;
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
+  keywords: Array<Keyword>;
   loginByCode: JwtToken;
   loginByOauth: JwtToken;
   loginSellerByCode: JwtToken;
   loginWithApple: JwtToken;
   looks: Array<Look>;
   me: User;
+  meOwnsCount: OwnsCountOutput;
   meSeller: Seller;
   meSellerExchangeRequests: Array<ExchangeRequest>;
   meSellerExchangeRequestsCount: ExchangeRequestsCountOutput;
@@ -1904,6 +1989,10 @@ export type QueryCheckNicknameDuplicateArgs = {
   nickname: Scalars['String'];
 };
 
+export type QueryCheckOwningArgs = {
+  keywordId: Scalars['Int'];
+};
+
 export type QueryCheckPinArgs = {
   checkPinInput: CheckPinInput;
 };
@@ -1944,6 +2033,11 @@ export type QueryItemsArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
+export type QueryKeywordsArgs = {
+  filter?: Maybe<KeywordFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 export type QueryLoginByCodeArgs = {
   loginByCodeInput: LoginByCodeInput;
 };
@@ -1963,6 +2057,10 @@ export type QueryLoginWithAppleArgs = {
 export type QueryLooksArgs = {
   filter?: Maybe<LookFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeOwnsCountArgs = {
+  keywordClassId: Scalars['Int'];
 };
 
 export type QueryMeSellerExchangeRequestsArgs = {

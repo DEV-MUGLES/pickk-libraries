@@ -1,6 +1,6 @@
 {
   "name": "@pickk/common",
-  "version": "1.7.16",
+  "version": "1.7.17",
   "description": "common files for pickk development",
   "keywords": [
     "graphql",
