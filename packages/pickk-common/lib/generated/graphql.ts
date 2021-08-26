@@ -66,6 +66,13 @@ export type AddItemUrlInput = {
   url: Scalars['String'];
 };
 
+export type AnswerInquiryInput = {
+  /** 최대 길이 255 */
+  content: Scalars['String'];
+  /** 표시될 답변작성자 이름. 최대 길이 30 */
+  displayAuthor: Scalars['String'];
+};
+
 /** 애플 로그인시 사용됩니다. [App, Web] */
 export enum AppleClientType {
   App = 'App',
@@ -158,6 +165,7 @@ export type Brand = {
   nameEng?: Maybe<Scalars['String']>;
   nameKor: Scalars['String'];
   seller?: Maybe<Seller>;
+  sellerId?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['DateTime'];
 };
 
@@ -249,9 +257,14 @@ export enum ClaimFeePayMethod {
 }
 
 export type Comment = {
-  content: Scalars['String'];
+  content?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
+  isDeleted: Scalars['Boolean'];
+  /** [MODEL ONLY] */
+  isLiking?: Maybe<Scalars['Boolean']>;
+  /** [MODEL ONLY] */
+  isMine?: Maybe<Scalars['Boolean']>;
   likeCount: Scalars['Int'];
   mentionedUser?: Maybe<User>;
   mentionedUserId?: Maybe<Scalars['Int']>;
@@ -349,7 +362,7 @@ export type CreateCartItemInput = {
 };
 
 export type CreateCommentInput = {
-  content: Scalars['String'];
+  content?: Maybe<Scalars['String']>;
   mentionedUserId?: Maybe<Scalars['Int']>;
   ownerId: Scalars['Int'];
   ownerType: CommentOwnerType;
@@ -380,6 +393,19 @@ export type CreateCourierInput = {
   name: Scalars['String'];
   phoneNumber: Scalars['String'];
   returnReserveUrl: Scalars['String'];
+};
+
+export type CreateInquiryInput = {
+  /** 알림톡 받을 전화번호 (11글자) */
+  contactPhoneNumber: Scalars['String'];
+  /** 최대 길이 255 */
+  content: Scalars['String'];
+  isSecret: Scalars['Boolean'];
+  itemId?: Maybe<Scalars['Int']>;
+  orderItemMerchantUid?: Maybe<Scalars['String']>;
+  /** 최대 길이 100 */
+  title: Scalars['String'];
+  type: InquiryType;
 };
 
 export type CreateItemDetailImageInput = {
@@ -560,7 +586,9 @@ export type Digest = {
 
 export type DigestFilter = {
   itemId?: Maybe<Scalars['Int']>;
+  orderBy?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['Int']>;
+  userIdIn?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type DigestImage = {
@@ -669,6 +697,73 @@ export enum HitOwnerType {
   Keyword = 'Keyword',
   Look = 'Look',
   Video = 'Video',
+}
+
+/** 생성일 기준 3달 이내의 건들만 count합니다. */
+export type InquiriesCountOutput = {
+  /** 답변 지연 (생성일 5일 경과) */
+  delayed: Scalars['Int'];
+  /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
+  id: Scalars['Int'];
+  lastUpdatedAt: Scalars['DateTime'];
+  /** 미답변 */
+  not_answered: Scalars['Int'];
+};
+
+export type Inquiry = {
+  answers: Array<InquiryAnswer>;
+  /** 알림톡 받을 전화번호 (11글자) */
+  contactPhoneNumber: Scalars['String'];
+  /** 최대 길이 255 */
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  isAnswered: Scalars['Boolean'];
+  isSecret: Scalars['Boolean'];
+  item?: Maybe<Item>;
+  itemId?: Maybe<Scalars['Int']>;
+  orderItem?: Maybe<OrderItem>;
+  orderItemMerchantUid?: Maybe<Scalars['String']>;
+  seller?: Maybe<Seller>;
+  sellerId?: Maybe<Scalars['Int']>;
+  /** 최대 길이 100 */
+  title: Scalars['String'];
+  type: InquiryType;
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+export type InquiryAnswer = {
+  /** 최대 길이 255 */
+  content: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  /** 표시될 답변작성자 이름. 최대 길이 30 */
+  displayAuthor: Scalars['String'];
+  from: InquiryAnswerFrom;
+  id: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  user?: Maybe<User>;
+  userId?: Maybe<Scalars['Int']>;
+};
+
+/** 답변 작성 출처입니다. (super or seller) */
+export enum InquiryAnswerFrom {
+  Seller = 'Seller',
+  Super = 'Super',
+}
+
+export type InquiryFilter = {
+  itemId?: Maybe<Scalars['Float']>;
+  sellerId?: Maybe<Scalars['Float']>;
+};
+
+/** 배송/사이즈/재입고/기타 */
+export enum InquiryType {
+  Etc = 'Etc',
+  Restock = 'Restock',
+  Ship = 'Ship',
+  Size = 'Size',
 }
 
 export type Item = {
@@ -883,6 +978,8 @@ export type ItemUrl = {
 export type JwtPayload = {
   /** Seller 로그인인 경우에만 발급된다. */
   brandId?: Maybe<Scalars['Float']>;
+  /** Seller 로그인인 경우에만 발급된다. */
+  brandNameKor?: Maybe<Scalars['String']>;
   /** 만료 시점 timestamp */
   exp: Scalars['Timestamp'];
   /** 발급 시점 timestamp */
@@ -906,11 +1003,16 @@ export type Keyword = {
   hitCount: Scalars['Int'];
   id: Scalars['Int'];
   imageUrl: Scalars['String'];
+  /** 좋아요 중 여부 */
+  isLiking?: Maybe<Scalars['Boolean']>;
+  /** 보유중 여부 */
+  isOwning?: Maybe<Scalars['Boolean']>;
   isVisible: Scalars['Boolean'];
   likeCount: Scalars['Int'];
   looks: Array<Look>;
   matchTags: Array<KeywordMatchTag>;
   name: Scalars['String'];
+  relatedKeywords: Array<Keyword>;
   score: Scalars['Float'];
   styleTags: Array<StyleTag>;
   /** 스타일팁 줄글 */
@@ -937,7 +1039,13 @@ export enum KeywordClassType {
 }
 
 export type KeywordFilter = {
+  /** 제공시 추가 연산을 수행합니다. (비로그인시 무시) */
+  isLiking?: Maybe<Scalars['Boolean']>;
+  /** 제공시 추가 연산을 수행합니다. (비로그인시 무시) */
+  isOwning?: Maybe<Scalars['Boolean']>;
   isVisible?: Maybe<Scalars['Boolean']>;
+  /** 제공시 추가 연산을 수행합니다. */
+  keywordClassId: Scalars['Int'];
 };
 
 export type KeywordMatchTag = {
@@ -996,7 +1104,11 @@ export type Look = {
 };
 
 export type LookFilter = {
+  orderBy?: Maybe<Scalars['String']>;
+  styleTagIdIn?: Maybe<Array<Scalars['Int']>>;
+  user?: Maybe<LookUserFilter>;
   userId?: Maybe<Scalars['Int']>;
+  userIdIn?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type LookImage = {
@@ -1004,6 +1116,10 @@ export type LookImage = {
   createdAt: Scalars['DateTime'];
   key: Scalars['String'];
   url: Scalars['String'];
+};
+
+export type LookUserFilter = {
+  heightBetween?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type Mutation = {
@@ -1015,6 +1131,7 @@ export type Mutation = {
   addItemUrl: ItemUrl;
   addMyRefundAccount: RefundAccount;
   addMyShippingAddress: Array<ShippingAddress>;
+  answerMeSellerInquiry: Inquiry;
   basifyPrice: Item;
   bulkPickMeSellerExchangeRequests: Scalars['Boolean'];
   bulkPickMeSellerRefundRequests: Scalars['Boolean'];
@@ -1029,10 +1146,12 @@ export type Mutation = {
   createCoupon: Coupon;
   createCouponSpecification: CouponSpecification;
   createCourier: Courier;
+  createInquiry: Inquiry;
   createItemOptionSet: Item;
   createMyCartItem: CartItem;
   createSeller: Seller;
   createUser: User;
+  deleteComment: Comment;
   dodgeVbankOrder: BaseOrderOutput;
   failOrder: BaseOrderOutput;
   follow: Scalars['Boolean'];
@@ -1043,6 +1162,7 @@ export type Mutation = {
   registerOrder: BaseOrderOutput;
   removeCourierIssue: Courier;
   removeDigest: Scalars['Boolean'];
+  removeInquiry: Scalars['Boolean'];
   removeItemDetailImage: Item;
   removeItemNotice: Item;
   removeItemPrice: Item;
@@ -1127,6 +1247,11 @@ export type MutationAddMyShippingAddressArgs = {
   createShippingAddressInput: CreateShippingAddressInput;
 };
 
+export type MutationAnswerMeSellerInquiryArgs = {
+  answerInquiryInput: AnswerInquiryInput;
+  id: Scalars['Int'];
+};
+
 export type MutationBasifyPriceArgs = {
   itemId: Scalars['Int'];
   priceId: Scalars['Int'];
@@ -1183,6 +1308,10 @@ export type MutationCreateCourierArgs = {
   createCourierInput: CreateCourierInput;
 };
 
+export type MutationCreateInquiryArgs = {
+  createInquiryInput: CreateInquiryInput;
+};
+
 export type MutationCreateItemOptionSetArgs = {
   createItemOptionSetInput: CreateItemOptionSetInput;
   id: Scalars['Int'];
@@ -1198,6 +1327,10 @@ export type MutationCreateSellerArgs = {
 
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
+};
+
+export type MutationDeleteCommentArgs = {
+  id: Scalars['Int'];
 };
 
 export type MutationDodgeVbankOrderArgs = {
@@ -1241,6 +1374,10 @@ export type MutationRemoveCourierIssueArgs = {
 };
 
 export type MutationRemoveDigestArgs = {
+  id: Scalars['Int'];
+};
+
+export type MutationRemoveInquiryArgs = {
   id: Scalars['Int'];
 };
 
@@ -1929,6 +2066,8 @@ export type Query = {
   digest: Digest;
   digests: Array<Digest>;
   genRandomNickname: Scalars['String'];
+  inquiries: Array<Inquiry>;
+  inquiry: Inquiry;
   item: Item;
   itemCategoryTree: Array<ItemCategory>;
   itemMajorCategories: Array<ItemCategory>;
@@ -1942,10 +2081,13 @@ export type Query = {
   loginWithApple: JwtToken;
   looks: Array<Look>;
   me: User;
+  meFollowingUsers: Array<User>;
   meOwnsCount: OwnsCountOutput;
   meSeller: Seller;
   meSellerExchangeRequests: Array<ExchangeRequest>;
   meSellerExchangeRequestsCount: ExchangeRequestsCountOutput;
+  meSellerInquiries: Array<Inquiry>;
+  meSellerInquiriesCount: InquiriesCountOutput;
   meSellerOrderItems: Array<OrderItem>;
   meSellerOrderItemsCount: OrderItemsCountOutput;
   meSellerRefundRequests: Array<RefundRequest>;
@@ -1968,7 +2110,6 @@ export type Query = {
   sellers: Array<Seller>;
   styleTags: Array<StyleTag>;
   user: User;
-  users: Array<User>;
   videos: Array<Video>;
 };
 
@@ -2019,6 +2160,15 @@ export type QueryDigestsArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
+export type QueryInquiriesArgs = {
+  filter?: Maybe<InquiryFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryInquiryArgs = {
+  id: Scalars['Int'];
+};
+
 export type QueryItemArgs = {
   id: Scalars['Int'];
 };
@@ -2034,7 +2184,7 @@ export type QueryItemsArgs = {
 };
 
 export type QueryKeywordsArgs = {
-  filter?: Maybe<KeywordFilter>;
+  filter: KeywordFilter;
   pageInput?: Maybe<PageInput>;
 };
 
@@ -2069,6 +2219,15 @@ export type QueryMeSellerExchangeRequestsArgs = {
 };
 
 export type QueryMeSellerExchangeRequestsCountArgs = {
+  forceUpdate?: Maybe<Scalars['Boolean']>;
+};
+
+export type QueryMeSellerInquiriesArgs = {
+  filter?: Maybe<InquiryFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeSellerInquiriesCountArgs = {
   forceUpdate?: Maybe<Scalars['Boolean']>;
 };
 
@@ -2462,7 +2621,7 @@ export type UpdateCartItemInput = {
 };
 
 export type UpdateCommentInput = {
-  content: Scalars['String'];
+  content?: Maybe<Scalars['String']>;
 };
 
 export type UpdateCourierInput = {
@@ -2695,5 +2854,7 @@ export type Video = {
 };
 
 export type VideoFilter = {
+  orderBy?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['Int']>;
+  userIdIn?: Maybe<Array<Scalars['Int']>>;
 };
