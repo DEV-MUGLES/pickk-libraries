@@ -258,8 +258,10 @@ export enum ClaimFeePayMethod {
 
 export type Comment = {
   content?: Maybe<Scalars['String']>;
+  contentUpdatedAt?: Maybe<Scalars['DateTime']>;
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
+  isContentUpdated: Scalars['Boolean'];
   isDeleted: Scalars['Boolean'];
   /** [MODEL ONLY] */
   isLiking?: Maybe<Scalars['Boolean']>;
@@ -422,11 +424,11 @@ export type CreateItemOptionSetInput = {
 };
 
 export type CreateOrderVbankReceiptInput = {
-  bankCode: BankCode;
-  due: Scalars['DateTime'];
+  bankCode?: Maybe<BankCode>;
+  due?: Maybe<Scalars['DateTime']>;
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
-  number: Scalars['String'];
-  ownerName: Scalars['String'];
+  number?: Maybe<Scalars['String']>;
+  ownerName?: Maybe<Scalars['String']>;
 };
 
 export type CreateRefundAccountInput = {
@@ -585,6 +587,7 @@ export type Digest = {
 };
 
 export type DigestFilter = {
+  idIn?: Maybe<Array<Scalars['Int']>>;
   itemId?: Maybe<Scalars['Int']>;
   orderBy?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['Int']>;
@@ -754,8 +757,8 @@ export enum InquiryAnswerFrom {
 }
 
 export type InquiryFilter = {
-  itemId?: Maybe<Scalars['Float']>;
-  sellerId?: Maybe<Scalars['Float']>;
+  itemId?: Maybe<Scalars['Int']>;
+  sellerId?: Maybe<Scalars['Int']>;
 };
 
 /** 배송/사이즈/재입고/기타 */
@@ -826,6 +829,7 @@ export type ItemFilter = {
   brandId?: Maybe<Scalars['Int']>;
   createdAtLte?: Maybe<Scalars['DateTime']>;
   createdAtMte?: Maybe<Scalars['DateTime']>;
+  idIn?: Maybe<Array<Scalars['Int']>>;
   isMdRecommended?: Maybe<Scalars['Boolean']>;
   isPurchasable?: Maybe<Scalars['Boolean']>;
   isSellable?: Maybe<Scalars['Boolean']>;
@@ -1039,6 +1043,7 @@ export enum KeywordClassType {
 }
 
 export type KeywordFilter = {
+  idIn?: Maybe<Array<Scalars['Int']>>;
   /** 제공시 추가 연산을 수행합니다. (비로그인시 무시) */
   isLiking?: Maybe<Scalars['Boolean']>;
   /** 제공시 추가 연산을 수행합니다. (비로그인시 무시) */
@@ -1104,6 +1109,7 @@ export type Look = {
 };
 
 export type LookFilter = {
+  idIn?: Maybe<Array<Scalars['Int']>>;
   orderBy?: Maybe<Scalars['String']>;
   styleTagIdIn?: Maybe<Array<Scalars['Int']>>;
   user?: Maybe<LookUserFilter>;
@@ -1156,6 +1162,9 @@ export type Mutation = {
   failOrder: BaseOrderOutput;
   follow: Scalars['Boolean'];
   hit: Scalars['Boolean'];
+  indexItem: Scalars['Boolean'];
+  indexKeyword: Scalars['Boolean'];
+  indexVideo: Scalars['Boolean'];
   like: Scalars['Boolean'];
   modifyItemSizeCharts: Item;
   own: Scalars['Boolean'];
@@ -2067,6 +2076,7 @@ export type Query = {
   digests: Array<Digest>;
   genRandomNickname: Scalars['String'];
   inquiries: Array<Inquiry>;
+  inquiriesCount: Scalars['Int'];
   inquiry: Inquiry;
   item: Item;
   itemCategoryTree: Array<ItemCategory>;
@@ -2075,6 +2085,10 @@ export type Query = {
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
   keywords: Array<Keyword>;
+  likingDigests: Array<Digest>;
+  likingKeywords: Array<Keyword>;
+  likingLooks: Array<Look>;
+  likingVideos: Array<Video>;
   loginByCode: JwtToken;
   loginByOauth: JwtToken;
   loginSellerByCode: JwtToken;
@@ -2106,6 +2120,11 @@ export type Query = {
   /** refresh token을 받아서 새로운 JwtToken을 생성합니다. */
   refreshJwtToken: JwtToken;
   requestPin: Scalars['Boolean'];
+  searchDigest: Array<Digest>;
+  searchItem: Array<Item>;
+  searchKeyword: Array<Keyword>;
+  searchLook: Array<Look>;
+  searchVideo: Array<Video>;
   seller: Seller;
   sellers: Array<Seller>;
   styleTags: Array<StyleTag>;
@@ -2165,6 +2184,10 @@ export type QueryInquiriesArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
+export type QueryInquiriesCountArgs = {
+  itemId: Scalars['Int'];
+};
+
 export type QueryInquiryArgs = {
   id: Scalars['Int'];
 };
@@ -2186,6 +2209,22 @@ export type QueryItemsArgs = {
 export type QueryKeywordsArgs = {
   filter: KeywordFilter;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryLikingDigestsArgs = {
+  pageInput: PageInput;
+};
+
+export type QueryLikingKeywordsArgs = {
+  pageInput: PageInput;
+};
+
+export type QueryLikingLooksArgs = {
+  pageInput: PageInput;
+};
+
+export type QueryLikingVideosArgs = {
+  pageInput: PageInput;
 };
 
 export type QueryLoginByCodeArgs = {
@@ -2269,6 +2308,31 @@ export type QueryPaymentsArgs = {
 
 export type QueryRequestPinArgs = {
   requestPinInput: RequestPinInput;
+};
+
+export type QuerySearchDigestArgs = {
+  pageInput?: Maybe<PageInput>;
+  query: Scalars['String'];
+};
+
+export type QuerySearchItemArgs = {
+  pageInput?: Maybe<PageInput>;
+  query: Scalars['String'];
+};
+
+export type QuerySearchKeywordArgs = {
+  pageInput?: Maybe<PageInput>;
+  query: Scalars['String'];
+};
+
+export type QuerySearchLookArgs = {
+  pageInput?: Maybe<PageInput>;
+  query: Scalars['String'];
+};
+
+export type QuerySearchVideoArgs = {
+  pageInput?: Maybe<PageInput>;
+  query: Scalars['String'];
 };
 
 export type QuerySellerArgs = {
@@ -2551,8 +2615,18 @@ export type Shipment = {
   lastTrackedAt?: Maybe<Scalars['DateTime']>;
   ownerPk?: Maybe<Scalars['String']>;
   ownerType?: Maybe<ShipmentOwnerType>;
+  shipmentHistories: Array<ShipmentHistory>;
   status: ShipmentStatus;
   trackCode?: Maybe<Scalars['String']>;
+};
+
+export type ShipmentHistory = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  locationName: Scalars['String'];
+  shipmentId: Scalars['Int'];
+  statusText: Scalars['String'];
+  time: Scalars['DateTime'];
 };
 
 /** 배송 연관 객체 분류입니다. */
@@ -2781,12 +2855,16 @@ export type UpdateShippingAddressInput = {
 export type UpdateUserInput = {
   avatarUrl?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
+  /** 최대 255자 */
+  description?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   height?: Maybe<Scalars['Int']>;
+  instagramCode?: Maybe<Scalars['String']>;
   name?: Maybe<Scalars['String']>;
   /** 최대 11자 */
   nickname?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Int']>;
+  youtubeUrl?: Maybe<Scalars['String']>;
 };
 
 export type UploadMultipleImageInput = {
@@ -2799,14 +2877,19 @@ export type User = {
   avatarUrl?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
+  /** 최대 255자 */
+  description?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   /** [ResolveField] 적립예정 포인트 잔고 */
   expectedPoint: Scalars['Int'];
   followCount: Scalars['Int'];
   height?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
+  instagramCode?: Maybe<Scalars['String']>;
   /** [MODEL ONLY] */
   isFollowing?: Maybe<Scalars['Boolean']>;
+  /** [MODEL ONLY] */
+  isMe?: Maybe<Scalars['Boolean']>;
   name?: Maybe<Scalars['String']>;
   /** 최대 11자 */
   nickname: Scalars['String'];
@@ -2819,6 +2902,7 @@ export type User = {
   styleTags: Array<StyleTag>;
   updatedAt: Scalars['DateTime'];
   weight?: Maybe<Scalars['Int']>;
+  youtubeUrl?: Maybe<Scalars['String']>;
 };
 
 /** Oauth 제공 서비스입니다. */
@@ -2854,6 +2938,7 @@ export type Video = {
 };
 
 export type VideoFilter = {
+  idIn?: Maybe<Array<Scalars['Int']>>;
   orderBy?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['Int']>;
   userIdIn?: Maybe<Array<Scalars['Int']>>;
