@@ -563,11 +563,10 @@ export type Digest = {
   hitCount: Scalars['Int'];
   id: Scalars['Int'];
   images: Array<DigestImage>;
-  /**
-   * read, list 호출 시 userId가 제공되면 liking 여부를 검사해 attach합니다.
-   * (true: 팔로잉, false: 팔로잉x, null: 유저정보 제공x)
-   */
+  /** [MODEL ONLY] */
   isLiking?: Maybe<Scalars['Boolean']>;
+  /** [MODEL ONLY] */
+  isMine?: Maybe<Scalars['Boolean']>;
   item?: Maybe<Item>;
   itemId?: Maybe<Scalars['Int']>;
   itemPropertyValues: Array<ItemPropertyValue>;
@@ -928,6 +927,7 @@ export type ItemPropertyValue = {
   name: Scalars['String'];
   /** 표시될 순서. 최소 0, 최대 255입니다. */
   order: Scalars['Float'];
+  property: ItemProperty;
   updatedAt: Scalars['DateTime'];
 };
 
@@ -1098,6 +1098,10 @@ export type Look = {
   hitCount: Scalars['Int'];
   id: Scalars['Int'];
   images: Array<LookImage>;
+  /** [MODEL ONLY] */
+  isLiking?: Maybe<Scalars['Boolean']>;
+  /** [MODEL ONLY] */
+  isMine?: Maybe<Scalars['Boolean']>;
   likeCount: Scalars['Int'];
   score: Scalars['Float'];
   styleTags: Array<StyleTag>;
@@ -2093,6 +2097,7 @@ export type Query = {
   loginByOauth: JwtToken;
   loginSellerByCode: JwtToken;
   loginWithApple: JwtToken;
+  look: Look;
   looks: Array<Look>;
   me: User;
   meFollowingUsers: Array<User>;
@@ -2129,6 +2134,7 @@ export type Query = {
   sellers: Array<Seller>;
   styleTags: Array<StyleTag>;
   user: User;
+  video: Video;
   videos: Array<Video>;
 };
 
@@ -2243,6 +2249,10 @@ export type QueryLoginWithAppleArgs = {
   getAppleProviderIdInput: LoginWithAppleInput;
 };
 
+export type QueryLookArgs = {
+  id: Scalars['Int'];
+};
+
 export type QueryLooksArgs = {
   filter?: Maybe<LookFilter>;
   pageInput?: Maybe<PageInput>;
@@ -2345,6 +2355,10 @@ export type QuerySellersArgs = {
 };
 
 export type QueryUserArgs = {
+  id: Scalars['Int'];
+};
+
+export type QueryVideoArgs = {
   id: Scalars['Int'];
 };
 
@@ -2863,6 +2877,7 @@ export type UpdateUserInput = {
   name?: Maybe<Scalars['String']>;
   /** 최대 11자 */
   nickname?: Maybe<Scalars['String']>;
+  styleTagIds?: Maybe<Array<Scalars['Int']>>;
   weight?: Maybe<Scalars['Int']>;
   youtubeUrl?: Maybe<Scalars['String']>;
 };
@@ -2926,6 +2941,10 @@ export type Video = {
   digests: Array<Digest>;
   hitCount: Scalars['Int'];
   id: Scalars['Int'];
+  /** [MODEL ONLY] */
+  isLiking?: Maybe<Scalars['Boolean']>;
+  /** [MODEL ONLY] */
+  isMine?: Maybe<Scalars['Boolean']>;
   likeCount: Scalars['Int'];
   score: Scalars['Float'];
   /** 최대 길이 127 */
