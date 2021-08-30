@@ -414,9 +414,14 @@ export type CreateItemDetailImageInput = {
   urls: Array<Scalars['String']>;
 };
 
+export type CreateItemOpionValueInput = {
+  name: Scalars['String'];
+  priceVariant: Scalars['Int'];
+};
+
 export type CreateItemOptionInput = {
   name: Scalars['String'];
-  values: Array<Scalars['String']>;
+  values: Array<CreateItemOpionValueInput>;
 };
 
 export type CreateItemOptionSetInput = {
@@ -873,6 +878,7 @@ export type ItemOptionValue = {
   id: Scalars['Int'];
   name: Scalars['String'];
   order: Scalars['Float'];
+  priceVariant: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -1817,6 +1823,7 @@ export type OrderSheet = {
   coupons: Array<Coupon>;
   /** ApolloClient 최적화를 위한 필드입니다. order의 merchantUid와 같습니다. */
   id: Scalars['String'];
+  me: User;
   order: Order;
   refundAccount?: Maybe<RefundAccount>;
   shippingAddresses: Array<ShippingAddress>;
@@ -2046,6 +2053,7 @@ export type Product = {
   item: Item;
   itemId: Scalars['Int'];
   itemOptionValues: Array<ItemOptionValue>;
+  priceVariant: Scalars['Int'];
   shippingReservePolicy?: Maybe<ProductShippingReservePolicy>;
   stock: Scalars['Int'];
   /** 이 Product의 stock이 0이면 예약배송정책의 stock을 반환합니다. */
