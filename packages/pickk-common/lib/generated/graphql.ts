@@ -1144,8 +1144,8 @@ export type Mutation = {
   addItemPrice: ItemPrice;
   addItemSizeCharts: Item;
   addItemUrl: ItemUrl;
-  addMyRefundAccount: RefundAccount;
-  addMyShippingAddress: Array<ShippingAddress>;
+  addMeRefundAccount: RefundAccount;
+  addMeShippingAddress: Array<ShippingAddress>;
   answerMeSellerInquiry: Inquiry;
   basifyPrice: Item;
   bulkPickMeSellerExchangeRequests: Scalars['Boolean'];
@@ -1185,9 +1185,9 @@ export type Mutation = {
   removeItemNotice: Item;
   removeItemPrice: Item;
   removeItemSizeChartsAll: Item;
+  removeMeRefundAccount: User;
+  removeMeShippingAddress: Array<ShippingAddress>;
   removeMyCartItems: Scalars['Boolean'];
-  removeMyRefundAccount: User;
-  removeMyShippingAddress: Array<ShippingAddress>;
   requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
@@ -1207,20 +1207,20 @@ export type Mutation = {
   updateItemOption: ItemOption;
   updateItemPrice: ItemPrice;
   updateMe: User;
+  updateMeRefundAccount: RefundAccount;
   updateMeSeller: Seller;
   /** 주문상품 단건 운송장 수정 */
   updateMeSellerOrderItemTrackCode: OrderItem;
+  updateMeShippingAddress: ShippingAddress;
   updateMyCartItem: CartItem;
   /** (!) 예전 비밀번호와 현재 비밀번호를 입력해주세요. */
   updateMyPassword: User;
-  updateMyRefundAccount: RefundAccount;
   updateMySellerClaimPolicy: SellerClaimPolicy;
   updateMySellerCrawlPolicy: SellerCrawlPolicy;
   updateMySellerReturnAddress: SellerReturnAddress;
   /** 추가도 이거로 해주시면 됩니다! */
   updateMySellerSettlePolicy: SellerSettlePolicy;
   updateMySellerShippingPolicy: SellerShippingPolicy;
-  updateMyShippingAddress: ShippingAddress;
   updateProduct: Product;
   /** 입력한 seller의 saleStrategy를 변경합니다. Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: SaleStrategy;
@@ -1257,11 +1257,11 @@ export type MutationAddItemUrlArgs = {
   itemId: Scalars['Int'];
 };
 
-export type MutationAddMyRefundAccountArgs = {
+export type MutationAddMeRefundAccountArgs = {
   createRefundAccountInput: CreateRefundAccountInput;
 };
 
-export type MutationAddMyShippingAddressArgs = {
+export type MutationAddMeShippingAddressArgs = {
   createShippingAddressInput: CreateShippingAddressInput;
 };
 
@@ -1417,12 +1417,12 @@ export type MutationRemoveItemSizeChartsAllArgs = {
   itemId: Scalars['Int'];
 };
 
-export type MutationRemoveMyCartItemsArgs = {
-  ids: Array<Scalars['Int']>;
+export type MutationRemoveMeShippingAddressArgs = {
+  addressId: Scalars['Int'];
 };
 
-export type MutationRemoveMyShippingAddressArgs = {
-  addressId: Scalars['Int'];
+export type MutationRemoveMyCartItemsArgs = {
+  ids: Array<Scalars['Int']>;
 };
 
 export type MutationRequestOrderItemExchangeArgs = {
@@ -1507,6 +1507,10 @@ export type MutationUpdateMeArgs = {
   updateUserInput: UpdateUserInput;
 };
 
+export type MutationUpdateMeRefundAccountArgs = {
+  updateRefundAccountInput: UpdateRefundAccountInput;
+};
+
 export type MutationUpdateMeSellerArgs = {
   updateSellerInput: UpdateSellerInput;
 };
@@ -1514,6 +1518,11 @@ export type MutationUpdateMeSellerArgs = {
 export type MutationUpdateMeSellerOrderItemTrackCodeArgs = {
   merchantUid: Scalars['String'];
   trackCode: Scalars['String'];
+};
+
+export type MutationUpdateMeShippingAddressArgs = {
+  addressId: Scalars['Int'];
+  updateShippingAddressInput: UpdateShippingAddressInput;
 };
 
 export type MutationUpdateMyCartItemArgs = {
@@ -1524,10 +1533,6 @@ export type MutationUpdateMyCartItemArgs = {
 export type MutationUpdateMyPasswordArgs = {
   newPassword: Scalars['String'];
   oldPassword: Scalars['String'];
-};
-
-export type MutationUpdateMyRefundAccountArgs = {
-  updateRefundAccountInput: UpdateRefundAccountInput;
 };
 
 export type MutationUpdateMySellerClaimPolicyArgs = {
@@ -1548,11 +1553,6 @@ export type MutationUpdateMySellerSettlePolicyArgs = {
 
 export type MutationUpdateMySellerShippingPolicyArgs = {
   updateSellerShippingPolicyInput: UpdateSellerShippingPolicyInput;
-};
-
-export type MutationUpdateMyShippingAddressArgs = {
-  addressId: Scalars['Int'];
-  updateShippingAddressInput: UpdateShippingAddressInput;
 };
 
 export type MutationUpdateProductArgs = {
@@ -2116,6 +2116,7 @@ export type Query = {
   meSellerOrderItemsCount: OrderItemsCountOutput;
   meSellerRefundRequests: Array<RefundRequest>;
   meSellerRefundRequestsCount: RefundRequestsCountOutput;
+  meShippingAddresses: Array<ShippingAddress>;
   myCart: Cart;
   myCartItemsCount: Scalars['Int'];
   myCoupons: Array<Coupon>;
@@ -2123,8 +2124,6 @@ export type Query = {
   /** Bearer token을 받아 JwtPayload를 반환합니다. */
   myJwtPayload: JwtPayload;
   myPointEvents: Array<PointEvent>;
-  myShippingAddress: ShippingAddress;
-  myShippingAddresses: Array<ShippingAddress>;
   /** [Admin] 결제 목록을 조회합니다. */
   payments: PaymentListOutput;
   /** refresh token을 받아서 새로운 JwtToken을 생성합니다. */
@@ -2316,10 +2315,6 @@ export type QueryMyExpectedPointEventsArgs = {
 export type QueryMyPointEventsArgs = {
   pageInput?: Maybe<PageInput>;
   pointEventFilter?: Maybe<PointEventFilter>;
-};
-
-export type QueryMyShippingAddressArgs = {
-  id: Scalars['Int'];
 };
 
 export type QueryPaymentsArgs = {
