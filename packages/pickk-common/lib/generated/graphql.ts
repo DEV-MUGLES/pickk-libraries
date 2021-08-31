@@ -540,8 +540,7 @@ export type CreateShippingAddressInput = {
   detailAddress: Scalars['String'];
   isPrimary: Scalars['Boolean'];
   name: Scalars['String'];
-  phoneNumber1: Scalars['String'];
-  phoneNumber2?: Maybe<Scalars['String']>;
+  phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
   receiverName: Scalars['String'];
 };
@@ -1167,7 +1166,6 @@ export type Mutation = {
   createMyCartItem: CartItem;
   createSeller: Seller;
   createUser: User;
-  deleteComment: Comment;
   dodgeVbankOrder: BaseOrderOutput;
   failOrder: BaseOrderOutput;
   follow: Scalars['Boolean'];
@@ -1179,6 +1177,7 @@ export type Mutation = {
   modifyItemSizeCharts: Item;
   own: Scalars['Boolean'];
   registerOrder: BaseOrderOutput;
+  removeComment: Comment;
   removeCourierIssue: Courier;
   removeDigest: Scalars['Boolean'];
   removeInquiry: Scalars['Boolean'];
@@ -1348,10 +1347,6 @@ export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
 };
 
-export type MutationDeleteCommentArgs = {
-  id: Scalars['Int'];
-};
-
 export type MutationDodgeVbankOrderArgs = {
   merchantUid: Scalars['String'];
 };
@@ -1386,6 +1381,10 @@ export type MutationOwnArgs = {
 
 export type MutationRegisterOrderArgs = {
   registerOrderInput: RegisterOrderInput;
+};
+
+export type MutationRemoveCommentArgs = {
+  id: Scalars['Int'];
 };
 
 export type MutationRemoveCourierIssueArgs = {
@@ -1786,17 +1785,14 @@ export type OrderReceiver = {
   name: Scalars['String'];
   phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
+  receiverName: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
 export type OrderReceiverInput = {
-  baseAddress: Scalars['String'];
-  detailAddress: Scalars['String'];
   /** 베송 요청사항 (최대 50자) */
   message?: Maybe<Scalars['String']>;
-  name: Scalars['String'];
-  phoneNumber: Scalars['String'];
-  postalCode: Scalars['String'];
+  shippingAddressId: Scalars['Int'];
 };
 
 /** 가상계좌 결제시 환불 받을 계좌 정보 */
@@ -2082,6 +2078,7 @@ export type Query = {
   checkPin: Scalars['Boolean'];
   checkoutOrder: OrderSheet;
   comments: Array<Comment>;
+  commentsCount: Scalars['Int'];
   courier: Courier;
   couriers: Array<Courier>;
   digest: Digest;
@@ -2178,6 +2175,11 @@ export type QueryCheckoutOrderArgs = {
 export type QueryCommentsArgs = {
   filter?: Maybe<CommentFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryCommentsCountArgs = {
+  ownerId: Scalars['Int'];
+  ownerType: Scalars['String'];
 };
 
 export type QueryCourierArgs = {
@@ -2597,7 +2599,10 @@ export type SellerReturnAddress = {
   createdAt: Scalars['DateTime'];
   detailAddress: Scalars['String'];
   id: Scalars['Int'];
+  name: Scalars['String'];
+  phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
+  receiverName: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -2673,8 +2678,7 @@ export type ShippingAddress = {
   id: Scalars['Int'];
   isPrimary: Scalars['Boolean'];
   name: Scalars['String'];
-  phoneNumber1: Scalars['String'];
-  phoneNumber2?: Maybe<Scalars['String']>;
+  phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
   receiverName: Scalars['String'];
   updatedAt: Scalars['DateTime'];
@@ -2867,8 +2871,7 @@ export type UpdateShippingAddressInput = {
   detailAddress?: Maybe<Scalars['String']>;
   isPrimary?: Maybe<Scalars['Boolean']>;
   name?: Maybe<Scalars['String']>;
-  phoneNumber1?: Maybe<Scalars['String']>;
-  phoneNumber2?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
   postalCode?: Maybe<Scalars['String']>;
   receiverName?: Maybe<Scalars['String']>;
   userId?: Maybe<Scalars['Int']>;
