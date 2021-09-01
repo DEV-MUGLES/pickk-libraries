@@ -1145,7 +1145,7 @@ export type Mutation = {
   addItemSizeCharts: Item;
   addItemUrl: ItemUrl;
   addMeRefundAccount: RefundAccount;
-  addMeShippingAddress: Array<ShippingAddress>;
+  addMeShippingAddress: ShippingAddress;
   answerMeSellerInquiry: Inquiry;
   basifyPrice: Item;
   bulkPickMeSellerExchangeRequests: Scalars['Boolean'];
@@ -1157,6 +1157,7 @@ export type Mutation = {
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
   completeOrder: BaseOrderOutput;
+  crawlItemOptionSet: Item;
   createComment: Comment;
   createCoupon: Coupon;
   createCouponSpecification: CouponSpecification;
@@ -1308,6 +1309,10 @@ export type MutationCancelOrderArgs = {
 export type MutationCompleteOrderArgs = {
   createOrderVbankReceiptInput?: Maybe<CreateOrderVbankReceiptInput>;
   merchantUid: Scalars['String'];
+};
+
+export type MutationCrawlItemOptionSetArgs = {
+  itemId: Scalars['Int'];
 };
 
 export type MutationCreateCommentArgs = {
@@ -2044,6 +2049,7 @@ export enum PointType {
 export type Product = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
+  isDeleted: Scalars['Boolean'];
   /** 예약배송 적용 여부 */
   isShipReserving: Scalars['Boolean'];
   item: Item;
