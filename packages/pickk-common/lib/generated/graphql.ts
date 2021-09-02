@@ -1193,7 +1193,7 @@ export type Mutation = {
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
   shipMeSellerOrderItem: OrderItem;
-  startOrder: BaseOrderOutput;
+  startOrder: Order;
   /** 여러번 구독된 상태였다면 모두 삭제됩니다. */
   unfollow: Scalars['Boolean'];
   /** 여러번 좋아요한 상태였다면 모두 삭제됩니다. */
