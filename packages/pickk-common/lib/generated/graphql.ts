@@ -1831,6 +1831,7 @@ export type OrderSheet = {
 };
 
 export type OrderSheetBrand = {
+  imageUrl: Scalars['String'];
   items: Array<OrderItem>;
   nameKor: Scalars['String'];
   shippingFee: Scalars['Int'];
