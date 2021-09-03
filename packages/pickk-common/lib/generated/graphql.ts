@@ -802,6 +802,7 @@ export type Item = {
   products?: Maybe<Array<Product>>;
   providedCode?: Maybe<Scalars['String']>;
   salePolicy?: Maybe<ItemSalePolicy>;
+  score: Scalars['Float'];
   sellPrice: Scalars['Float'];
   /** 판매가능시점(=활성전환일) */
   sellableAt?: Maybe<Scalars['DateTime']>;
@@ -838,6 +839,8 @@ export type ItemFilter = {
   isSellable?: Maybe<Scalars['Boolean']>;
   majorCategoryId?: Maybe<Scalars['Float']>;
   minorCategoryId?: Maybe<Scalars['Float']>;
+  orderBy: Scalars['String'];
+  scoreMt?: Maybe<Scalars['DateTime']>;
   /** 아이템 이름(name)으로 검색합니다. */
   search?: Maybe<Scalars['String']>;
   sellableAtLte?: Maybe<Scalars['DateTime']>;
@@ -1930,7 +1933,7 @@ export type Payment = {
   status: PaymentStatus;
   updatedAt: Scalars['DateTime'];
   vbankCode?: Maybe<BankCode>;
-  vbankDate?: Maybe<Scalars['String']>;
+  vbankDate?: Maybe<Scalars['DateTime']>;
   vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankHolder?: Maybe<Scalars['String']>;
   vbankNum?: Maybe<Scalars['String']>;
