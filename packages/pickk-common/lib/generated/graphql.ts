@@ -133,6 +133,8 @@ export enum BankCode {
 }
 
 export type BaseOrderOutput = {
+  /** [MODEL ONLY] */
+  brands: Array<OrderBrand>;
   createdAt: Scalars['DateTime'];
   failedAt?: Maybe<Scalars['DateTime']>;
   /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
@@ -604,6 +606,13 @@ export type DigestImage = {
   url: Scalars['String'];
 };
 
+export type DigestsExhibition = {
+  createdAt: Scalars['DateTime'];
+  digests: Array<Digest>;
+  id: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: RefundRequestFaultOf;
@@ -987,6 +996,13 @@ export type ItemUrl = {
   url: Scalars['String'];
 };
 
+export type ItemsExhibition = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  items: Array<Item>;
+  updatedAt: Scalars['DateTime'];
+};
+
 export type JwtPayload = {
   /** Seller 로그인인 경우에만 발급된다. */
   brandId?: Maybe<Scalars['Float']>;
@@ -1122,6 +1138,8 @@ export type Look = {
 
 export type LookFilter = {
   idIn?: Maybe<Array<Scalars['Int']>>;
+  /** 사용시 다른 필터는 무시합니다. (정렬: "score") */
+  itemId?: Maybe<Scalars['Int']>;
   orderBy?: Maybe<Scalars['String']>;
   styleTagIdIn?: Maybe<Array<Scalars['Int']>>;
   user?: Maybe<LookUserFilter>;
@@ -1206,10 +1224,12 @@ export type Mutation = {
   updateComment: Comment;
   updateCourier: Courier;
   updateCourierIssue: CourierIssue;
+  updateDigestsExhibitionDigests: DigestsExhibition;
   updateItem: Item;
   updateItemNotice: ItemNotice;
   updateItemOption: ItemOption;
   updateItemPrice: ItemPrice;
+  updateItemsExhibitionItems: ItemsExhibition;
   updateMe: User;
   updateMeRefundAccount: RefundAccount;
   updateMeSeller: Seller;
@@ -1491,6 +1511,11 @@ export type MutationUpdateCourierIssueArgs = {
   updateCourierIssueInput: UpdateCourierIssueInput;
 };
 
+export type MutationUpdateDigestsExhibitionDigestsArgs = {
+  digestIds: Array<Scalars['Int']>;
+  id: Scalars['Int'];
+};
+
 export type MutationUpdateItemArgs = {
   itemId: Scalars['Int'];
   updateItemInput: UpdateItemInput;
@@ -1509,6 +1534,11 @@ export type MutationUpdateItemOptionArgs = {
 export type MutationUpdateItemPriceArgs = {
   id: Scalars['Int'];
   updateItemPriceInput: UpdateItemPriceInput;
+};
+
+export type MutationUpdateItemsExhibitionItemsArgs = {
+  id: Scalars['Int'];
+  itemIds: Array<Scalars['Int']>;
 };
 
 export type MutationUpdateMeArgs = {
@@ -1578,6 +1608,8 @@ export type MutationUploadMultipleImagesArgs = {
 };
 
 export type Order = {
+  /** [MODEL ONLY] */
+  brands: Array<OrderBrand>;
   buyer?: Maybe<OrderBuyer>;
   createdAt: Scalars['DateTime'];
   failedAt?: Maybe<Scalars['DateTime']>;
@@ -1605,6 +1637,14 @@ export type Order = {
   vbankInfo?: Maybe<OrderVbankReceipt>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
   withdrawnAt?: Maybe<Scalars['DateTime']>;
+};
+
+export type OrderBrand = {
+  imageUrl: Scalars['String'];
+  items: Array<OrderItem>;
+  nameKor: Scalars['String'];
+  shippingFee: Scalars['Int'];
+  totalItemFinalPrice: Scalars['Int'];
 };
 
 export type OrderBuyer = {
@@ -1823,7 +1863,7 @@ export type OrderRefundAccountInput = {
 
 export type OrderSheet = {
   availablePointAmount: Scalars['Int'];
-  brands: Array<OrderSheetBrand>;
+  brands: Array<OrderBrand>;
   coupons: Array<Coupon>;
   /** ApolloClient 최적화를 위한 필드입니다. order의 merchantUid와 같습니다. */
   id: Scalars['String'];
@@ -1831,14 +1871,6 @@ export type OrderSheet = {
   order: Order;
   refundAccount?: Maybe<RefundAccount>;
   shippingAddresses: Array<ShippingAddress>;
-};
-
-export type OrderSheetBrand = {
-  imageUrl: Scalars['String'];
-  items: Array<OrderItem>;
-  nameKor: Scalars['String'];
-  shippingFee: Scalars['Int'];
-  totalItemFinalPrice: Scalars['Int'];
 };
 
 /** 주문 상태입니다. 클라이언트에선 거의 사용되지 않을 값입니다. */
@@ -2093,16 +2125,16 @@ export type Query = {
   couriers: Array<Courier>;
   digest: Digest;
   digests: Array<Digest>;
+  digestsExhibitions: Array<DigestsExhibition>;
   genRandomNickname: Scalars['String'];
-  inquiries: Array<Inquiry>;
   inquiriesCount: Scalars['Int'];
-  inquiry: Inquiry;
   item: Item;
   itemCategoryTree: Array<ItemCategory>;
   itemMajorCategories: Array<ItemCategory>;
   itemMinorCategories: Array<ItemCategory>;
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
+  itemsExhibitions: Array<ItemsExhibition>;
   keywords: Array<Keyword>;
   likingDigests: Array<Digest>;
   likingKeywords: Array<Keyword>;
@@ -2116,6 +2148,10 @@ export type Query = {
   looks: Array<Look>;
   me: User;
   meFollowingUsers: Array<User>;
+  meInquiries: Array<Inquiry>;
+  meInquiry: Inquiry;
+  meOrder: Order;
+  meOrders: Array<Order>;
   meOwnsCount: OwnsCountOutput;
   meSeller: Seller;
   meSellerExchangeRequests: Array<ExchangeRequest>;
@@ -2204,17 +2240,8 @@ export type QueryDigestsArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
-export type QueryInquiriesArgs = {
-  filter?: Maybe<InquiryFilter>;
-  pageInput?: Maybe<PageInput>;
-};
-
 export type QueryInquiriesCountArgs = {
   itemId: Scalars['Int'];
-};
-
-export type QueryInquiryArgs = {
-  id: Scalars['Int'];
 };
 
 export type QueryItemArgs = {
@@ -2274,6 +2301,23 @@ export type QueryLookArgs = {
 
 export type QueryLooksArgs = {
   filter?: Maybe<LookFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeInquiriesArgs = {
+  filter?: Maybe<InquiryFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeInquiryArgs = {
+  id: Scalars['Int'];
+};
+
+export type QueryMeOrderArgs = {
+  merchantUid: Scalars['String'];
+};
+
+export type QueryMeOrdersArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
