@@ -1000,6 +1000,8 @@ export type ItemsExhibition = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   items: Array<Item>;
+  /** 최대 50자 */
+  title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
