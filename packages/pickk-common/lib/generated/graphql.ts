@@ -771,6 +771,7 @@ export enum InquiryAnswerFrom {
 export type InquiryFilter = {
   itemId?: Maybe<Scalars['Int']>;
   sellerId?: Maybe<Scalars['Int']>;
+  userId?: Maybe<Scalars['Int']>;
 };
 
 /** 배송/사이즈/재입고/기타 */
@@ -2129,6 +2130,7 @@ export type Query = {
   digests: Array<Digest>;
   digestsExhibitions: Array<DigestsExhibition>;
   genRandomNickname: Scalars['String'];
+  inquiries: Array<Inquiry>;
   inquiriesCount: Scalars['Int'];
   item: Item;
   itemCategoryTree: Array<ItemCategory>;
@@ -2242,6 +2244,11 @@ export type QueryDigestsArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
+export type QueryInquiriesArgs = {
+  filter?: Maybe<InquiryFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 export type QueryInquiriesCountArgs = {
   itemId: Scalars['Int'];
 };
@@ -2307,7 +2314,6 @@ export type QueryLooksArgs = {
 };
 
 export type QueryMeInquiriesArgs = {
-  filter?: Maybe<InquiryFilter>;
   pageInput?: Maybe<PageInput>;
 };
 
@@ -2949,6 +2955,8 @@ export type UploadMultipleImageInput = {
 };
 
 export type User = {
+  /** [ResolveField] 활성화된 주문건들 개수 */
+  activeOrderItemsCount: Scalars['Int'];
   /** [ResolveField] 사용가능 포인트 잔고 */
   availablePoint: Scalars['Int'];
   avatarUrl?: Maybe<Scalars['String']>;
