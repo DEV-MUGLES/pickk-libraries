@@ -1041,7 +1041,7 @@ export type Keyword = {
   isVisible: Scalars['Boolean'];
   likeCount: Scalars['Int'];
   looks: Array<Look>;
-  matchTags: Array<KeywordMatchTag>;
+  matchTagNames: Array<Scalars['String']>;
   name: Scalars['String'];
   relatedKeywords: Array<Keyword>;
   score: Scalars['Float'];
@@ -1083,16 +1083,6 @@ export type KeywordFilter = {
   isVisible?: Maybe<Scalars['Boolean']>;
   /** 제공시 추가 연산을 수행합니다. */
   keywordClassId: Scalars['Int'];
-};
-
-export type KeywordMatchTag = {
-  createdAt: Scalars['DateTime'];
-  id: Scalars['Int'];
-  isVisible: Scalars['Boolean'];
-  name: Scalars['String'];
-  /** 0~255 정수 */
-  order: Scalars['Int'];
-  updatedAt: Scalars['DateTime'];
 };
 
 /** 좋아요 대상 객체 분류입니다. (Digest, Look, Video, Comment, Keyword) */
