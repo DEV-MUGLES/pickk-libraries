@@ -1064,6 +1064,11 @@ export type KeywordClass = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type KeywordClassFilter = {
+  isVisible?: Maybe<Scalars['Boolean']>;
+  type?: Maybe<KeywordClassType>;
+};
+
 export enum KeywordClassType {
   Essential = 'Essential',
   Trending = 'Trending',
@@ -2139,6 +2144,8 @@ export type Query = {
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
   itemsExhibitions: Array<ItemsExhibition>;
+  keyword: Keyword;
+  keywordClasses: Array<KeywordClass>;
   keywords: Array<Keyword>;
   likingDigests: Array<Digest>;
   likingKeywords: Array<Keyword>;
@@ -2264,6 +2271,15 @@ export type QueryItemPropertiesArgs = {
 
 export type QueryItemsArgs = {
   itemFilter?: Maybe<ItemFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryKeywordArgs = {
+  id: Scalars['Int'];
+};
+
+export type QueryKeywordClassesArgs = {
+  filter: KeywordClassFilter;
   pageInput?: Maybe<PageInput>;
 };
 
