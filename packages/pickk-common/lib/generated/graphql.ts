@@ -2137,6 +2137,7 @@ export type Query = {
   keyword: Keyword;
   keywordClasses: Array<KeywordClass>;
   keywords: Array<Keyword>;
+  keywordsCountByClass: Scalars['Int'];
   likingDigests: Array<Digest>;
   likingKeywords: Array<Keyword>;
   likingLooks: Array<Look>;
@@ -2276,6 +2277,10 @@ export type QueryKeywordClassesArgs = {
 export type QueryKeywordsArgs = {
   filter: KeywordFilter;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryKeywordsCountByClassArgs = {
+  keywordClassId: Scalars['Int'];
 };
 
 export type QueryLikingDigestsArgs = {
