@@ -19,8 +19,6 @@ export type Scalars = {
   Rating: any;
   /** Date type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch. */
   Timestamp: any;
-  /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
 };
 
 export type AddItemNoticeInput = {
@@ -399,6 +397,18 @@ export type CreateCourierInput = {
   returnReserveUrl: Scalars['String'];
 };
 
+export type CreateDigestInput = {
+  /** 최대 길이 2047 */
+  content?: Maybe<Scalars['String']>;
+  imageUrls: Array<Scalars['String']>;
+  itemId?: Maybe<Scalars['Int']>;
+  itemPropertyValueIds: Array<Scalars['Int']>;
+  rating?: Maybe<Scalars['Rating']>;
+  size: Scalars['String'];
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
+};
+
 export type CreateInquiryInput = {
   /** 알림톡 받을 전화번호 (11글자) */
   contactPhoneNumber: Scalars['String'];
@@ -528,6 +538,7 @@ export type CreateSellerSettlePolicyInput = {
 };
 
 export type CreateSellerShippingPolicyInput = {
+  description?: Maybe<Scalars['String']>;
   fee: Scalars['Int'];
   minimumAmountForFree: Scalars['Int'];
 };
@@ -593,8 +604,10 @@ export type Digest = {
 
 export type DigestFilter = {
   idIn?: Maybe<Array<Scalars['Int']>>;
+  item?: Maybe<DigestItemFilter>;
   itemId?: Maybe<Scalars['Int']>;
   orderBy?: Maybe<Scalars['String']>;
+  user?: Maybe<DigestUserFilter>;
   userId?: Maybe<Scalars['Int']>;
   userIdIn?: Maybe<Array<Scalars['Int']>>;
 };
@@ -603,7 +616,16 @@ export type DigestImage = {
   angle: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   key: Scalars['String'];
+  order: Scalars['Float'];
   url: Scalars['String'];
+};
+
+export type DigestItemFilter = {
+  minorCategoryId?: Maybe<Scalars['Int']>;
+};
+
+export type DigestUserFilter = {
+  heightBetween?: Maybe<Array<Scalars['Int']>>;
 };
 
 export type DigestsExhibition = {
@@ -718,7 +740,7 @@ export enum HitOwnerType {
 export type InquiriesCountOutput = {
   /** 답변 지연 (생성일 5일 경과) */
   delayed: Scalars['Int'];
-  /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
+  /** sellerId와 동일한 값(or 0). Apollo Client 캐싱을 위해 존재합니다. */
   id: Scalars['Int'];
   lastUpdatedAt: Scalars['DateTime'];
   /** 미답변 */
@@ -762,10 +784,10 @@ export type InquiryAnswer = {
   userId?: Maybe<Scalars['Int']>;
 };
 
-/** 답변 작성 출처입니다. (super or seller) */
+/** 답변 작성 출처입니다. (SELLER or ROOT) */
 export enum InquiryAnswerFrom {
-  Seller = 'Seller',
-  Super = 'Super',
+  Root = 'ROOT',
+  Seller = 'SELLER',
 }
 
 export type InquiryFilter = {
@@ -1050,7 +1072,7 @@ export type Keyword = {
   stylingTip: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   /** 0~100 정수. 필수템에 표시될 녀석들한테만 존재 */
-  usablityRate: Scalars['Int'];
+  usablityRate?: Maybe<Scalars['Int']>;
 };
 
 export type KeywordClass = {
@@ -1181,6 +1203,7 @@ export type Mutation = {
   createCoupon: Coupon;
   createCouponSpecification: CouponSpecification;
   createCourier: Courier;
+  createDigest: Digest;
   createInquiry: Inquiry;
   createItemOptionSet: Item;
   createMyCartItem: CartItem;
@@ -1211,6 +1234,7 @@ export type Mutation = {
   requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
+  rootAnswerInquiry: Inquiry;
   shipMeSellerOrderItem: OrderItem;
   startOrder: Order;
   /** 여러번 구독된 상태였다면 모두 삭제됩니다. */
@@ -1222,6 +1246,7 @@ export type Mutation = {
   updateComment: Comment;
   updateCourier: Courier;
   updateCourierIssue: CourierIssue;
+  updateDigest: Digest;
   updateDigestsExhibitionDigests: DigestsExhibition;
   updateItem: Item;
   updateItemNotice: ItemNotice;
@@ -1246,7 +1271,6 @@ export type Mutation = {
   updateProduct: Product;
   /** 입력한 seller의 saleStrategy를 변경합니다. Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: SaleStrategy;
-  uploadMultipleImages: Array<Scalars['String']>;
 };
 
 export type MutationActivateItemPriceArgs = {
@@ -1350,6 +1374,10 @@ export type MutationCreateCouponSpecificationArgs = {
 
 export type MutationCreateCourierArgs = {
   createCourierInput: CreateCourierInput;
+};
+
+export type MutationCreateDigestArgs = {
+  createDigestInput: CreateDigestInput;
 };
 
 export type MutationCreateInquiryArgs = {
@@ -1466,6 +1494,11 @@ export type MutationReshipMeSellerExchangeRequestArgs = {
   reshipExchangeRequestInput: ReshipExchangeRequestInput;
 };
 
+export type MutationRootAnswerInquiryArgs = {
+  answerInquiryInput: AnswerInquiryInput;
+  id: Scalars['Int'];
+};
+
 export type MutationShipMeSellerOrderItemArgs = {
   merchantUid: Scalars['String'];
   shipOrderItemInput: ShipOrderItemInput;
@@ -1507,6 +1540,11 @@ export type MutationUpdateCourierArgs = {
 export type MutationUpdateCourierIssueArgs = {
   courierId: Scalars['Int'];
   updateCourierIssueInput: UpdateCourierIssueInput;
+};
+
+export type MutationUpdateDigestArgs = {
+  id: Scalars['Int'];
+  updateDigestInput: UpdateDigestInput;
 };
 
 export type MutationUpdateDigestsExhibitionDigestsArgs = {
@@ -1599,10 +1637,6 @@ export type MutationUpdateProductArgs = {
 export type MutationUpdateSellerSaleStrategyArgs = {
   sellerId: Scalars['Int'];
   updateSaleStrategyInput: FindSaleStrategyInput;
-};
-
-export type MutationUploadMultipleImagesArgs = {
-  uploadImageInput: UploadMultipleImageInput;
 };
 
 export type Order = {
@@ -1894,8 +1928,8 @@ export type OrderVbankReceipt = {
 
 /** 키워드 보유중 여부와 관련된 개수들입니다. */
 export type OwnsCountOutput = {
-  /** '`user:<userId>:keywordClassId:<keywordClassId>`와 동일 */
-  id: Scalars['String'];
+  /** keywordClassId와 동일 */
+  id: Scalars['Int'];
   /** 해당 클래스의 키워드 중 내가 보유한 수 */
   owning: Scalars['Int'];
   /** 해당 클래스의 키워드 수 */
@@ -2177,6 +2211,10 @@ export type Query = {
   /** refresh token을 받아서 새로운 JwtToken을 생성합니다. */
   refreshJwtToken: JwtToken;
   requestPin: Scalars['Boolean'];
+  rootInquiries: Array<Inquiry>;
+  /** [ROOT ADMIN] */
+  rootInquiriesCount: InquiriesCountOutput;
+  rootInquiry: Inquiry;
   searchDigest: Array<Digest>;
   searchItem: Array<Item>;
   searchKeyword: Array<Keyword>;
@@ -2396,6 +2434,19 @@ export type QueryPaymentsArgs = {
 
 export type QueryRequestPinArgs = {
   requestPinInput: RequestPinInput;
+};
+
+export type QueryRootInquiriesArgs = {
+  filter?: Maybe<InquiryFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryRootInquiriesCountArgs = {
+  forceUpdate?: Maybe<Scalars['Boolean']>;
+};
+
+export type QueryRootInquiryArgs = {
+  id: Scalars['Int'];
 };
 
 export type QuerySearchDigestArgs = {
@@ -2623,6 +2674,7 @@ export type SellerClaimAccount = {
 export type SellerClaimPolicy = {
   account?: Maybe<SellerClaimAccount>;
   createdAt: Scalars['DateTime'];
+  description?: Maybe<Scalars['String']>;
   fee: Scalars['Int'];
   feePayMethod: ClaimFeePayMethod;
   id: Scalars['Int'];
@@ -2691,6 +2743,7 @@ export type SellerSettlePolicy = {
 
 export type SellerShippingPolicy = {
   createdAt: Scalars['DateTime'];
+  description?: Maybe<Scalars['String']>;
   fee: Scalars['Int'];
   id: Scalars['Int'];
   minimumAmountForFree: Scalars['Int'];
@@ -2802,6 +2855,18 @@ export type UpdateCourierInput = {
 export type UpdateCourierIssueInput = {
   endAt: Scalars['DateTime'];
   message: Scalars['String'];
+};
+
+export type UpdateDigestInput = {
+  /** 최대 길이 2047 */
+  content?: Maybe<Scalars['String']>;
+  imageUrls?: Maybe<Array<Scalars['String']>>;
+  itemId?: Maybe<Scalars['Int']>;
+  itemPropertyValueIds?: Maybe<Array<Scalars['Int']>>;
+  rating?: Maybe<Scalars['Rating']>;
+  size?: Maybe<Scalars['String']>;
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
 };
 
 export type UpdateItemInput = {
@@ -2930,6 +2995,7 @@ export type UpdateSellerSettlePolicyInput = {
 };
 
 export type UpdateSellerShippingPolicyInput = {
+  description?: Maybe<Scalars['String']>;
   fee?: Maybe<Scalars['Int']>;
   minimumAmountForFree?: Maybe<Scalars['Int']>;
 };
@@ -2959,10 +3025,6 @@ export type UpdateUserInput = {
   styleTagIds?: Maybe<Array<Scalars['Int']>>;
   weight?: Maybe<Scalars['Int']>;
   youtubeUrl?: Maybe<Scalars['String']>;
-};
-
-export type UploadMultipleImageInput = {
-  files: Array<Scalars['Upload']>;
 };
 
 export type User = {
