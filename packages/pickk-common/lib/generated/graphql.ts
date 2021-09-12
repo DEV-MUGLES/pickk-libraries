@@ -1178,6 +1178,17 @@ export type LookUserFilter = {
   heightBetween?: Maybe<Array<Scalars['Int']>>;
 };
 
+export type ManualCreateItemInput = {
+  brandNameKor: Scalars['String'];
+  imageUrl: Scalars['String'];
+  majorCategoryId: Scalars['Int'];
+  minorCategoryId: Scalars['Int'];
+  name: Scalars['String'];
+  originalPrice: Scalars['Int'];
+  sellPrice: Scalars['Int'];
+  url: Scalars['String'];
+};
+
 export type Mutation = {
   activateItemPrice: Item;
   addItemDetailImages: Item;
@@ -1205,6 +1216,7 @@ export type Mutation = {
   createCourier: Courier;
   createDigest: Digest;
   createInquiry: Inquiry;
+  createItemByUrl: Item;
   createItemOptionSet: Item;
   createMyCartItem: CartItem;
   createSeller: Seller;
@@ -1217,6 +1229,7 @@ export type Mutation = {
   indexKeyword: Scalars['Boolean'];
   indexVideo: Scalars['Boolean'];
   like: Scalars['Boolean'];
+  manualCreateItem: Item;
   modifyItemSizeCharts: Item;
   own: Scalars['Boolean'];
   registerOrder: BaseOrderOutput;
@@ -1231,10 +1244,13 @@ export type Mutation = {
   removeMeRefundAccount: User;
   removeMeShippingAddress: Array<ShippingAddress>;
   removeMyCartItems: Scalars['Boolean'];
+  /** 정보에 오류가 있는 아이템을 신고합니다. */
+  reportItem: Scalars['Boolean'];
   requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
   rootAnswerInquiry: Inquiry;
+  setCategoryToItem: Item;
   shipMeSellerOrderItem: OrderItem;
   startOrder: Order;
   /** 여러번 구독된 상태였다면 모두 삭제됩니다. */
@@ -1384,6 +1400,10 @@ export type MutationCreateInquiryArgs = {
   createInquiryInput: CreateInquiryInput;
 };
 
+export type MutationCreateItemByUrlArgs = {
+  url: Scalars['String'];
+};
+
 export type MutationCreateItemOptionSetArgs = {
   createItemOptionSetInput: CreateItemOptionSetInput;
   id: Scalars['Int'];
@@ -1421,6 +1441,10 @@ export type MutationHitArgs = {
 export type MutationLikeArgs = {
   ownerId: Scalars['Int'];
   ownerType: LikeOwnerType;
+};
+
+export type MutationManualCreateItemArgs = {
+  input: ManualCreateItemInput;
 };
 
 export type MutationModifyItemSizeChartsArgs = {
@@ -1479,6 +1503,11 @@ export type MutationRemoveMyCartItemsArgs = {
   ids: Array<Scalars['Int']>;
 };
 
+export type MutationReportItemArgs = {
+  id: Scalars['Int'];
+  reason: Scalars['String'];
+};
+
 export type MutationRequestOrderItemExchangeArgs = {
   merchantUid: Scalars['String'];
   requestOrderItemExchangeInput: RequestOrderItemExchangeInput;
@@ -1497,6 +1526,11 @@ export type MutationReshipMeSellerExchangeRequestArgs = {
 export type MutationRootAnswerInquiryArgs = {
   answerInquiryInput: AnswerInquiryInput;
   id: Scalars['Int'];
+};
+
+export type MutationSetCategoryToItemArgs = {
+  id: Scalars['Int'];
+  setCategoryToItemInput: SetCategoryToItemInput;
 };
 
 export type MutationShipMeSellerOrderItemArgs = {
@@ -2748,6 +2782,11 @@ export type SellerShippingPolicy = {
   id: Scalars['Int'];
   minimumAmountForFree: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
+};
+
+export type SetCategoryToItemInput = {
+  majorCategoryId: Scalars['Int'];
+  minorCategoryId: Scalars['Int'];
 };
 
 export type ShipOrderItemInput = {
