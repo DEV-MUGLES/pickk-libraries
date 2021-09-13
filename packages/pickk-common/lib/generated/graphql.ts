@@ -440,6 +440,19 @@ export type CreateItemOptionSetInput = {
   options: Array<CreateItemOptionInput>;
 };
 
+export type CreateLookDigestInput = {
+  itemId: Scalars['Int'];
+  size: Scalars['String'];
+};
+
+export type CreateLookInput = {
+  digests: Array<CreateLookDigestInput>;
+  imageUrls: Array<Scalars['String']>;
+  styleTagIds: Array<Scalars['Int']>;
+  /** 최대 길이 127 */
+  title: Scalars['String'];
+};
+
 export type CreateOrderVbankReceiptInput = {
   bankCode?: Maybe<BankCode>;
   due?: Maybe<Scalars['DateTime']>;
@@ -570,6 +583,25 @@ export type CreateUserInput = {
   oauthProvider?: Maybe<UserProviderType>;
   password?: Maybe<Scalars['String']>;
   weight?: Maybe<Scalars['Int']>;
+};
+
+export type CreateVideoDigestInput = {
+  itemId?: Maybe<Scalars['Int']>;
+  itemPropertyValueIds?: Maybe<Array<Scalars['Int']>>;
+  rating?: Maybe<Scalars['Rating']>;
+  size: Scalars['String'];
+  timestampEndSecond?: Maybe<Scalars['Int']>;
+  timestampStartSecond?: Maybe<Scalars['Int']>;
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
+};
+
+export type CreateVideoInput = {
+  digests: Array<CreateVideoDigestInput>;
+  /** 최대 길이 127 */
+  title: Scalars['String'];
+  /** 최대 길이 40 */
+  youtubeCode: Scalars['String'];
 };
 
 export type Digest = {
@@ -1171,6 +1203,7 @@ export type LookImage = {
   angle: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   key: Scalars['String'];
+  order: Scalars['Int'];
   url: Scalars['String'];
 };
 
@@ -1218,9 +1251,11 @@ export type Mutation = {
   createInquiry: Inquiry;
   createItemByUrl: Item;
   createItemOptionSet: Item;
+  createLook: Look;
   createMyCartItem: CartItem;
   createSeller: Seller;
   createUser: User;
+  createVideo: Video;
   dodgeVbankOrder: BaseOrderOutput;
   failOrder: BaseOrderOutput;
   follow: Scalars['Boolean'];
@@ -1269,6 +1304,7 @@ export type Mutation = {
   updateItemOption: ItemOption;
   updateItemPrice: ItemPrice;
   updateItemsExhibitionItems: ItemsExhibition;
+  updateLook: Look;
   updateMe: User;
   updateMeRefundAccount: RefundAccount;
   updateMeSeller: Seller;
@@ -1287,6 +1323,7 @@ export type Mutation = {
   updateProduct: Product;
   /** 입력한 seller의 saleStrategy를 변경합니다. Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: SaleStrategy;
+  updateVideo: Video;
 };
 
 export type MutationActivateItemPriceArgs = {
@@ -1409,6 +1446,10 @@ export type MutationCreateItemOptionSetArgs = {
   id: Scalars['Int'];
 };
 
+export type MutationCreateLookArgs = {
+  createLookInput: CreateLookInput;
+};
+
 export type MutationCreateMyCartItemArgs = {
   createCartItemInput: CreateCartItemInput;
 };
@@ -1419,6 +1460,10 @@ export type MutationCreateSellerArgs = {
 
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
+};
+
+export type MutationCreateVideoArgs = {
+  createVideoInput: CreateVideoInput;
 };
 
 export type MutationDodgeVbankOrderArgs = {
@@ -1611,6 +1656,11 @@ export type MutationUpdateItemsExhibitionItemsArgs = {
   itemIds: Array<Scalars['Int']>;
 };
 
+export type MutationUpdateLookArgs = {
+  id: Scalars['Int'];
+  updateLookInput: UpdateLookInput;
+};
+
 export type MutationUpdateMeArgs = {
   updateUserInput: UpdateUserInput;
 };
@@ -1671,6 +1721,11 @@ export type MutationUpdateProductArgs = {
 export type MutationUpdateSellerSaleStrategyArgs = {
   sellerId: Scalars['Int'];
   updateSaleStrategyInput: FindSaleStrategyInput;
+};
+
+export type MutationUpdateVideoArgs = {
+  id: Scalars['Int'];
+  updateVideoInput: UpdateVideoInput;
 };
 
 export type Order = {
@@ -2961,6 +3016,20 @@ export type UpdateItemSizeChartInput = {
   watchBandDepth?: Maybe<Scalars['Float']>;
 };
 
+export type UpdateLookDigestInput = {
+  id?: Maybe<Scalars['Int']>;
+  itemId?: Maybe<Scalars['Int']>;
+  size?: Maybe<Scalars['String']>;
+};
+
+export type UpdateLookInput = {
+  digests?: Maybe<Array<UpdateLookDigestInput>>;
+  imageUrls?: Maybe<Array<Scalars['String']>>;
+  styleTagIds?: Maybe<Array<Scalars['Int']>>;
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
+};
+
 export type UpdateProductInput = {
   stock: Scalars['Int'];
 };
@@ -3064,6 +3133,26 @@ export type UpdateUserInput = {
   styleTagIds?: Maybe<Array<Scalars['Int']>>;
   weight?: Maybe<Scalars['Int']>;
   youtubeUrl?: Maybe<Scalars['String']>;
+};
+
+export type UpdateVideoDigestInput = {
+  id?: Maybe<Scalars['Int']>;
+  itemId?: Maybe<Scalars['Int']>;
+  itemPropertyValueIds?: Maybe<Array<Scalars['Int']>>;
+  rating?: Maybe<Scalars['Rating']>;
+  size?: Maybe<Scalars['String']>;
+  timestampEndSecond?: Maybe<Scalars['Int']>;
+  timestampStartSecond?: Maybe<Scalars['Int']>;
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
+};
+
+export type UpdateVideoInput = {
+  digests?: Maybe<Array<UpdateVideoDigestInput>>;
+  /** 최대 길이 127 */
+  title?: Maybe<Scalars['String']>;
+  /** 최대 길이 40 */
+  youtubeCode?: Maybe<Scalars['String']>;
 };
 
 export type User = {

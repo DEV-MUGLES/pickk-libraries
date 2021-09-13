@@ -103,3 +103,7 @@
 ## v1.7.35
 
 ✨ update api to pickk-server v0.1.82
+
+## v1.7.36
+
+✨ update api to pickk-server v0.1.88
