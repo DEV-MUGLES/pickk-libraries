@@ -107,3 +107,8 @@
 ## v1.7.36
 
 ✨ update api to pickk-server v0.1.88
+
+## v1.7.37
+
+- update useImperativeQuery to return whole result
+- ✨ update api to pickk-server v0.1.90
