@@ -295,8 +295,9 @@ export enum CommentOwnerType {
 
 /** 컨텐츠 타입입니다. */
 export enum ContentType {
-  Look = 'Look',
-  Pickk = 'Pickk',
+  Digest = 'digest',
+  Look = 'look',
+  Video = 'video',
 }
 
 export type Coupon = {
@@ -621,6 +622,7 @@ export type Digest = {
   itemPropertyValues: Array<ItemPropertyValue>;
   likeCount: Scalars['Int'];
   look?: Maybe<Look>;
+  lookId?: Maybe<Scalars['Int']>;
   rating?: Maybe<Scalars['Rating']>;
   score: Scalars['Float'];
   size: Scalars['String'];
@@ -632,6 +634,7 @@ export type Digest = {
   user?: Maybe<User>;
   userId?: Maybe<Scalars['Int']>;
   video?: Maybe<Video>;
+  videoId?: Maybe<Scalars['Int']>;
 };
 
 export type DigestFilter = {
@@ -639,6 +642,7 @@ export type DigestFilter = {
   item?: Maybe<DigestItemFilter>;
   itemId?: Maybe<Scalars['Int']>;
   orderBy?: Maybe<Scalars['String']>;
+  ratingIsNull?: Maybe<Scalars['Boolean']>;
   user?: Maybe<DigestUserFilter>;
   userId?: Maybe<Scalars['Int']>;
   userIdIn?: Maybe<Array<Scalars['Int']>>;
