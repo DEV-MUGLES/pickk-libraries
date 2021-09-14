@@ -4,6 +4,7 @@ import {
   useQuery,
   QueryHookOptions,
   DocumentNode,
+  ApolloQueryResult,
 } from '@apollo/client';
 
 /**
@@ -23,15 +24,20 @@ export const useImperativeQuery = <
 >(
   query: DocumentNode,
   options: QueryHookOptions<TData, TVariables> = {}
-): QueryResult<TData, TVariables>['refetch'] => {
-  const { refetch } = useQuery<TData, TVariables>(query, {
+): QueryResult & {
+  callQuery: (vars: TVariables) => Promise<ApolloQueryResult<TData>>;
+} => {
+  const result = useQuery<TData, TVariables>(query, {
     ...options,
     skip: true,
   });
 
   const imperativelyCallQuery = (queryVariables: TVariables) => {
-    return refetch(queryVariables);
+    return result.refetch(queryVariables);
   };
 
-  return imperativelyCallQuery;
+  return {
+    callQuery: imperativelyCallQuery,
+    ...result,
+  };
 };
