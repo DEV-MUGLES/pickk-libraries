@@ -135,9 +135,9 @@ export type BaseOrderOutput = {
   brands: Array<OrderBrand>;
   createdAt: Scalars['DateTime'];
   failedAt?: Maybe<Scalars['DateTime']>;
-  /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
+  /** [MODEL ONLY] */
   id: Scalars['String'];
-  /** 주문고유번호. PrimaryColumn입니다. YYMMDDHHmmssSSS + NN(00~99) 형식입니다. */
+  /** (PK) 주문고유번호. YYMMDDHHmmssSSS + NN(00~99) */
   merchantUid: Scalars['String'];
   paidAt?: Maybe<Scalars['DateTime']>;
   payMethod?: Maybe<PayMethod>;
@@ -145,10 +145,8 @@ export type BaseOrderOutput = {
   refundAccount?: Maybe<OrderRefundAccount>;
   refundRequests: Array<RefundRequest>;
   status: OrderStatus;
-  totalCouponDiscountAmount: Scalars['Int'];
   totalItemFinalPrice: Scalars['Int'];
   totalPayAmount: Scalars['Int'];
-  totalShippingFee: Scalars['Int'];
   totalUsedPointAmount: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
   userId?: Maybe<Scalars['Int']>;
@@ -674,9 +672,10 @@ export type DigestsExhibition = {
 export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: RefundRequestFaultOf;
-  id: Scalars['Int'];
   isProcessDelaying: Scalars['Boolean'];
   itemName: Scalars['String'];
+  /** orderItemMerchantUid와 동일 */
+  merchantUid: Scalars['String'];
   orderItem: OrderItem;
   orderItemMerchantUid: Scalars['String'];
   pickShipment?: Maybe<Shipment>;
@@ -1064,6 +1063,15 @@ export type ItemsExhibition = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type ItemsPackage = {
+  /** 최대 50자 */
+  code: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  items: Array<Item>;
+  updatedAt: Scalars['DateTime'];
+};
+
 export type JwtPayload = {
   /** Seller 로그인인 경우에만 발급된다. */
   brandId?: Maybe<Scalars['Float']>;
@@ -1308,6 +1316,7 @@ export type Mutation = {
   updateItemOption: ItemOption;
   updateItemPrice: ItemPrice;
   updateItemsExhibitionItems: ItemsExhibition;
+  updateItemsPackageItems: ItemsPackage;
   updateLook: Look;
   updateMe: User;
   updateMeRefundAccount: RefundAccount;
@@ -1379,11 +1388,11 @@ export type MutationBasifyPriceArgs = {
 };
 
 export type MutationBulkPickMeSellerExchangeRequestsArgs = {
-  ids: Array<Scalars['Int']>;
+  merchantUids: Array<Scalars['String']>;
 };
 
 export type MutationBulkPickMeSellerRefundRequestsArgs = {
-  ids: Array<Scalars['Int']>;
+  merchantUids: Array<Scalars['String']>;
 };
 
 export type MutationBulkShipMeSellerOrderItemsArgs = {
@@ -1568,7 +1577,7 @@ export type MutationRequestOrderRefundArgs = {
 };
 
 export type MutationReshipMeSellerExchangeRequestArgs = {
-  id: Scalars['Int'];
+  merchantUid: Scalars['String'];
   reshipExchangeRequestInput: ReshipExchangeRequestInput;
 };
 
@@ -1660,6 +1669,11 @@ export type MutationUpdateItemsExhibitionItemsArgs = {
   itemIds: Array<Scalars['Int']>;
 };
 
+export type MutationUpdateItemsPackageItemsArgs = {
+  code: Scalars['String'];
+  itemIds: Array<Scalars['Int']>;
+};
+
 export type MutationUpdateLookArgs = {
   id: Scalars['Int'];
   updateLookInput: UpdateLookInput;
@@ -1738,9 +1752,9 @@ export type Order = {
   buyer?: Maybe<OrderBuyer>;
   createdAt: Scalars['DateTime'];
   failedAt?: Maybe<Scalars['DateTime']>;
-  /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
+  /** [MODEL ONLY] */
   id: Scalars['String'];
-  /** 주문고유번호. PrimaryColumn입니다. YYMMDDHHmmssSSS + NN(00~99) 형식입니다. */
+  /** (PK) 주문고유번호. YYMMDDHHmmssSSS + NN(00~99) */
   merchantUid: Scalars['String'];
   orderItems: Array<OrderItem>;
   paidAt?: Maybe<Scalars['DateTime']>;
@@ -1750,10 +1764,8 @@ export type Order = {
   refundAccount?: Maybe<OrderRefundAccount>;
   refundRequests: Array<RefundRequest>;
   status: OrderStatus;
-  totalCouponDiscountAmount: Scalars['Int'];
   totalItemFinalPrice: Scalars['Int'];
   totalPayAmount: Scalars['Int'];
-  totalShippingFee: Scalars['Int'];
   totalUsedPointAmount: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
   user?: Maybe<User>;
@@ -1765,6 +1777,7 @@ export type Order = {
 };
 
 export type OrderBrand = {
+  id: Scalars['Int'];
   imageUrl: Scalars['String'];
   items: Array<OrderItem>;
   nameKor: Scalars['String'];
@@ -1803,10 +1816,11 @@ export type OrderItem = {
   exchangeRequestedAt?: Maybe<Scalars['DateTime']>;
   exchangedAt?: Maybe<Scalars['DateTime']>;
   failedAt?: Maybe<Scalars['DateTime']>;
-  /** ApolloClient 최적화를 위한 필드입니다. DB에는 존재하지 않습니다. */
+  /** [MODEL ONLY] */
   id: Scalars['String'];
   isConfirmed: Scalars['Boolean'];
   isDelaying: Scalars['Boolean'];
+  isFreeShippingPackage: Scalars['Boolean'];
   isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
   isShipReserved: Scalars['Boolean'];
@@ -1814,13 +1828,13 @@ export type OrderItem = {
   itemFinalPrice: Scalars['Int'];
   itemId?: Maybe<Scalars['Int']>;
   itemName: Scalars['String'];
-  /** 주문상품고유번호. PrimaryColumn입니다. order의 merchantUid + 숫자 1자리 형식입니다. */
+  /** order.merchantUid + 숫자 2자리 */
   merchantUid: Scalars['String'];
   name: Scalars['String'];
   order: Order;
   orderMerchantUid: Scalars['String'];
   paidAt?: Maybe<Scalars['DateTime']>;
-  /** itemFinalPrice - usedPointAmount - couponDiscountAmount */
+  /** 상품가격 - 포인트사용액 - 쿠폰할인액 */
   payAmount: Scalars['Float'];
   /** 처리지연 전환 시점 */
   processDelayedAt?: Maybe<Scalars['DateTime']>;
@@ -1845,8 +1859,9 @@ export type OrderItem = {
   shipmentId?: Maybe<Scalars['Int']>;
   shippedAt?: Maybe<Scalars['DateTime']>;
   shippingAt?: Maybe<Scalars['DateTime']>;
+  shippingFee: Scalars['Int'];
   status: OrderItemStatus;
-  /** 프론트엔드에서 보여주기 위한 status/claimStatus 표시값입니다. */
+  /** 프론트엔드를 위한 status/claimStatus 표시값입니다. */
   statusDisplayName: Scalars['String'];
   updatedAt: Scalars['DateTime'];
   usedCoupon?: Maybe<Coupon>;
@@ -1857,7 +1872,6 @@ export type OrderItem = {
   userId?: Maybe<Scalars['Int']>;
   vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
-  withdrawnAt?: Maybe<Scalars['DateTime']>;
 };
 
 /** 주문상품 클레임상태입니다. */
@@ -2211,15 +2225,17 @@ export type Product = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   isDeleted: Scalars['Boolean'];
-  /** 예약배송 적용 여부 */
+  /** [MODEL ONLY] 예약배송 적용 여부 */
   isShipReserving: Scalars['Boolean'];
   item: Item;
   itemId: Scalars['Int'];
   itemOptionValues: Array<ItemOptionValue>;
   priceVariant: Scalars['Int'];
+  /** [MODEL ONLY] 아이템 finalPrice와 priceVariant를 더한 값입니다. */
+  purchasePrice: Scalars['Float'];
   shippingReservePolicy?: Maybe<ProductShippingReservePolicy>;
   stock: Scalars['Int'];
-  /** 이 Product의 stock이 0이면 예약배송정책의 stock을 반환합니다. */
+  /** [MODEL ONLY] 이 Product의 stock이 0이면 예약배송정책의 stock을 반환합니다. */
   stockThreshold: Scalars['Float'];
   updatedAt: Scalars['DateTime'];
 };
@@ -2261,6 +2277,7 @@ export type Query = {
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
   itemsExhibitions: Array<ItemsExhibition>;
+  itemsPackage: ItemsPackage;
   keyword: Keyword;
   keywordClasses: Array<KeywordClass>;
   keywords: Array<Keyword>;
@@ -2394,6 +2411,10 @@ export type QueryItemPropertiesArgs = {
 export type QueryItemsArgs = {
   itemFilter?: Maybe<ItemFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryItemsPackageArgs = {
+  code: Scalars['String'];
 };
 
 export type QueryKeywordArgs = {
@@ -2604,8 +2625,9 @@ export type RefundRequest = {
   amount: Scalars['Int'];
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: RefundRequestFaultOf;
-  id: Scalars['Int'];
   isProcessDelaying: Scalars['Boolean'];
+  /** (PK) YYMMDDHHmmssSSS + NN(00~99) + M */
+  merchantUid: Scalars['String'];
   order: Order;
   orderItems: Array<OrderItem>;
   orderMerchantUid: Scalars['String'];
@@ -2914,7 +2936,7 @@ export type StartOrderInput = {
 };
 
 export type StartOrderItemInput = {
-  /** 주문상품고유번호. PrimaryColumn입니다. order의 merchantUid + 숫자 1자리 형식입니다. */
+  /** order.merchantUid + 숫자 2자리 */
   merchantUid: Scalars['String'];
   usedCouponId?: Maybe<Scalars['Int']>;
 };
