@@ -138,8 +138,10 @@ export type BaseOrderOutput = {
   refundAccount?: Maybe<OrderRefundAccount>;
   refundRequests: Array<RefundRequest>;
   status: OrderStatus;
+  totalCouponDiscountAmount: Scalars['Int'];
   totalItemFinalPrice: Scalars['Int'];
   totalPayAmount: Scalars['Int'];
+  totalShippingFee: Scalars['Int'];
   totalUsedPointAmount: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
   userId?: Maybe<Scalars['Int']>;
@@ -1737,8 +1739,10 @@ export type Order = {
   refundAccount?: Maybe<OrderRefundAccount>;
   refundRequests: Array<RefundRequest>;
   status: OrderStatus;
+  totalCouponDiscountAmount: Scalars['Int'];
   totalItemFinalPrice: Scalars['Int'];
   totalPayAmount: Scalars['Int'];
+  totalShippingFee: Scalars['Int'];
   totalUsedPointAmount: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
   user?: Maybe<User>;
