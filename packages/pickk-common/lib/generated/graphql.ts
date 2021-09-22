@@ -64,10 +64,10 @@ export type AnswerInquiryInput = {
   displayAuthor: Scalars['String'];
 };
 
-/** 애플 로그인시 사용됩니다. [APP, WEB] */
+/** 애플 로그인시 사용됩니다. [App, Web] */
 export enum AppleClientType {
-  App = 'APP',
-  Web = 'WEB',
+  App = 'App',
+  Web = 'Web',
 }
 
 /** 은행 식별 코드입니다. InicisBankCode와 값이 같습니다. */
@@ -277,16 +277,16 @@ export type CommentFilter = {
 
 /** 댓글 연관 객체 분류입니다. */
 export enum CommentOwnerType {
-  Digest = 'DIGEST',
-  Look = 'LOOK',
-  Video = 'VIDEO',
+  Digest = 'Digest',
+  Look = 'Look',
+  Video = 'Video',
 }
 
 /** 컨텐츠 타입입니다. */
 export enum ContentType {
-  Digest = 'DIGEST',
-  Look = 'LOOK',
-  Video = 'VIDEO',
+  Digest = 'Digest',
+  Look = 'Look',
+  Video = 'Video',
 }
 
 export type Coupon = {
@@ -319,16 +319,16 @@ export type CouponSpecification = {
   updatedAt: Scalars['DateTime'];
 };
 
-/** 쿠폰 상태입니다. 사용가능(READY), 사용됨(APPLIED) */
+/** 쿠폰 상태입니다. 사용가능(Ready), 사용됨(Applied) */
 export enum CouponStatus {
-  Applied = 'APPLIED',
-  Ready = 'READY',
+  Applied = 'Applied',
+  Ready = 'Ready',
 }
 
-/** 쿠폰 분류입니다. 정률적용(RATE), 정액적용(AMOUNT) */
+/** 쿠폰 분류입니다. 정률적용(Rate), 정액적용(Amount) */
 export enum CouponType {
-  Amount = 'AMOUNT',
-  Rate = 'RATE',
+  Amount = 'Amount',
+  Rate = 'Rate',
 }
 
 export type Courier = {
@@ -715,25 +715,25 @@ export type ExchangeRequestOrderItemFilter = {
 
 /** 교한신청 상태입니다. */
 export enum ExchangeRequestStatus {
-  Picked = 'PICKED',
-  Rejected = 'REJECTED',
-  Requested = 'REQUESTED',
-  Reshipped = 'RESHIPPED',
-  Reshipping = 'RESHIPPING',
+  Picked = 'Picked',
+  Rejected = 'Rejected',
+  Requested = 'Requested',
+  Reshipped = 'Reshipped',
+  Reshipping = 'Reshipping',
 }
 
 /** 생성일 기준 3달 이내의 건들만 count합니다. */
 export type ExchangeRequestsCountOutput = {
   /** 수거 완료 */
-  PICKED: Scalars['Int'];
+  Picked: Scalars['Int'];
   /** 교환 거부 */
-  REJECTED: Scalars['Int'];
+  Rejected: Scalars['Int'];
   /** 교환 요청 (= 수거중) */
-  REQUESTED: Scalars['Int'];
+  Requested: Scalars['Int'];
   /** 교환 배송 완료 */
-  RESHIPPED: Scalars['Int'];
+  Reshipped: Scalars['Int'];
   /** 교환 배송 중 */
-  RESHIPPING: Scalars['Int'];
+  Reshipping: Scalars['Int'];
   /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
   id: Scalars['Int'];
   lastUpdatedAt: Scalars['DateTime'];
@@ -754,11 +754,11 @@ export type FindSaleStrategyInput = {
 
 /** 조회수 누적 대상 객체 분류입니다. */
 export enum HitOwnerType {
-  Digest = 'DIGEST',
-  Item = 'ITEM',
-  Keyword = 'KEYWORD',
-  Look = 'LOOK',
-  Video = 'VIDEO',
+  Digest = 'Digest',
+  Item = 'Item',
+  Keyword = 'Keyword',
+  Look = 'Look',
+  Video = 'Video',
 }
 
 /** 생성일 기준 3달 이내의 건들만 count합니다. */
@@ -811,10 +811,10 @@ export type InquiryAnswer = {
   userId?: Maybe<Scalars['Int']>;
 };
 
-/** 답변 작성 출처입니다. (SELLER or ROOT) */
+/** 답변 작성 출처입니다. (Seller or Root) */
 export enum InquiryAnswerFrom {
-  Root = 'ROOT',
-  Seller = 'SELLER',
+  Root = 'Root',
+  Seller = 'Seller',
 }
 
 export type InquiryFilter = {
@@ -825,10 +825,10 @@ export type InquiryFilter = {
 
 /** 배송/사이즈/재입고/기타 */
 export enum InquiryType {
-  Etc = 'ETC',
-  Restock = 'RESTOCK',
-  Ship = 'SHIP',
-  Size = 'SIZE',
+  Etc = 'Etc',
+  Restock = 'Restock',
+  Ship = 'Ship',
+  Size = 'Size',
 }
 
 export type Item = {
@@ -1119,8 +1119,8 @@ export type KeywordClassFilter = {
 };
 
 export enum KeywordClassType {
-  Essential = 'ESSENTIAL',
-  Trending = 'TRENDING',
+  Essential = 'Essential',
+  Trending = 'Trending',
 }
 
 export type KeywordFilter = {
@@ -1138,11 +1138,11 @@ export type KeywordFilter = {
 
 /** 좋아요 대상 객체 분류입니다. (Digest, Look, Video, Comment, Keyword) */
 export enum LikeOwnerType {
-  Comment = 'COMMENT',
-  Digest = 'DIGEST',
-  Keyword = 'KEYWORD',
-  Look = 'LOOK',
-  Video = 'VIDEO',
+  Comment = 'Comment',
+  Digest = 'Digest',
+  Keyword = 'Keyword',
+  Look = 'Look',
+  Video = 'Video',
 }
 
 export type LoginByCodeInput = {
@@ -1853,12 +1853,12 @@ export type OrderItem = {
 
 /** 주문상품 클레임상태입니다. */
 export enum OrderItemClaimStatus {
-  Cancelled = 'CANCELLED',
-  CancelRequested = 'CANCEL_REQUESTED',
-  Exchanged = 'EXCHANGED',
-  ExchangeRequested = 'EXCHANGE_REQUESTED',
-  Refunded = 'REFUNDED',
-  RefundRequested = 'REFUND_REQUESTED',
+  CancelRequested = 'CancelRequested',
+  Cancelled = 'Cancelled',
+  ExchangeRequested = 'ExchangeRequested',
+  Exchanged = 'Exchanged',
+  RefundRequested = 'RefundRequested',
+  Refunded = 'Refunded',
 }
 
 export type OrderItemFilter = {
@@ -1880,52 +1880,52 @@ export type OrderItemFilter = {
 
 /** 주문상품 상태입니다. 클레임상태와 무관하게 handling됩니다. */
 export enum OrderItemStatus {
-  Failed = 'FAILED',
-  Paid = 'PAID',
-  Pending = 'PENDING',
-  Shipped = 'SHIPPED',
-  Shipping = 'SHIPPING',
-  ShipPending = 'SHIP_PENDING',
-  ShipReady = 'SHIP_READY',
-  VbankDodged = 'VBANK_DODGED',
-  VbankReady = 'VBANK_READY',
+  Failed = 'Failed',
+  Paid = 'Paid',
+  Pending = 'Pending',
+  ShipPending = 'ShipPending',
+  ShipReady = 'ShipReady',
+  Shipped = 'Shipped',
+  Shipping = 'Shipping',
+  VbankDodged = 'VbankDodged',
+  VbankReady = 'VbankReady',
 }
 
 /** 생성일 기준 3달 이내의 건들만 count합니다. */
 export type OrderItemsCountOutput = {
-  /** 취소 완료 */
-  CANCELLED: Scalars['Int'];
   /**
    * 취소 요청됨 (deprecated)
    * @deprecated 현재 취소는 신청 즉시 완료됩니다.
    */
-  CANCEL_REQUESTED: Scalars['Int'];
-  /** 교환 완료 */
-  EXCHANGED: Scalars['Int'];
+  CancelRequested: Scalars['Int'];
+  /** 취소 완료 */
+  Cancelled: Scalars['Int'];
   /** 교환 요청됨 */
-  EXCHANGE_REQUESTED: Scalars['Int'];
+  ExchangeRequested: Scalars['Int'];
+  /** 교환 완료 */
+  Exchanged: Scalars['Int'];
   /** 결제 실패 */
-  FAILED: Scalars['Int'];
+  Failed: Scalars['Int'];
   /** 결제 완료 */
-  PAID: Scalars['Int'];
+  Paid: Scalars['Int'];
   /** 결제대기 (입금대기와 다릅니다.) */
-  PENDING: Scalars['Int'];
-  /** 반품 완료 */
-  REFUNDED: Scalars['Int'];
+  Pending: Scalars['Int'];
   /** 반품 요청됨 */
-  REFUND_REQUESTED: Scalars['Int'];
-  /** 배송 완료 */
-  SHIPPED: Scalars['Int'];
-  /** 배송 중 */
-  SHIPPPING: Scalars['Int'];
+  RefundRequested: Scalars['Int'];
+  /** 반품 완료 */
+  Refunded: Scalars['Int'];
   /** 배송 보류중(예약중) */
-  SHIP_PENDING: Scalars['Int'];
+  ShipPending: Scalars['Int'];
   /** 배송 준비중 */
-  SHIP_READY: Scalars['Int'];
+  ShipReady: Scalars['Int'];
+  /** 배송 완료 */
+  Shipped: Scalars['Int'];
+  /** 배송 중 */
+  Shipping: Scalars['Int'];
   /** 입금 전 취소 */
-  VBANK_DODGED: Scalars['Int'];
+  VbankDodged: Scalars['Int'];
   /** 입금 대기 */
-  VBANK_READY: Scalars['Int'];
+  VbankReady: Scalars['Int'];
   /** 구매 확정 */
   confirmed: Scalars['Int'];
   /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
@@ -1991,12 +1991,12 @@ export type OrderSheet = {
 
 /** 주문 상태입니다. 클라이언트에선 거의 사용되지 않을 값입니다. */
 export enum OrderStatus {
-  Failed = 'FAILED',
-  Paid = 'PAID',
-  Paying = 'PAYING',
-  Pending = 'PENDING',
-  VbankDodged = 'VBANK_DODGED',
-  VbankReady = 'VBANK_READY',
+  Failed = 'Failed',
+  Paid = 'Paid',
+  Paying = 'Paying',
+  Pending = 'Pending',
+  VbankDodged = 'VbankDodged',
+  VbankReady = 'VbankReady',
 }
 
 export type OrderVbankReceipt = {
@@ -2027,8 +2027,8 @@ export type PageInput = {
 };
 
 export enum PayEnviroment {
-  Mobile = 'MOBILE',
-  Pc = 'PC',
+  Mobile = 'Mobile',
+  Pc = 'Pc',
 }
 
 /** 결제수단입니다. */
@@ -2103,8 +2103,8 @@ export type PaymentCancellation = {
 };
 
 export enum PaymentCancellationType {
-  Cancel = 'CANCEL',
-  PartialCancel = 'PARTIAL_CANCEL',
+  Cancel = 'Cancel',
+  PartialCancel = 'PartialCancel',
 }
 
 export type PaymentFilter = {
@@ -2130,13 +2130,13 @@ export type PaymentListOutput = {
 };
 
 export enum PaymentStatus {
-  Cancelled = 'CANCELLED',
-  Failed = 'FAILED',
-  Paid = 'PAID',
-  PartialCancelled = 'PARTIAL_CANCELLED',
-  Pending = 'PENDING',
-  VbankDodged = 'VBANK_DODGED',
-  VbankReady = 'VBANK_READY',
+  Cancelled = 'Cancelled',
+  Failed = 'Failed',
+  Paid = 'Paid',
+  PartialCancelled = 'PartialCancelled',
+  Pending = 'Pending',
+  VbankDodged = 'VbankDodged',
+  VbankReady = 'VbankReady',
 }
 
 export type PaymentsListAmount = {
@@ -2156,12 +2156,12 @@ export type PaymentsListPgCount = {
 };
 
 export type PaymentsListStatusCount = {
-  CANCELLED: Scalars['Float'];
-  FAILED: Scalars['Float'];
-  PAID: Scalars['Float'];
-  PARTIAL_CANCELLED: Scalars['Float'];
-  PENDING: Scalars['Float'];
-  VBANK_READY: Scalars['Float'];
+  Cancelled: Scalars['Float'];
+  Failed: Scalars['Float'];
+  Paid: Scalars['Float'];
+  PartialCancelled: Scalars['Float'];
+  Pending: Scalars['Float'];
+  VbankReady: Scalars['Float'];
 };
 
 /** PG사입니다. */
@@ -2191,10 +2191,10 @@ export type PointEventFilter = {
   userId?: Maybe<Scalars['Int']>;
 };
 
-/** 포인트 분류입니다. 적립(ADD), 사용(SUB) */
+/** 포인트 분류입니다. 적립(Add), 사용(Sub) */
 export enum PointType {
-  Add = 'ADD',
-  Sub = 'SUB',
+  Add = 'Add',
+  Sub = 'Sub',
 }
 
 export type Product = {
@@ -2633,8 +2633,8 @@ export type RefundRequest = {
 
 /** 교환/반품 책임자?입니다. (구매자 or 판매자) */
 export enum RefundRequestFaultOf {
-  Customer = 'CUSTOMER',
-  Seller = 'SELLER',
+  Customer = 'Customer',
+  Seller = 'Seller',
 }
 
 export type RefundRequestFilter = {
@@ -2657,22 +2657,22 @@ export type RefundRequestOrderFilter = {
 
 /** 반품요청 상태입니다. */
 export enum RefundRequestStatus {
-  Confirmed = 'CONFIRMED',
-  Picked = 'PICKED',
-  Rejected = 'REJECTED',
-  Requested = 'REQUESTED',
+  Confirmed = 'Confirmed',
+  Picked = 'Picked',
+  Rejected = 'Rejected',
+  Requested = 'Requested',
 }
 
 /** 생성일 기준 3달 이내의 건들만 count합니다. */
 export type RefundRequestsCountOutput = {
   /** 반품 승인 */
-  CONFIRMED: Scalars['Int'];
+  Confirmed: Scalars['Int'];
   /** 수거 완료 */
-  PICKED: Scalars['Int'];
+  Picked: Scalars['Int'];
   /** 반품 거부 */
-  REJECTED: Scalars['Int'];
+  Rejected: Scalars['Int'];
   /** 반품 요청 (= 수거중) */
-  REQUESTED: Scalars['Int'];
+  Requested: Scalars['Int'];
   /** sellerId와 동일한 값. Apollo Client 캐싱을 위해 존재합니다. */
   id: Scalars['Int'];
   lastUpdatedAt: Scalars['DateTime'];
@@ -2888,17 +2888,17 @@ export type ShipmentHistory = {
 
 /** 배송 연관 객체 분류입니다. */
 export enum ShipmentOwnerType {
-  ExchangeRequestPick = 'EXCHANGE_REQUEST_PICK',
-  ExchangeRequestReship = 'EXCHANGE_REQUEST_RESHIP',
-  OrderItem = 'ORDER_ITEM',
-  RefundRequest = 'REFUND_REQUEST',
+  ExchangeRequestPick = 'ExchangeRequestPick',
+  ExchangeRequestReship = 'ExchangeRequestReship',
+  OrderItem = 'OrderItem',
+  RefundRequest = 'RefundRequest',
 }
 
 export enum ShipmentStatus {
-  Cancelled = 'CANCELLED',
-  Failed = 'FAILED',
-  Shipped = 'SHIPPED',
-  Shipping = 'SHIPPING',
+  Cancelled = 'Cancelled',
+  Failed = 'Failed',
+  Shipped = 'Shipped',
+  Shipping = 'Shipping',
 }
 
 export type ShippingAddress = {
@@ -3190,17 +3190,17 @@ export type User = {
 
 /** Oauth 제공 서비스입니다. */
 export enum UserProviderType {
-  Apple = 'APPLE',
-  Facebook = 'FACEBOOK',
-  Kakao = 'KAKAO',
+  Apple = 'Apple',
+  Facebook = 'Facebook',
+  Kakao = 'Kakao',
 }
 
-/** 유저의 역할/권한을 나타냅니다. USER->EDITOR->SELLER->ADMIN 순으로 계층 구조입니다. */
+/** 유저의 역할/권한을 나타냅니다. User->Editor->Seller->Admin 순으로 계층 구조입니다. */
 export enum UserRole {
-  Admin = 'ADMIN',
-  Editor = 'EDITOR',
-  Seller = 'SELLER',
-  User = 'USER',
+  Admin = 'Admin',
+  Editor = 'Editor',
+  Seller = 'Seller',
+  User = 'User',
 }
 
 export type Video = {
