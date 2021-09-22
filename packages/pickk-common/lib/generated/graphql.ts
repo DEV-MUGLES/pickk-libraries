@@ -832,7 +832,7 @@ export enum InquiryType {
 }
 
 export type Item = {
-  brand?: Maybe<Brand>;
+  brand: Brand;
   brandId: Scalars['Int'];
   campaigns?: Maybe<Array<Campaign>>;
   createdAt: Scalars['DateTime'];
