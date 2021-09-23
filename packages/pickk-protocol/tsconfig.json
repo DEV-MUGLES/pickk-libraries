@@ -1,8 +1,8 @@
-{ 
-    "extends": "../../tsconfig",
-    "compilerOptions": {
-        "rootDir": "./lib",
-        "outDir": "./dist"
-    }
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "rootDir": "./lib",
+    "outDir": "./dist"
+  }
 }
-  
