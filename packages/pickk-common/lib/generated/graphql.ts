@@ -1390,6 +1390,7 @@ export type MutationBulkUpdateItemsArgs = {
 
 export type MutationCancelMeSellerOrderItemArgs = {
   merchantUid: Scalars['String'];
+  restock: Scalars['Boolean'];
 };
 
 export type MutationCancelOrderArgs = {
