@@ -752,6 +752,11 @@ export type FindSaleStrategyInput = {
   canUseMileage: Scalars['Boolean'];
 };
 
+export type GetAppleAuthCodeInput = {
+  clientType: AppleClientType;
+  code: Scalars['String'];
+};
+
 /** 조회수 누적 대상 객체 분류입니다. */
 export enum HitOwnerType {
   Digest = 'Digest',
@@ -1157,11 +1162,6 @@ export type LoginByOauthInput = {
   minRole?: Maybe<UserRole>;
   oauthCode?: Maybe<Scalars['String']>;
   oauthProvider?: Maybe<UserProviderType>;
-};
-
-export type LoginWithAppleInput = {
-  clientType: AppleClientType;
-  code: Scalars['String'];
 };
 
 export type Look = {
@@ -1808,12 +1808,13 @@ export type OrderItem = {
   itemName: Scalars['String'];
   /** order.merchantUid + 숫자 2자리 */
   merchantUid: Scalars['String'];
+  /** [MODEL ONLY] */
   name: Scalars['String'];
   order: Order;
   orderMerchantUid: Scalars['String'];
   paidAt?: Maybe<Scalars['DateTime']>;
-  /** 상품가격 - 포인트사용액 - 쿠폰할인액 */
-  payAmount: Scalars['Float'];
+  /** [MODEL ONLY] */
+  payAmount: Scalars['Int'];
   /** 처리지연 전환 시점 */
   processDelayedAt?: Maybe<Scalars['DateTime']>;
   product?: Maybe<Product>;
@@ -2245,6 +2246,7 @@ export type Query = {
   digests: Array<Digest>;
   digestsExhibitions: Array<DigestsExhibition>;
   genRandomNickname: Scalars['String'];
+  getAppleAuthCode: Scalars['String'];
   inquiries: Array<Inquiry>;
   inquiriesCount: Scalars['Int'];
   item: Item;
@@ -2266,7 +2268,6 @@ export type Query = {
   loginByCode: JwtToken;
   loginByOauth: JwtToken;
   loginSellerByCode: JwtToken;
-  loginWithApple: JwtToken;
   look: Look;
   looks: Array<Look>;
   me: User;
@@ -2367,6 +2368,10 @@ export type QueryDigestsArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
+export type QueryGetAppleAuthCodeArgs = {
+  getAppleAuthCodeInput: GetAppleAuthCodeInput;
+};
+
 export type QueryInquiriesArgs = {
   filter?: Maybe<InquiryFilter>;
   pageInput?: Maybe<PageInput>;
@@ -2438,10 +2443,6 @@ export type QueryLoginByOauthArgs = {
 
 export type QueryLoginSellerByCodeArgs = {
   loginByCodeInput: LoginByCodeInput;
-};
-
-export type QueryLoginWithAppleArgs = {
-  getAppleProviderIdInput: LoginWithAppleInput;
 };
 
 export type QueryLookArgs = {
