@@ -823,7 +823,10 @@ export enum InquiryAnswerFrom {
 }
 
 export type InquiryFilter = {
+  isAnswered?: Maybe<Scalars['Boolean']>;
   itemId?: Maybe<Scalars['Int']>;
+  /** 주문상품번호로 검색 가능 */
+  search?: Maybe<Scalars['String']>;
   sellerId?: Maybe<Scalars['Int']>;
   userId?: Maybe<Scalars['Int']>;
 };
@@ -1230,6 +1233,7 @@ export type Mutation = {
   addMeRefundAccount: RefundAccount;
   addMeShippingAddress: ShippingAddress;
   answerMeSellerInquiry: Inquiry;
+  answerRootInquiry: Inquiry;
   basifyPrice: Item;
   bulkPickMeSellerExchangeRequests: Scalars['Boolean'];
   bulkPickMeSellerRefundRequests: Scalars['Boolean'];
@@ -1240,6 +1244,7 @@ export type Mutation = {
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
   completeOrder: BaseOrderOutput;
+  confirmMeOrderItem: OrderItem;
   confirmMeSellerRefundRequest: Scalars['Boolean'];
   crawlItemOptionSet: Item;
   createComment: Comment;
@@ -1283,7 +1288,6 @@ export type Mutation = {
   requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
-  rootAnswerInquiry: Inquiry;
   setCategoryToItem: Item;
   shipMeSellerOrderItem: OrderItem;
   startOrder: Order;
@@ -1306,6 +1310,7 @@ export type Mutation = {
   updateMe: User;
   updateMeRefundAccount: RefundAccount;
   updateMeSeller: Seller;
+  updateMeSellerInquiryAnswer: InquiryAnswer;
   /** 주문상품 단건 운송장 수정 */
   updateMeSellerOrderItemTrackCode: OrderItem;
   updateMeShippingAddress: ShippingAddress;
@@ -1319,6 +1324,7 @@ export type Mutation = {
   updateMySellerSettlePolicy: SellerSettlePolicy;
   updateMySellerShippingPolicy: SellerShippingPolicy;
   updateProduct: Product;
+  updateRootInquiryAnswer: InquiryAnswer;
   /** 입력한 seller의 saleStrategy를 변경합니다. Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: SaleStrategy;
   updateVideo: Video;
@@ -1362,6 +1368,11 @@ export type MutationAnswerMeSellerInquiryArgs = {
   id: Scalars['Int'];
 };
 
+export type MutationAnswerRootInquiryArgs = {
+  answerInquiryInput: AnswerInquiryInput;
+  id: Scalars['Int'];
+};
+
 export type MutationBasifyPriceArgs = {
   itemId: Scalars['Int'];
   priceId: Scalars['Int'];
@@ -1400,6 +1411,10 @@ export type MutationCancelOrderArgs = {
 
 export type MutationCompleteOrderArgs = {
   createOrderVbankReceiptInput?: Maybe<CreateOrderVbankReceiptInput>;
+  merchantUid: Scalars['String'];
+};
+
+export type MutationConfirmMeOrderItemArgs = {
   merchantUid: Scalars['String'];
 };
 
@@ -1567,11 +1582,6 @@ export type MutationReshipMeSellerExchangeRequestArgs = {
   reshipExchangeRequestInput: ReshipExchangeRequestInput;
 };
 
-export type MutationRootAnswerInquiryArgs = {
-  answerInquiryInput: AnswerInquiryInput;
-  id: Scalars['Int'];
-};
-
 export type MutationSetCategoryToItemArgs = {
   id: Scalars['Int'];
   setCategoryToItemInput: SetCategoryToItemInput;
@@ -1667,6 +1677,11 @@ export type MutationUpdateMeSellerArgs = {
   updateSellerInput: UpdateSellerInput;
 };
 
+export type MutationUpdateMeSellerInquiryAnswerArgs = {
+  id: Scalars['Int'];
+  updateInquiryAnswerInput: UpdateInquiryAnswerInput;
+};
+
 export type MutationUpdateMeSellerOrderItemTrackCodeArgs = {
   merchantUid: Scalars['String'];
   trackCode: Scalars['String'];
@@ -1710,6 +1725,11 @@ export type MutationUpdateMySellerShippingPolicyArgs = {
 export type MutationUpdateProductArgs = {
   id: Scalars['Int'];
   updateProductInput: UpdateProductInput;
+};
+
+export type MutationUpdateRootInquiryAnswerArgs = {
+  id: Scalars['Int'];
+  updateInquiryAnswerInput: UpdateInquiryAnswerInput;
 };
 
 export type MutationUpdateSellerSaleStrategyArgs = {
@@ -2245,6 +2265,8 @@ export type Query = {
   digest: Digest;
   digests: Array<Digest>;
   digestsExhibitions: Array<DigestsExhibition>;
+  expectedCancelAmount: Scalars['Int'];
+  expectedClaimShippingFee: Scalars['Int'];
   genRandomNickname: Scalars['String'];
   getAppleAuthCode: Scalars['String'];
   inquiries: Array<Inquiry>;
@@ -2282,6 +2304,7 @@ export type Query = {
   meSellerExchangeRequestsCount: ExchangeRequestsCountOutput;
   meSellerInquiries: Array<Inquiry>;
   meSellerInquiriesCount: InquiriesCountOutput;
+  meSellerInquiry: Inquiry;
   meSellerOrderItems: Array<OrderItem>;
   meSellerOrderItemsCount: OrderItemsCountOutput;
   meSellerRefundRequests: Array<RefundRequest>;
@@ -2303,6 +2326,7 @@ export type Query = {
   /** [ROOT ADMIN] */
   rootInquiriesCount: InquiriesCountOutput;
   rootInquiry: Inquiry;
+  rootOrderItems: Array<OrderItem>;
   searchDigest: Array<Digest>;
   searchItem: Array<Item>;
   searchKeyword: Array<Keyword>;
@@ -2366,6 +2390,17 @@ export type QueryDigestArgs = {
 export type QueryDigestsArgs = {
   filter?: Maybe<DigestFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryExpectedCancelAmountArgs = {
+  merchantUid: Scalars['String'];
+  orderItemMerchantUids: Array<Scalars['String']>;
+};
+
+export type QueryExpectedClaimShippingFeeArgs = {
+  faultOf: RefundRequestFaultOf;
+  merchantUid: Scalars['String'];
+  orderItemMerchantUids: Array<Scalars['String']>;
 };
 
 export type QueryGetAppleAuthCodeArgs = {
@@ -2492,6 +2527,10 @@ export type QueryMeSellerInquiriesCountArgs = {
   forceUpdate?: Maybe<Scalars['Boolean']>;
 };
 
+export type QueryMeSellerInquiryArgs = {
+  id: Scalars['Int'];
+};
+
 export type QueryMeSellerOrderItemsArgs = {
   orderItemFilter?: Maybe<OrderItemFilter>;
   pageInput?: Maybe<PageInput>;
@@ -2539,6 +2578,11 @@ export type QueryRootInquiriesCountArgs = {
 
 export type QueryRootInquiryArgs = {
   id: Scalars['Int'];
+};
+
+export type QueryRootOrderItemsArgs = {
+  orderItemFilter?: Maybe<OrderItemFilter>;
+  pageInput?: Maybe<PageInput>;
 };
 
 export type QuerySearchDigestArgs = {
@@ -2973,6 +3017,13 @@ export type UpdateDigestInput = {
   size?: Maybe<Scalars['String']>;
   /** 최대 길이 127 */
   title?: Maybe<Scalars['String']>;
+};
+
+export type UpdateInquiryAnswerInput = {
+  /** 최대 길이 255 */
+  content?: Maybe<Scalars['String']>;
+  /** 표시될 답변작성자 이름. 최대 길이 30 */
+  displayAuthor?: Maybe<Scalars['String']>;
 };
 
 export type UpdateItemInput = {
