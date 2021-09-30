@@ -904,6 +904,7 @@ export type ItemDetailImage = {
 
 export type ItemFilter = {
   brandId?: Maybe<Scalars['Int']>;
+  createdAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   createdAtLte?: Maybe<Scalars['DateTime']>;
   createdAtMte?: Maybe<Scalars['DateTime']>;
   idIn?: Maybe<Array<Scalars['Int']>>;
@@ -916,6 +917,7 @@ export type ItemFilter = {
   scoreMt?: Maybe<Scalars['Float']>;
   /** 아이템 이름(name)으로 검색합니다. */
   search?: Maybe<Scalars['String']>;
+  sellableAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   sellableAtLte?: Maybe<Scalars['DateTime']>;
   sellableAtMte?: Maybe<Scalars['DateTime']>;
 };
@@ -2306,6 +2308,7 @@ export type Query = {
   meSellerInquiries: Array<Inquiry>;
   meSellerInquiriesCount: InquiriesCountOutput;
   meSellerInquiry: Inquiry;
+  meSellerItems: Array<Item>;
   meSellerOrderItems: Array<OrderItem>;
   meSellerOrderItemsCount: OrderItemsCountOutput;
   meSellerRefundRequests: Array<RefundRequest>;
@@ -2530,6 +2533,11 @@ export type QueryMeSellerInquiriesCountArgs = {
 
 export type QueryMeSellerInquiryArgs = {
   id: Scalars['Int'];
+};
+
+export type QueryMeSellerItemsArgs = {
+  itemFilter?: Maybe<ItemFilter>;
+  pageInput?: Maybe<PageInput>;
 };
 
 export type QueryMeSellerOrderItemsArgs = {
