@@ -898,6 +898,7 @@ export type ItemDetailImage = {
   createdAt: Scalars['DateTime'];
   itemId: Scalars['Int'];
   key: Scalars['String'];
+  order: Scalars['Int'];
   url: Scalars['String'];
 };
 
@@ -912,7 +913,7 @@ export type ItemFilter = {
   majorCategoryId?: Maybe<Scalars['Float']>;
   minorCategoryId?: Maybe<Scalars['Float']>;
   orderBy?: Maybe<Scalars['String']>;
-  scoreMt?: Maybe<Scalars['DateTime']>;
+  scoreMt?: Maybe<Scalars['Float']>;
   /** 아이템 이름(name)으로 검색합니다. */
   search?: Maybe<Scalars['String']>;
   sellableAtLte?: Maybe<Scalars['DateTime']>;
