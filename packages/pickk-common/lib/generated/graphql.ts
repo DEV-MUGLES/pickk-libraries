@@ -441,6 +441,13 @@ export type CreateOrderVbankReceiptInput = {
   ownerName?: Maybe<Scalars['String']>;
 };
 
+export type CreateProductShippingReservePolicyInput = {
+  /** 예약발송 예정일 */
+  estimatedShippingBegginDate: Scalars['DateTime'];
+  /** 예약설정된 재고. 예약발송일이 되면, 예약발송 상태는 자동으로 종료되며, 잔여 예약발송 재고는 일반 재고에 합산됩니다. */
+  stock: Scalars['Int'];
+};
+
 export type CreateRefundAccountInput = {
   bankCode: BankCode;
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
@@ -493,7 +500,7 @@ export type CreateSellerInput = {
   /** 최대 20자 */
   representativeName?: Maybe<Scalars['String']>;
   returnAddressInput: CreateSellerReturnAddressInput;
-  saleStrategyInput: FindSaleStrategyInput;
+  saleStrategyInput: CreateSellerSaleStrategyInput;
   settlePolicyInput?: Maybe<CreateSellerSettlePolicyInput>;
   shippingPolicyInput: CreateSellerShippingPolicyInput;
   userId: Scalars['Int'];
@@ -503,6 +510,12 @@ export type CreateSellerReturnAddressInput = {
   baseAddress: Scalars['String'];
   detailAddress: Scalars['String'];
   postalCode: Scalars['String'];
+};
+
+export type CreateSellerSaleStrategyInput = {
+  canUseCoupon: Scalars['Boolean'];
+  canUseMileage: Scalars['Boolean'];
+  pickkDiscountRate: Scalars['Int'];
 };
 
 export type CreateSellerSettleAccountInput = {
@@ -654,7 +667,7 @@ export type DigestsExhibition = {
 
 export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
-  faultOf: RefundRequestFaultOf;
+  faultOf: OrderClaimFaultOf;
   isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
   itemName: Scalars['String'];
@@ -1257,6 +1270,7 @@ export type Mutation = {
   createLook: Look;
   createMyCartItem: CartItem;
   createSeller: Seller;
+  createShippingReservePolicy: Product;
   createUser: User;
   createVideo: Video;
   dodgeVbankOrder: BaseOrderOutput;
@@ -1324,8 +1338,9 @@ export type Mutation = {
   updateMySellerShippingPolicy: SellerShippingPolicy;
   updateProduct: Product;
   updateRootInquiryAnswer: InquiryAnswer;
-  /** 입력한 seller의 saleStrategy를 변경합니다. Admin 이상의 권한이 필요합니다. */
-  updateSellerSaleStrategy: SaleStrategy;
+  /** Admin 이상의 권한이 필요합니다. */
+  updateSellerSaleStrategy: Seller;
+  updateShippingReservePolicy: Product;
   updateVideo: Video;
 };
 
@@ -1469,6 +1484,11 @@ export type MutationCreateMyCartItemArgs = {
 
 export type MutationCreateSellerArgs = {
   createSellerInput: CreateSellerInput;
+};
+
+export type MutationCreateShippingReservePolicyArgs = {
+  createProductShippingReservePolicyInput: CreateProductShippingReservePolicyInput;
+  productId: Scalars['Int'];
 };
 
 export type MutationCreateUserArgs = {
@@ -1736,6 +1756,11 @@ export type MutationUpdateSellerSaleStrategyArgs = {
   updateSaleStrategyInput: FindSaleStrategyInput;
 };
 
+export type MutationUpdateShippingReservePolicyArgs = {
+  productId: Scalars['Int'];
+  updateProductShippingReservePolicyInput: UpdateProductShippingReservePolicyInput;
+};
+
 export type MutationUpdateVideoArgs = {
   id: Scalars['Int'];
   updateVideoInput: UpdateVideoInput;
@@ -1796,6 +1821,12 @@ export type OrderBuyerInput = {
   name: Scalars['String'];
   phoneNumber: Scalars['String'];
 };
+
+/** 교환/반품 책임자?입니다. (구매자 or 판매자) */
+export enum OrderClaimFaultOf {
+  Customer = 'Customer',
+  Seller = 'Seller',
+}
 
 export type OrderItem = {
   brandNameKor: Scalars['String'];
@@ -2399,7 +2430,7 @@ export type QueryExpectedCancelAmountArgs = {
 };
 
 export type QueryExpectedClaimShippingFeeArgs = {
-  faultOf: RefundRequestFaultOf;
+  faultOf: OrderClaimFaultOf;
   merchantUid: Scalars['String'];
   orderItemMerchantUids: Array<Scalars['String']>;
 };
@@ -2654,7 +2685,7 @@ export type RefundRequest = {
   /** 반품대상 주문상품 총 결제액 (배송비 제외) */
   amount: Scalars['Int'];
   confirmedAt?: Maybe<Scalars['DateTime']>;
-  faultOf: RefundRequestFaultOf;
+  faultOf: OrderClaimFaultOf;
   isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
   /** (PK) YYMMDDHHmmssSSS + NN(00~99) + M */
@@ -2682,12 +2713,6 @@ export type RefundRequest = {
   user?: Maybe<User>;
   userId?: Maybe<Scalars['Int']>;
 };
-
-/** 교환/반품 책임자?입니다. (구매자 or 판매자) */
-export enum RefundRequestFaultOf {
-  Customer = 'Customer',
-  Seller = 'Seller',
-}
 
 export type RefundRequestFilter = {
   confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
@@ -2744,7 +2769,7 @@ export type RegisterOrderItemInput = {
 };
 
 export type RequestOrderItemExchangeInput = {
-  faultOf: RefundRequestFaultOf;
+  faultOf: OrderClaimFaultOf;
   /** 교환 대상 product */
   productId: Scalars['Int'];
   /** 255자 이내로 적어주세요 */
@@ -2753,7 +2778,7 @@ export type RequestOrderItemExchangeInput = {
 };
 
 export type RequestOrderRefundInput = {
-  faultOf: RefundRequestFaultOf;
+  faultOf: OrderClaimFaultOf;
   /** 반품처리할 OrderItem들. 같은 브랜드의 OrderItem들로만 신청할 수 있습니다. */
   orderItemMerchantUids: Array<Scalars['String']>;
   /** 최대 255자 */
@@ -2768,14 +2793,6 @@ export type RequestPinInput = {
 export type ReshipExchangeRequestInput = {
   courierId: Scalars['Int'];
   trackCode: Scalars['String'];
-};
-
-export type SaleStrategy = {
-  canUseCoupon: Scalars['Boolean'];
-  canUseMileage: Scalars['Boolean'];
-  createdAt: Scalars['DateTime'];
-  id: Scalars['Int'];
-  updatedAt: Scalars['DateTime'];
 };
 
 export type Seller = {
@@ -2800,7 +2817,7 @@ export type Seller = {
   /** 최대 20자 */
   representativeName?: Maybe<Scalars['String']>;
   returnAddress: SellerReturnAddress;
-  saleStrategy: SaleStrategy;
+  saleStrategy: SellerSaleStrategy;
   settlePolicy?: Maybe<SellerSettlePolicy>;
   shippingPolicy: SellerShippingPolicy;
   updatedAt: Scalars['DateTime'];
@@ -2863,6 +2880,16 @@ export type SellerReturnAddress = {
   phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
   receiverName: Scalars['String'];
+  sellerId: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type SellerSaleStrategy = {
+  canUseCoupon: Scalars['Boolean'];
+  canUseMileage: Scalars['Boolean'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  pickkDiscountRate: Scalars['Int'];
   sellerId: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
 };
@@ -3093,6 +3120,13 @@ export type UpdateLookInput = {
 
 export type UpdateProductInput = {
   stock: Scalars['Int'];
+};
+
+export type UpdateProductShippingReservePolicyInput = {
+  /** 예약발송 예정일 */
+  estimatedShippingBegginDate?: Maybe<Scalars['DateTime']>;
+  /** 예약설정된 재고. 예약발송일이 되면, 예약발송 상태는 자동으로 종료되며, 잔여 예약발송 재고는 일반 재고에 합산됩니다. */
+  stock?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateRefundAccountInput = {
