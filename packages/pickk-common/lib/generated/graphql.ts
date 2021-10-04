@@ -214,7 +214,7 @@ export enum CardCode {
 }
 
 export type Cart = {
-  /** CartItem들을 브랜드 단위로 묶은 단위입니다. */
+  /** CartItem을 브랜드 단위로 묶은 것 */
   cartBrands: Array<CartBrand>;
   cartItems: Array<CartItem>;
   /** userId와 동일한 더미값입니다. */
@@ -231,10 +231,12 @@ export type CartItem = {
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   /** [MODEL ONLY] */
-  isAdjusted: Scalars['Boolean'];
+  isAdjusted?: Maybe<Scalars['Boolean']>;
   product: Product;
   productId: Scalars['Int'];
   quantity: Scalars['Int'];
+  recommendDigest?: Maybe<Digest>;
+  recommendDigestId?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['DateTime'];
   user: User;
   userId: Scalars['Int'];
@@ -277,13 +279,6 @@ export type CommentFilter = {
 
 /** 댓글 연관 객체 분류입니다. */
 export enum CommentOwnerType {
-  Digest = 'Digest',
-  Look = 'Look',
-  Video = 'Video',
-}
-
-/** 컨텐츠 타입입니다. */
-export enum ContentType {
   Digest = 'Digest',
   Look = 'Look',
   Video = 'Video',
@@ -344,6 +339,7 @@ export type Courier = {
 export type CreateCartItemInput = {
   productId: Scalars['Int'];
   quantity: Scalars['Int'];
+  recommendDigestId?: Maybe<Scalars['Int']>;
 };
 
 export type CreateCommentInput = {
@@ -1230,7 +1226,7 @@ export type ManualCreateItemInput = {
 export type Mutation = {
   activateItemPrice: Item;
   addItemDetailImages: Item;
-  addItemPrice: ItemPrice;
+  addItemPrice: Item;
   addItemSizeCharts: Item;
   addItemUrl: ItemUrl;
   addMeRefundAccount: RefundAccount;
@@ -1282,8 +1278,8 @@ export type Mutation = {
   removeItemPrice: Item;
   removeItemSizeChartsAll: Item;
   removeLook: Scalars['Boolean'];
-  removeMeRefundAccount: User;
-  removeMeShippingAddress: Array<ShippingAddress>;
+  removeMeRefundAccount: Scalars['Boolean'];
+  removeMeShippingAddress: Scalars['Boolean'];
   removeMyCartItems: Scalars['Boolean'];
   removeVideo: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
@@ -1306,7 +1302,7 @@ export type Mutation = {
   updateDigestsExhibitionDigests: DigestsExhibition;
   updateItem: Item;
   updateItemOption: ItemOption;
-  updateItemPrice: ItemPrice;
+  updateItemPrice: Item;
   updateItemsExhibitionItems: ItemsExhibition;
   updateItemsPackageItems: ItemsPackage;
   updateLook: Look;
@@ -1844,8 +1840,8 @@ export type OrderItem = {
   productId?: Maybe<Scalars['Int']>;
   productVariantName: Scalars['String'];
   quantity: Scalars['Int'];
-  recommendContentItemId?: Maybe<Scalars['Int']>;
-  recommendContentType?: Maybe<ContentType>;
+  recommendDigest?: Maybe<Digest>;
+  recommendDigestId?: Maybe<Scalars['Int']>;
   recommenderId?: Maybe<Scalars['Int']>;
   recommenderNickname?: Maybe<Scalars['String']>;
   refundRequest: RefundRequest;
@@ -1957,11 +1953,11 @@ export type OrderItemsCountOutput = {
   id: Scalars['Int'];
   lastUpdatedAt: Scalars['DateTime'];
   /** 결제 완료 */
-  process_delayed_paid: Scalars['Int'];
+  process_delayed_Paid: Scalars['Int'];
   /** 배송 보류중(예약중) */
-  process_delayed_ship_pending: Scalars['Int'];
+  process_delayed_ShipPending: Scalars['Int'];
   /** 배송 준비중 */
-  process_delayed_ship_ready: Scalars['Int'];
+  process_delayed_ShipReady: Scalars['Int'];
 };
 
 export type OrderReceiver = {
@@ -2300,6 +2296,7 @@ export type Query = {
   meInquiries: Array<Inquiry>;
   meInquiry: Inquiry;
   meOrder: Order;
+  /** VbankReady, Paid만 표시 */
   meOrders: Array<Order>;
   meOwnsCount: OwnsCountOutput;
   meSeller: Seller;
@@ -2743,8 +2740,7 @@ export type RegisterOrderInput = {
 export type RegisterOrderItemInput = {
   productId: Scalars['Int'];
   quantity: Scalars['Int'];
-  recommendContentItemId?: Maybe<Scalars['Int']>;
-  recommendContentType?: Maybe<ContentType>;
+  recommendDigestId?: Maybe<Scalars['Int']>;
 };
 
 export type RequestOrderItemExchangeInput = {
@@ -2874,12 +2870,12 @@ export type SellerReturnAddress = {
 /** 정산 계좌 */
 export type SellerSettleAccount = {
   bankCode: BankCode;
-  claimPolicyId: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   /** 계좌번호입니다.("-" 제외) 최대 14자까지 입력 가능합니다. */
   number: Scalars['String'];
   ownerName: Scalars['String'];
+  settlePolicyId: Scalars['Int'];
   updatedAt: Scalars['DateTime'];
 };
 
