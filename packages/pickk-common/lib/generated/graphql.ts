@@ -456,6 +456,7 @@ export type CreateRefundAccountInput = {
 };
 
 export type CreateSellerClaimPolicyInput = {
+  description?: Maybe<Scalars['String']>;
   fee: Scalars['Int'];
   isExchangable: Scalars['Boolean'];
   isRefundable: Scalars['Boolean'];
@@ -609,6 +610,7 @@ export type Digest = {
   likeCount: Scalars['Int'];
   look?: Maybe<Look>;
   lookId?: Maybe<Scalars['Int']>;
+  order: Scalars['Float'];
   rating?: Maybe<Scalars['Rating']>;
   score: Scalars['Float'];
   size: Scalars['String'];
@@ -724,6 +726,7 @@ export type ExchangeRequestOrderItemFilter = {
 
 /** 교한신청 상태입니다. */
 export enum ExchangeRequestStatus {
+  Pending = 'Pending',
   Picked = 'Picked',
   Rejected = 'Rejected',
   Requested = 'Requested',
@@ -1201,6 +1204,7 @@ export type Look = {
 };
 
 export type LookFilter = {
+  brandId?: Maybe<Scalars['Int']>;
   idIn?: Maybe<Array<Scalars['Int']>>;
   /** 사용시 다른 필터는 무시합니다. (정렬: "score") */
   itemId?: Maybe<Scalars['Int']>;
@@ -1255,6 +1259,7 @@ export type Mutation = {
   /** 취소 사유는 "담당자 취소 처리"로 고정 */
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
+  completeExchangeRequest: ExchangeRequest;
   completeOrder: BaseOrderOutput;
   confirmMeOrderItem: OrderItem;
   confirmMeSellerRefundRequest: Scalars['Boolean'];
@@ -1284,6 +1289,7 @@ export type Mutation = {
   manualCreateItem: Item;
   modifyItemSizeCharts: Item;
   own: Scalars['Boolean'];
+  registerExchangeRequest: ExchangeRequest;
   registerOrder: BaseOrderOutput;
   removeComment: Comment;
   removeDigest: Scalars['Boolean'];
@@ -1298,7 +1304,6 @@ export type Mutation = {
   removeVideo: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
   reportItem: Scalars['Boolean'];
-  requestOrderItemExchange: OrderItem;
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
   setCategoryToItem: Item;
@@ -1423,6 +1428,10 @@ export type MutationCancelOrderArgs = {
   merchantUid: Scalars['String'];
 };
 
+export type MutationCompleteExchangeRequestArgs = {
+  merchantUid: Scalars['String'];
+};
+
 export type MutationCompleteOrderArgs = {
   createOrderVbankReceiptInput?: Maybe<CreateOrderVbankReceiptInput>;
   merchantUid: Scalars['String'];
@@ -1535,6 +1544,11 @@ export type MutationOwnArgs = {
   keywordId: Scalars['Int'];
 };
 
+export type MutationRegisterExchangeRequestArgs = {
+  merchantUid: Scalars['String'];
+  registerExchangeRequestInput: RegisterExchangeRequestInput;
+};
+
 export type MutationRegisterOrderArgs = {
   registerOrderInput: RegisterOrderInput;
 };
@@ -1584,11 +1598,6 @@ export type MutationRemoveVideoArgs = {
 export type MutationReportItemArgs = {
   id: Scalars['Int'];
   reason: Scalars['String'];
-};
-
-export type MutationRequestOrderItemExchangeArgs = {
-  merchantUid: Scalars['String'];
-  requestOrderItemExchangeInput: RequestOrderItemExchangeInput;
 };
 
 export type MutationRequestOrderRefundArgs = {
@@ -1800,7 +1809,7 @@ export type Order = {
 
 export type OrderBrand = {
   id: Scalars['Int'];
-  imageUrl: Scalars['String'];
+  imageUrl?: Maybe<Scalars['String']>;
   items: Array<OrderItem>;
   nameKor: Scalars['String'];
   shippingFee: Scalars['Int'];
@@ -2327,6 +2336,7 @@ export type Query = {
   meInquiries: Array<Inquiry>;
   meInquiry: Inquiry;
   meOrder: Order;
+  meOrderItem: OrderItem;
   /** VbankReady, Paid만 표시 */
   meOrders: Array<Order>;
   meOwnsCount: OwnsCountOutput;
@@ -2351,6 +2361,7 @@ export type Query = {
   myPointEvents: Array<PointEvent>;
   /** [Admin] 결제 목록을 조회합니다. */
   payments: PaymentListOutput;
+  product: Product;
   /** refresh token을 받아서 새로운 JwtToken을 생성합니다. */
   refreshJwtToken: JwtToken;
   requestPin: Scalars['Boolean'];
@@ -2533,6 +2544,10 @@ export type QueryMeOrderArgs = {
   merchantUid: Scalars['String'];
 };
 
+export type QueryMeOrderItemArgs = {
+  merchantUid: Scalars['String'];
+};
+
 export type QueryMeOrdersArgs = {
   pageInput?: Maybe<PageInput>;
 };
@@ -2598,6 +2613,10 @@ export type QueryMyPointEventsArgs = {
 
 export type QueryPaymentsArgs = {
   paymentFilter: PaymentFilter;
+};
+
+export type QueryProductArgs = {
+  id: Scalars['Int'];
 };
 
 export type QueryRequestPinArgs = {
@@ -2757,6 +2776,15 @@ export type RefundRequestsCountOutput = {
   process_delayed: Scalars['Int'];
 };
 
+export type RegisterExchangeRequestInput = {
+  faultOf: OrderClaimFaultOf;
+  /** 교환 대상 product */
+  productId: Scalars['Int'];
+  /** 255자 이내로 적어주세요 */
+  reason: Scalars['String'];
+  shipmentInput?: Maybe<CreateShipmentInput>;
+};
+
 export type RegisterOrderInput = {
   cartItemIds?: Maybe<Array<Scalars['Int']>>;
   orderItemInputs?: Maybe<Array<RegisterOrderItemInput>>;
@@ -2766,15 +2794,6 @@ export type RegisterOrderItemInput = {
   productId: Scalars['Int'];
   quantity: Scalars['Int'];
   recommendDigestId?: Maybe<Scalars['Int']>;
-};
-
-export type RequestOrderItemExchangeInput = {
-  faultOf: OrderClaimFaultOf;
-  /** 교환 대상 product */
-  productId: Scalars['Int'];
-  /** 255자 이내로 적어주세요 */
-  reason: Scalars['String'];
-  shipmentInput?: Maybe<CreateShipmentInput>;
 };
 
 export type RequestOrderRefundInput = {
@@ -3137,6 +3156,7 @@ export type UpdateRefundAccountInput = {
 };
 
 export type UpdateSellerClaimPolicyInput = {
+  description?: Maybe<Scalars['String']>;
   fee?: Maybe<Scalars['Int']>;
   isExchangable?: Maybe<Scalars['Boolean']>;
   isRefundable?: Maybe<Scalars['Boolean']>;
