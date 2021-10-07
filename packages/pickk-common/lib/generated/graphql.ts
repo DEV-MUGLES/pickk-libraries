@@ -176,6 +176,8 @@ export type Campaign = {
   createdAt: Scalars['DateTime'];
   endAt: Scalars['DateTime'];
   id: Scalars['Int'];
+  /** [MODEL ONLY] */
+  isActive: Scalars['Boolean'];
   items: Array<Item>;
   /** 적용 정산률 (0~100) */
   rate: Scalars['Int'];
@@ -378,7 +380,7 @@ export type CreateCourierInput = {
 };
 
 export type CreateDigestInput = {
-  /** 최대 길이 2047 */
+  /** 최대 길이 65000자 */
   content?: Maybe<Scalars['String']>;
   imageUrls: Array<Scalars['String']>;
   itemId?: Maybe<Scalars['Int']>;
@@ -510,7 +512,10 @@ export type CreateSellerInput = {
 export type CreateSellerReturnAddressInput = {
   baseAddress: Scalars['String'];
   detailAddress: Scalars['String'];
+  name: Scalars['String'];
+  phoneNumber: Scalars['String'];
   postalCode: Scalars['String'];
+  receiverName: Scalars['String'];
 };
 
 export type CreateSellerSaleStrategyInput = {
@@ -594,7 +599,7 @@ export type CreateVideoInput = {
 
 export type Digest = {
   commentCount: Scalars['Int'];
-  /** 최대 길이 2047 */
+  /** 최대 길이 65000자 */
   content?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   hitCount: Scalars['Int'];
@@ -878,6 +883,8 @@ export type Item = {
   options?: Maybe<Array<ItemOption>>;
   /** [MODEL ONLY] */
   originalPrice: Scalars['Float'];
+  /** [MODEL ONLY] */
+  pickkDiscountRate: Scalars['Float'];
   prices: Array<ItemPrice>;
   products?: Maybe<Array<Product>>;
   providedCode?: Maybe<Scalars['String']>;
@@ -1282,9 +1289,6 @@ export type Mutation = {
   failOrder: BaseOrderOutput;
   follow: Scalars['Boolean'];
   hit: Scalars['Boolean'];
-  indexItem: Scalars['Boolean'];
-  indexKeyword: Scalars['Boolean'];
-  indexVideo: Scalars['Boolean'];
   like: Scalars['Boolean'];
   manualCreateItem: Item;
   modifyItemSizeCharts: Item;
@@ -1838,7 +1842,10 @@ export enum OrderClaimFaultOf {
 }
 
 export type OrderItem = {
+  additionalDiscountRate: Scalars['Int'];
   brandNameKor: Scalars['String'];
+  campaign?: Maybe<Campaign>;
+  campaignId?: Maybe<Scalars['Int']>;
   cancelRequestedAt?: Maybe<Scalars['DateTime']>;
   cancelledAt?: Maybe<Scalars['DateTime']>;
   claimStatus?: Maybe<OrderItemClaimStatus>;
@@ -1889,6 +1896,7 @@ export type OrderItem = {
   refundedAt?: Maybe<Scalars['DateTime']>;
   seller?: Maybe<Seller>;
   sellerId?: Maybe<Scalars['Int']>;
+  settleAmount: Scalars['Int'];
   settledAt?: Maybe<Scalars['DateTime']>;
   shipReadyAt?: Maybe<Scalars['DateTime']>;
   /** 예약발송 예정일 */
@@ -2233,14 +2241,13 @@ export enum Pg {
 export type PointEvent = {
   /** 적립/사용 금액. 양수/음수 구분함 */
   amount: Scalars['Int'];
-  content: Scalars['String'];
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
   orderItemMerchantUid?: Maybe<Scalars['String']>;
   /** 적립/사용 이후 잔고 */
   resultBalance: Scalars['Int'];
+  sign: PointSign;
   title: Scalars['String'];
-  type: PointType;
   updatedAt: Scalars['DateTime'];
   userId: Scalars['Int'];
 };
@@ -2248,14 +2255,14 @@ export type PointEvent = {
 export type PointEventFilter = {
   createdAtLte?: Maybe<Scalars['DateTime']>;
   createdAtMte?: Maybe<Scalars['DateTime']>;
-  type?: Maybe<PointType>;
+  sign?: Maybe<PointSign>;
   userId?: Maybe<Scalars['Int']>;
 };
 
-/** 포인트 분류입니다. 적립(Add), 사용(Sub) */
-export enum PointType {
-  Add = 'Add',
-  Sub = 'Sub',
+/** 포인트 분류입니다. 적립(Plus), 사용(Minus) */
+export enum PointSign {
+  Minus = 'Minus',
+  Plus = 'Plus',
 }
 
 export type Product = {
@@ -2370,10 +2377,11 @@ export type Query = {
   rootInquiriesCount: InquiriesCountOutput;
   rootInquiry: Inquiry;
   rootOrderItems: Array<OrderItem>;
+  searchAllItem: Array<Item>;
   searchDigest: Array<Digest>;
-  searchItem: Array<Item>;
   searchKeyword: Array<Keyword>;
   searchLook: Array<Look>;
+  searchPurchasableItem: Array<Item>;
   searchVideo: Array<Video>;
   seller: Seller;
   sellers: Array<Seller>;
@@ -2641,12 +2649,12 @@ export type QueryRootOrderItemsArgs = {
   pageInput?: Maybe<PageInput>;
 };
 
-export type QuerySearchDigestArgs = {
+export type QuerySearchAllItemArgs = {
   pageInput?: Maybe<PageInput>;
   query: Scalars['String'];
 };
 
-export type QuerySearchItemArgs = {
+export type QuerySearchDigestArgs = {
   pageInput?: Maybe<PageInput>;
   query: Scalars['String'];
 };
@@ -2657,6 +2665,11 @@ export type QuerySearchKeywordArgs = {
 };
 
 export type QuerySearchLookArgs = {
+  pageInput?: Maybe<PageInput>;
+  query: Scalars['String'];
+};
+
+export type QuerySearchPurchasableItemArgs = {
   pageInput?: Maybe<PageInput>;
   query: Scalars['String'];
 };
@@ -3059,7 +3072,7 @@ export type UpdateCourierInput = {
 };
 
 export type UpdateDigestInput = {
-  /** 최대 길이 2047 */
+  /** 최대 길이 65000자 */
   content?: Maybe<Scalars['String']>;
   imageUrls?: Maybe<Array<Scalars['String']>>;
   itemId?: Maybe<Scalars['Int']>;
@@ -3190,7 +3203,10 @@ export type UpdateSellerInput = {
 export type UpdateSellerReturnAddressInput = {
   baseAddress?: Maybe<Scalars['String']>;
   detailAddress?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  phoneNumber?: Maybe<Scalars['String']>;
   postalCode?: Maybe<Scalars['String']>;
+  receiverName?: Maybe<Scalars['String']>;
 };
 
 export type UpdateSellerSettleAccountInput = {
