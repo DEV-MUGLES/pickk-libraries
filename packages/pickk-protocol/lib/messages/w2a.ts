@@ -1,6 +1,6 @@
 import { UserProviderType } from '@pickk/common';
 
-import { REQUEST_OAUTH_LOGIN, SIGNIN_COMPLETE } from '../constants';
+import { REQUEST_OAUTH_LOGIN, SIGN_IN_COMPLETE } from '../constants';
 
 /** W2A */
 export type RequestLoginMessage = {
@@ -11,8 +11,8 @@ export type RequestLoginMessage = {
 };
 
 /** W2A */
-export type SigninCompleteMessage = {
-  name: typeof SIGNIN_COMPLETE;
+export type SignInCompleteMessage = {
+  name: typeof SIGN_IN_COMPLETE;
   body: {
     accessToken: string;
   };
