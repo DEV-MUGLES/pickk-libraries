@@ -147,7 +147,6 @@ export type BaseOrderOutput = {
   userId?: Maybe<Scalars['Int']>;
   vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
-  withdrawnAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type Brand = {
@@ -867,6 +866,7 @@ export type Item = {
   digestCount: Scalars['Int'];
   /** [MODEL ONLY] */
   finalPrice: Scalars['Float'];
+  groupItems?: Maybe<Array<Item>>;
   hitCount: Scalars['Int'];
   id: Scalars['Int'];
   imageUrl: Scalars['String'];
@@ -1074,6 +1074,24 @@ export type ItemsExhibition = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type ItemsGroup = {
+  createdAt: Scalars['DateTime'];
+  groupItems: Array<ItemsGroupItem>;
+  id: Scalars['Int'];
+  items: Array<Item>;
+  name: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type ItemsGroupItem = {
+  createdAt: Scalars['DateTime'];
+  group: ItemsGroup;
+  id: Scalars['Int'];
+  item: Item;
+  order: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type ItemsPackage = {
   /** 최대 50자 */
   code: Scalars['String'];
@@ -1128,8 +1146,7 @@ export type Keyword = {
   /** 스타일팁 줄글 */
   stylingTip: Scalars['String'];
   updatedAt: Scalars['DateTime'];
-  /** 0~100 정수. 필수템만 있음 */
-  usablityRate?: Maybe<Scalars['Int']>;
+  usablityRate?: Maybe<Scalars['Float']>;
 };
 
 export type KeywordClass = {
@@ -1161,7 +1178,7 @@ export type KeywordFilter = {
   isOwning?: Maybe<Scalars['Boolean']>;
   isVisible?: Maybe<Scalars['Boolean']>;
   /** [CUSTOM] */
-  keywordClassId?: Maybe<Scalars['Int']>;
+  keywordClassIdIn?: Maybe<Array<Scalars['Int']>>;
   /** 기본값 id */
   orderBy?: Maybe<Scalars['String']>;
 };
@@ -1308,6 +1325,7 @@ export type Mutation = {
   removeVideo: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
   reportItem: Scalars['Boolean'];
+  requestAppInstallPoint: Scalars['Boolean'];
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
   setCategoryToItem: Item;
@@ -1347,6 +1365,12 @@ export type Mutation = {
   updateMySellerShippingPolicy: SellerShippingPolicy;
   updateProduct: Product;
   updateRootInquiryAnswer: InquiryAnswer;
+  updateRootItemByCrawl: Item;
+  updateRootItemDetailImages: Item;
+  updateRootItemImageUrl: Item;
+  updateSellerItemByCrawl: Item;
+  updateSellerItemDetailImages: Item;
+  updateSellerItemImageUrl: Item;
   /** Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: Seller;
   updateShippingReservePolicy: Product;
@@ -1764,6 +1788,30 @@ export type MutationUpdateRootInquiryAnswerArgs = {
   updateInquiryAnswerInput: UpdateInquiryAnswerInput;
 };
 
+export type MutationUpdateRootItemByCrawlArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateRootItemDetailImagesArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateRootItemImageUrlArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateSellerItemByCrawlArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateSellerItemDetailImagesArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateSellerItemImageUrlArgs = {
+  itemId: Scalars['Int'];
+};
+
 export type MutationUpdateSellerSaleStrategyArgs = {
   sellerId: Scalars['Int'];
   updateSaleStrategyInput: FindSaleStrategyInput;
@@ -1808,7 +1856,6 @@ export type Order = {
   vbankDodgedAt?: Maybe<Scalars['DateTime']>;
   vbankReadyAt?: Maybe<Scalars['DateTime']>;
   vbankReceipt?: Maybe<OrderVbankReceipt>;
-  withdrawnAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type OrderBrand = {
@@ -1842,7 +1889,6 @@ export enum OrderClaimFaultOf {
 }
 
 export type OrderItem = {
-  additionalDiscountRate: Scalars['Int'];
   brandNameKor: Scalars['String'];
   campaign?: Maybe<Campaign>;
   campaignId?: Maybe<Scalars['Int']>;
@@ -1872,6 +1918,7 @@ export type OrderItem = {
   itemFinalPrice: Scalars['Int'];
   itemId?: Maybe<Scalars['Int']>;
   itemName: Scalars['String'];
+  itemSellPrice: Scalars['Int'];
   /** order.merchantUid + 숫자 2자리 */
   merchantUid: Scalars['String'];
   /** [MODEL ONLY] */
@@ -1896,7 +1943,6 @@ export type OrderItem = {
   refundedAt?: Maybe<Scalars['DateTime']>;
   seller?: Maybe<Seller>;
   sellerId?: Maybe<Scalars['Int']>;
-  settleAmount: Scalars['Int'];
   settledAt?: Maybe<Scalars['DateTime']>;
   shipReadyAt?: Maybe<Scalars['DateTime']>;
   /** 예약발송 예정일 */
@@ -1940,6 +1986,23 @@ export type OrderItemFilter = {
   /** 주문번호, 주문상품번호, 아이템 명으로 검색합니다. 구매자 번호를 검색할 땐 dash를 제거하고 보내주세요! */
   search?: Maybe<Scalars['String']>;
   sellerId?: Maybe<Scalars['Int']>;
+  shipReadyAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  shippedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  shippingAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  status?: Maybe<OrderItemStatus>;
+  statusIn?: Maybe<Array<OrderItemStatus>>;
+};
+
+export type OrderItemSearchFilter = {
+  claimStatus?: Maybe<OrderItemClaimStatus>;
+  claimStatusIn?: Maybe<Array<OrderItemClaimStatus>>;
+  claimStatusIsNull?: Maybe<Scalars['Boolean']>;
+  confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  isConfirmed?: Maybe<Scalars['Boolean']>;
+  isSettled?: Maybe<Scalars['Boolean']>;
+  paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  sellerId?: Maybe<Scalars['Int']>;
+  settledAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   shipReadyAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   shippedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   shippingAtBetween?: Maybe<Array<Scalars['DateTime']>>;
@@ -2183,6 +2246,7 @@ export type PaymentFilter = {
   createdAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   merchantUid?: Maybe<Scalars['String']>;
   merchantUidSearch?: Maybe<Scalars['String']>;
+  paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   payMethodIn?: Maybe<Array<PayMethod>>;
   pgIn?: Maybe<Array<Pg>>;
   pgTid?: Maybe<Scalars['String']>;
@@ -2315,6 +2379,7 @@ export type Query = {
   expectedClaimShippingFee: Scalars['Int'];
   genRandomNickname: Scalars['String'];
   getAppleAuthCode: Scalars['String'];
+  groupItemIds?: Maybe<Array<Scalars['Int']>>;
   inquiries: Array<Inquiry>;
   inquiriesCount: Scalars['Int'];
   item: Item;
@@ -2335,6 +2400,7 @@ export type Query = {
   likingVideos: Array<Video>;
   loginByCode: JwtToken;
   loginByOauth: JwtToken;
+  loginRootSeller: JwtToken;
   loginSellerByCode: JwtToken;
   look: Look;
   looks: Array<Look>;
@@ -2381,7 +2447,9 @@ export type Query = {
   searchDigest: Array<Digest>;
   searchKeyword: Array<Keyword>;
   searchLook: Array<Look>;
+  searchMeSellerOrderItems: SearchOrderItemsOutput;
   searchPurchasableItem: Array<Item>;
+  searchRootOrderItems: SearchOrderItemsOutput;
   searchVideo: Array<Video>;
   seller: Seller;
   sellers: Array<Seller>;
@@ -2458,6 +2526,10 @@ export type QueryGetAppleAuthCodeArgs = {
   getAppleAuthCodeInput: GetAppleAuthCodeInput;
 };
 
+export type QueryGroupItemIdsArgs = {
+  itemId: Scalars['Int'];
+};
+
 export type QueryInquiriesArgs = {
   filter?: Maybe<InquiryFilter>;
   pageInput?: Maybe<PageInput>;
@@ -2525,6 +2597,11 @@ export type QueryLoginByCodeArgs = {
 
 export type QueryLoginByOauthArgs = {
   loginByOauthInput: LoginByOauthInput;
+};
+
+export type QueryLoginRootSellerArgs = {
+  loginByCodeInput: LoginByCodeInput;
+  sellerId: Scalars['Int'];
 };
 
 export type QueryLoginSellerByCodeArgs = {
@@ -2669,9 +2746,21 @@ export type QuerySearchLookArgs = {
   query: Scalars['String'];
 };
 
+export type QuerySearchMeSellerOrderItemsArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<OrderItemSearchFilter>;
+};
+
 export type QuerySearchPurchasableItemArgs = {
   pageInput?: Maybe<PageInput>;
   query: Scalars['String'];
+};
+
+export type QuerySearchRootOrderItemsArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<OrderItemSearchFilter>;
 };
 
 export type QuerySearchVideoArgs = {
@@ -2825,6 +2914,11 @@ export type RequestPinInput = {
 export type ReshipExchangeRequestInput = {
   courierId: Scalars['Int'];
   trackCode: Scalars['String'];
+};
+
+export type SearchOrderItemsOutput = {
+  result: Array<OrderItem>;
+  total: Scalars['Int'];
 };
 
 export type Seller = {
