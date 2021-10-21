@@ -119,6 +119,7 @@ export enum BankCode {
   Shinsegae = 'Shinsegae',
   Sj = 'Sj',
   SsgMoney = 'SsgMoney',
+  TossBank = 'TossBank',
   TossMoney = 'TossMoney',
   Woori = 'Woori',
 }
@@ -633,6 +634,7 @@ export type DigestFilter = {
   idIn?: Maybe<Array<Scalars['Int']>>;
   item?: Maybe<DigestItemFilter>;
   itemId?: Maybe<Scalars['Int']>;
+  itemIdIn?: Maybe<Array<Scalars['Int']>>;
   orderBy?: Maybe<Scalars['String']>;
   ratingIsNull?: Maybe<Scalars['Boolean']>;
   user?: Maybe<DigestUserFilter>;
@@ -673,6 +675,7 @@ export type DigestsExhibition = {
 
 export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
+  convertedAt?: Maybe<Scalars['DateTime']>;
   faultOf: OrderClaimFaultOf;
   isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
@@ -730,6 +733,7 @@ export type ExchangeRequestOrderItemFilter = {
 
 /** 교한신청 상태입니다. */
 export enum ExchangeRequestStatus {
+  Converted = 'Converted',
   Pending = 'Pending',
   Picked = 'Picked',
   Rejected = 'Rejected',
@@ -864,6 +868,7 @@ export type Item = {
   detailImages?: Maybe<Array<ItemDetailImage>>;
   digestAverageRating: Scalars['Float'];
   digestCount: Scalars['Int'];
+  digests?: Maybe<Array<Digest>>;
   /** [MODEL ONLY] */
   finalPrice: Scalars['Float'];
   groupItems?: Maybe<Array<Item>>;
@@ -1232,6 +1237,8 @@ export type LookFilter = {
   idIn?: Maybe<Array<Scalars['Int']>>;
   /** 사용시 다른 필터는 무시합니다. (정렬: "score") */
   itemId?: Maybe<Scalars['Int']>;
+  /** 사용시 다른 필터는 무시합니다. (정렬: "score") */
+  itemIdIn?: Maybe<Array<Scalars['Int']>>;
   orderBy?: Maybe<Scalars['String']>;
   styleTagIdIn?: Maybe<Array<Scalars['Int']>>;
   user?: Maybe<LookUserFilter>;
@@ -1287,6 +1294,8 @@ export type Mutation = {
   completeOrder: BaseOrderOutput;
   confirmMeOrderItem: OrderItem;
   confirmMeSellerRefundRequest: Scalars['Boolean'];
+  convertMeSellerExchangeRequest: ExchangeRequest;
+  convertMeSellerRefundRequest: RefundRequest;
   crawlItemOptionSet: Item;
   createComment: Comment;
   createCoupon: Coupon;
@@ -1328,6 +1337,7 @@ export type Mutation = {
   requestAppInstallPoint: Scalars['Boolean'];
   requestOrderRefund: Order;
   reshipMeSellerExchangeRequest: ExchangeRequest;
+  scrapRootSeller: Scalars['Boolean'];
   setCategoryToItem: Item;
   shipMeSellerOrderItem: OrderItem;
   startOrder: Order;
@@ -1472,6 +1482,16 @@ export type MutationConfirmMeOrderItemArgs = {
 export type MutationConfirmMeSellerRefundRequestArgs = {
   merchantUid: Scalars['String'];
   shippingFee: Scalars['Int'];
+};
+
+export type MutationConvertMeSellerExchangeRequestArgs = {
+  merchantUid: Scalars['String'];
+};
+
+export type MutationConvertMeSellerRefundRequestArgs = {
+  merchantUid: Scalars['String'];
+  orderItemMerchantUid: Scalars['String'];
+  productId: Scalars['Int'];
 };
 
 export type MutationCrawlItemOptionSetArgs = {
@@ -1636,6 +1656,10 @@ export type MutationRequestOrderRefundArgs = {
 export type MutationReshipMeSellerExchangeRequestArgs = {
   merchantUid: Scalars['String'];
   reshipExchangeRequestInput: ReshipExchangeRequestInput;
+};
+
+export type MutationScrapRootSellerArgs = {
+  id: Scalars['Int'];
 };
 
 export type MutationSetCategoryToItemArgs = {
@@ -1979,6 +2003,7 @@ export enum OrderItemClaimStatus {
 export type OrderItemFilter = {
   claimStatus?: Maybe<OrderItemClaimStatus>;
   claimStatusIn?: Maybe<Array<OrderItemClaimStatus>>;
+  claimStatusIsNull?: Maybe<Scalars['Boolean']>;
   isConfirmed?: Maybe<Scalars['Boolean']>;
   isProcessDelaying?: Maybe<Scalars['Boolean']>;
   merchantUidIn?: Maybe<Array<Scalars['String']>>;
@@ -2389,6 +2414,8 @@ export type Query = {
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
   itemsExhibitions: Array<ItemsExhibition>;
+  itemsGroupDigests: Array<Digest>;
+  itemsGroupLooks: Array<Look>;
   itemsPackage: ItemsPackage;
   keyword: Keyword;
   keywordClasses: Array<KeywordClass>;
@@ -2448,8 +2475,10 @@ export type Query = {
   searchKeyword: Array<Keyword>;
   searchLook: Array<Look>;
   searchMeSellerOrderItems: SearchOrderItemsOutput;
+  searchMeSellerOrderItemsCount: Scalars['Int'];
   searchPurchasableItem: Array<Item>;
   searchRootOrderItems: SearchOrderItemsOutput;
+  searchRootOrderItemsCount: Scalars['Int'];
   searchVideo: Array<Video>;
   seller: Seller;
   sellers: Array<Seller>;
@@ -2550,6 +2579,17 @@ export type QueryItemPropertiesArgs = {
 
 export type QueryItemsArgs = {
   itemFilter?: Maybe<ItemFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryItemsGroupDigestsArgs = {
+  filter?: Maybe<DigestFilter>;
+  itemId: Scalars['Int'];
+  pageInput?: Maybe<PageInput>;
+};
+
+export type QueryItemsGroupLooksArgs = {
+  itemId: Scalars['Int'];
   pageInput?: Maybe<PageInput>;
 };
 
@@ -2752,6 +2792,11 @@ export type QuerySearchMeSellerOrderItemsArgs = {
   searchFilter?: Maybe<OrderItemSearchFilter>;
 };
 
+export type QuerySearchMeSellerOrderItemsCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<OrderItemSearchFilter>;
+};
+
 export type QuerySearchPurchasableItemArgs = {
   pageInput?: Maybe<PageInput>;
   query: Scalars['String'];
@@ -2759,6 +2804,11 @@ export type QuerySearchPurchasableItemArgs = {
 
 export type QuerySearchRootOrderItemsArgs = {
   pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<OrderItemSearchFilter>;
+};
+
+export type QuerySearchRootOrderItemsCountArgs = {
   query?: Maybe<Scalars['String']>;
   searchFilter?: Maybe<OrderItemSearchFilter>;
 };
