@@ -32,26 +32,6 @@ export type AddItemPriceInput = {
   startAt?: Maybe<Scalars['DateTime']>;
 };
 
-export type AddItemSizeChartInput = {
-  accDepth?: Maybe<Scalars['Float']>;
-  accHeight?: Maybe<Scalars['Float']>;
-  accWidth?: Maybe<Scalars['Float']>;
-  chestWidth?: Maybe<Scalars['Float']>;
-  crossStrapLength?: Maybe<Scalars['Float']>;
-  glassBridgeLength?: Maybe<Scalars['Float']>;
-  glassLegLength?: Maybe<Scalars['Float']>;
-  glassWidth?: Maybe<Scalars['Float']>;
-  hemWidth?: Maybe<Scalars['Float']>;
-  name: Scalars['String'];
-  riseHeight?: Maybe<Scalars['Float']>;
-  shoulderWidth?: Maybe<Scalars['Float']>;
-  sleeveLength?: Maybe<Scalars['Float']>;
-  thighWidth?: Maybe<Scalars['Float']>;
-  totalLength?: Maybe<Scalars['Float']>;
-  waistWidth?: Maybe<Scalars['Float']>;
-  watchBandDepth?: Maybe<Scalars['Float']>;
-};
-
 export type AddItemUrlInput = {
   isPrimary: Scalars['Boolean'];
   url: Scalars['String'];
@@ -422,6 +402,12 @@ export type CreateItemOptionSetInput = {
   options: Array<CreateItemOptionInput>;
 };
 
+export type CreateItemSizeChartInput = {
+  labels: Array<Scalars['String']>;
+  recommendations?: Maybe<Array<ItemSizeRecommendationInput>>;
+  sizes: Array<ItemSizeInput>;
+};
+
 export type CreateLookDigestInput = {
   itemId: Scalars['Int'];
   size: Scalars['String'];
@@ -772,6 +758,12 @@ export type FindSaleStrategyInput = {
   canUseMileage: Scalars['Boolean'];
 };
 
+export type FollowOutput = {
+  id: Scalars['Int'];
+  /** [MODEL ONLY] */
+  isFollowing?: Maybe<Scalars['Boolean']>;
+};
+
 export type GetAppleAuthCodeInput = {
   clientType: AppleClientType;
   code: Scalars['String'];
@@ -899,8 +891,7 @@ export type Item = {
   sellPrice: Scalars['Float'];
   /** 판매가능시점(=활성전환일) */
   sellableAt?: Maybe<Scalars['DateTime']>;
-  sizeChartMetaDatas?: Maybe<Array<ItemSizeChartMetaData>>;
-  sizeCharts?: Maybe<Array<ItemSizeChart>>;
+  sizeChart?: Maybe<ItemSizeChart>;
   updatedAt: Scalars['DateTime'];
   urls: Array<ItemUrl>;
 };
@@ -1031,33 +1022,35 @@ export type ItemSalePolicy = {
   updatedAt: Scalars['DateTime'];
 };
 
-export type ItemSizeChart = {
-  accDepth?: Maybe<Scalars['Float']>;
-  accHeight?: Maybe<Scalars['Float']>;
-  accWidth?: Maybe<Scalars['Float']>;
-  chestWidth?: Maybe<Scalars['Float']>;
-  createdAt: Scalars['DateTime'];
-  crossStrapLength?: Maybe<Scalars['Float']>;
-  glassBridgeLength?: Maybe<Scalars['Float']>;
-  glassLegLength?: Maybe<Scalars['Float']>;
-  glassWidth?: Maybe<Scalars['Float']>;
-  hemWidth?: Maybe<Scalars['Float']>;
-  id: Scalars['Int'];
-  itemId: Scalars['Int'];
+export type ItemSize = {
   name: Scalars['String'];
-  riseHeight?: Maybe<Scalars['Float']>;
-  shoulderWidth?: Maybe<Scalars['Float']>;
-  sleeveLength?: Maybe<Scalars['Float']>;
-  thighWidth?: Maybe<Scalars['Float']>;
-  totalLength?: Maybe<Scalars['Float']>;
-  updatedAt: Scalars['DateTime'];
-  waistWidth?: Maybe<Scalars['Float']>;
-  watchBandDepth?: Maybe<Scalars['Float']>;
+  values: Array<Scalars['String']>;
 };
 
-export type ItemSizeChartMetaData = {
-  columnName: Scalars['String'];
-  displayName: Scalars['String'];
+export type ItemSizeChart = {
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  labels: Array<Scalars['String']>;
+  recommendations?: Maybe<Array<ItemSizeRecommendation>>;
+  sizes: Array<ItemSize>;
+  updatedAt: Scalars['DateTime'];
+};
+
+export type ItemSizeInput = {
+  name: Scalars['String'];
+  values: Array<Scalars['String']>;
+};
+
+export type ItemSizeRecommendation = {
+  height: Scalars['Float'];
+  sizeName: Scalars['String'];
+  weight: Scalars['Float'];
+};
+
+export type ItemSizeRecommendationInput = {
+  height: Scalars['Float'];
+  sizeName: Scalars['String'];
+  weight: Scalars['Float'];
 };
 
 export type ItemUrl = {
@@ -1275,7 +1268,6 @@ export type Mutation = {
   activateItemPrice: Item;
   addItemDetailImages: Item;
   addItemPrice: Item;
-  addItemSizeCharts: Item;
   addItemUrl: ItemUrl;
   addMeRefundAccount: RefundAccount;
   addMeShippingAddress: ShippingAddress;
@@ -1307,17 +1299,18 @@ export type Mutation = {
   createItemOptionSet: Item;
   createLook: Look;
   createMyCartItem: CartItem;
+  createRootSizeChart: Item;
   createSeller: Seller;
+  createSellerSizeChart: Item;
   createShippingReservePolicy: Product;
   createUser: User;
   createVideo: Video;
   dodgeVbankOrder: BaseOrderOutput;
   failOrder: BaseOrderOutput;
-  follow: Scalars['Boolean'];
+  follow: FollowOutput;
   hit: Scalars['Boolean'];
   like: Scalars['Boolean'];
   manualCreateItem: Item;
-  modifyItemSizeCharts: Item;
   own: Scalars['Boolean'];
   registerExchangeRequest: ExchangeRequest;
   registerOrder: BaseOrderOutput;
@@ -1326,11 +1319,12 @@ export type Mutation = {
   removeInquiry: Scalars['Boolean'];
   removeItemDetailImage: Item;
   removeItemPrice: Item;
-  removeItemSizeChartsAll: Item;
   removeLook: Scalars['Boolean'];
   removeMeRefundAccount: Scalars['Boolean'];
   removeMeShippingAddress: Scalars['Boolean'];
   removeMyCartItems: Scalars['Boolean'];
+  removeRootSizeChart: Item;
+  removeSellerSizeChart: Item;
   removeVideo: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
   reportItem: Scalars['Boolean'];
@@ -1342,7 +1336,7 @@ export type Mutation = {
   shipMeSellerOrderItem: OrderItem;
   startOrder: Order;
   /** 여러번 구독된 상태였다면 모두 삭제됩니다. */
-  unfollow: Scalars['Boolean'];
+  unfollow: FollowOutput;
   /** 여러번 좋아요한 상태였다면 모두 삭제됩니다. */
   unlike: Scalars['Boolean'];
   unown: Scalars['Boolean'];
@@ -1378,11 +1372,13 @@ export type Mutation = {
   updateRootItemByCrawl: Item;
   updateRootItemDetailImages: Item;
   updateRootItemImageUrl: Item;
+  updateRootSizeChart: Item;
   updateSellerItemByCrawl: Item;
   updateSellerItemDetailImages: Item;
   updateSellerItemImageUrl: Item;
   /** Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: Seller;
+  updateSellerSizeChart: Item;
   updateShippingReservePolicy: Product;
   updateVideo: Video;
 };
@@ -1399,11 +1395,6 @@ export type MutationAddItemDetailImagesArgs = {
 
 export type MutationAddItemPriceArgs = {
   addItemPriceInput: AddItemPriceInput;
-  itemId: Scalars['Int'];
-};
-
-export type MutationAddItemSizeChartsArgs = {
-  addItemSizeChartInputs: Array<AddItemSizeChartInput>;
   itemId: Scalars['Int'];
 };
 
@@ -1539,8 +1530,18 @@ export type MutationCreateMyCartItemArgs = {
   createCartItemInput: CreateCartItemInput;
 };
 
+export type MutationCreateRootSizeChartArgs = {
+  input: CreateItemSizeChartInput;
+  itemId: Scalars['Int'];
+};
+
 export type MutationCreateSellerArgs = {
   createSellerInput: CreateSellerInput;
+};
+
+export type MutationCreateSellerSizeChartArgs = {
+  input: CreateItemSizeChartInput;
+  itemId: Scalars['Int'];
 };
 
 export type MutationCreateShippingReservePolicyArgs = {
@@ -1582,12 +1583,6 @@ export type MutationManualCreateItemArgs = {
   input: ManualCreateItemInput;
 };
 
-export type MutationModifyItemSizeChartsArgs = {
-  itemId: Scalars['Int'];
-  removedChartIds?: Maybe<Array<Scalars['Int']>>;
-  updateItemSizeChartInput?: Maybe<Array<UpdateItemSizeChartInput>>;
-};
-
 export type MutationOwnArgs = {
   keywordId: Scalars['Int'];
 };
@@ -1623,10 +1618,6 @@ export type MutationRemoveItemPriceArgs = {
   priceId: Scalars['Int'];
 };
 
-export type MutationRemoveItemSizeChartsAllArgs = {
-  itemId: Scalars['Int'];
-};
-
 export type MutationRemoveLookArgs = {
   id: Scalars['Int'];
 };
@@ -1637,6 +1628,14 @@ export type MutationRemoveMeShippingAddressArgs = {
 
 export type MutationRemoveMyCartItemsArgs = {
   ids: Array<Scalars['Int']>;
+};
+
+export type MutationRemoveRootSizeChartArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationRemoveSellerSizeChartArgs = {
+  itemId: Scalars['Int'];
 };
 
 export type MutationRemoveVideoArgs = {
@@ -1824,6 +1823,11 @@ export type MutationUpdateRootItemImageUrlArgs = {
   itemId: Scalars['Int'];
 };
 
+export type MutationUpdateRootSizeChartArgs = {
+  input: UpdateItemSizeChartInput;
+  itemId: Scalars['Int'];
+};
+
 export type MutationUpdateSellerItemByCrawlArgs = {
   itemId: Scalars['Int'];
 };
@@ -1839,6 +1843,11 @@ export type MutationUpdateSellerItemImageUrlArgs = {
 export type MutationUpdateSellerSaleStrategyArgs = {
   sellerId: Scalars['Int'];
   updateSaleStrategyInput: FindSaleStrategyInput;
+};
+
+export type MutationUpdateSellerSizeChartArgs = {
+  input: UpdateItemSizeChartInput;
+  itemId: Scalars['Int'];
 };
 
 export type MutationUpdateShippingReservePolicyArgs = {
@@ -2024,7 +2033,9 @@ export type OrderItemSearchFilter = {
   claimStatusIsNull?: Maybe<Scalars['Boolean']>;
   confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   isConfirmed?: Maybe<Scalars['Boolean']>;
+  isProcessDelaying?: Maybe<Scalars['Boolean']>;
   isSettled?: Maybe<Scalars['Boolean']>;
+  merchantUidMt?: Maybe<Scalars['String']>;
   paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   sellerId?: Maybe<Scalars['Int']>;
   settledAtBetween?: Maybe<Array<Scalars['DateTime']>>;
@@ -2437,7 +2448,7 @@ export type Query = {
   meInquiry: Inquiry;
   meOrder: Order;
   meOrderItem: OrderItem;
-  /** VbankReady, Paid만 표시 */
+  /** VbankReady, VbankDodged, Paid만 표시 */
   meOrders: Array<Order>;
   meOwnsCount: OwnsCountOutput;
   meSeller: Seller;
@@ -3260,24 +3271,9 @@ export type UpdateItemPriceInput = {
 };
 
 export type UpdateItemSizeChartInput = {
-  accDepth?: Maybe<Scalars['Float']>;
-  accHeight?: Maybe<Scalars['Float']>;
-  accWidth?: Maybe<Scalars['Float']>;
-  chestWidth?: Maybe<Scalars['Float']>;
-  crossStrapLength?: Maybe<Scalars['Float']>;
-  glassBridgeLength?: Maybe<Scalars['Float']>;
-  glassLegLength?: Maybe<Scalars['Float']>;
-  glassWidth?: Maybe<Scalars['Float']>;
-  hemWidth?: Maybe<Scalars['Float']>;
-  id?: Maybe<Scalars['Int']>;
-  name: Scalars['String'];
-  riseHeight?: Maybe<Scalars['Float']>;
-  shoulderWidth?: Maybe<Scalars['Float']>;
-  sleeveLength?: Maybe<Scalars['Float']>;
-  thighWidth?: Maybe<Scalars['Float']>;
-  totalLength?: Maybe<Scalars['Float']>;
-  waistWidth?: Maybe<Scalars['Float']>;
-  watchBandDepth?: Maybe<Scalars['Float']>;
+  labels: Array<Scalars['String']>;
+  recommendations?: Maybe<Array<ItemSizeRecommendationInput>>;
+  sizes: Array<ItemSizeInput>;
 };
 
 export type UpdateLookDigestInput = {
