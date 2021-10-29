@@ -162,6 +162,7 @@ export type Campaign = {
   /** 적용 정산률 (0~100) */
   rate: Scalars['Int'];
   startAt: Scalars['DateTime'];
+  title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -663,6 +664,8 @@ export type ExchangeRequest = {
   confirmedAt?: Maybe<Scalars['DateTime']>;
   convertedAt?: Maybe<Scalars['DateTime']>;
   faultOf: OrderClaimFaultOf;
+  /** [MODEL ONLY] */
+  id: Scalars['String'];
   isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
   itemName: Scalars['String'];
@@ -715,6 +718,23 @@ export type ExchangeRequestFilter = {
 
 export type ExchangeRequestOrderItemFilter = {
   paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+};
+
+export type ExchangeRequestSearchFilter = {
+  convertedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  isProcessDelaying?: Maybe<Scalars['Boolean']>;
+  isSettled?: Maybe<Scalars['Boolean']>;
+  orderBuyerName?: Maybe<Scalars['String']>;
+  pickedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  productId?: Maybe<Scalars['Int']>;
+  rejectedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  requestedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  reshippedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  reshippingAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  sellerId?: Maybe<Scalars['Int']>;
+  settledAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  status?: Maybe<ExchangeRequestStatus>;
+  statusIn?: Maybe<Array<ExchangeRequestStatus>>;
 };
 
 /** 교한신청 상태입니다. */
@@ -835,12 +855,23 @@ export enum InquiryAnswerFrom {
 }
 
 export type InquiryFilter = {
+  idIn?: Maybe<Array<Scalars['Int']>>;
   isAnswered?: Maybe<Scalars['Boolean']>;
   itemId?: Maybe<Scalars['Int']>;
   /** 주문상품번호로 검색 가능 */
   search?: Maybe<Scalars['String']>;
   sellerId?: Maybe<Scalars['Int']>;
   userId?: Maybe<Scalars['Int']>;
+};
+
+export type InquirySearchFilter = {
+  createdAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  isAnswered?: Maybe<Scalars['Boolean']>;
+  itemName?: Maybe<Scalars['String']>;
+  orderBuyerName?: Maybe<Scalars['String']>;
+  orderItemMerchantUid?: Maybe<Scalars['String']>;
+  type?: Maybe<Scalars['String']>;
+  userNickname?: Maybe<Scalars['String']>;
 };
 
 /** 배송/사이즈/재입고/기타 */
@@ -1278,7 +1309,8 @@ export type Mutation = {
   bulkPickMeSellerRefundRequests: Scalars['Boolean'];
   bulkShipMeSellerOrderItems: Scalars['Boolean'];
   bulkShipReadyMeSellerOrderItems: Scalars['Boolean'];
-  bulkUpdateItems: Scalars['Boolean'];
+  bulkUpdateMeSellerItems: Scalars['Boolean'];
+  bulkUpdateRootItems: Scalars['Boolean'];
   /** 취소 사유는 "담당자 취소 처리"로 고정 */
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
@@ -1296,12 +1328,13 @@ export type Mutation = {
   createDigest: Digest;
   createInquiry: Inquiry;
   createItemByUrl: Item;
-  createItemOptionSet: Item;
   createLook: Look;
+  createMeSellerItemOptionSet: Item;
+  createMeSellerSizeChart: Item;
   createMyCartItem: CartItem;
+  createRootItemOptionSet: Item;
   createRootSizeChart: Item;
   createSeller: Seller;
-  createSellerSizeChart: Item;
   createShippingReservePolicy: Product;
   createUser: User;
   createVideo: Video;
@@ -1321,10 +1354,10 @@ export type Mutation = {
   removeItemPrice: Item;
   removeLook: Scalars['Boolean'];
   removeMeRefundAccount: Scalars['Boolean'];
+  removeMeSellerSizeChart: Item;
   removeMeShippingAddress: Scalars['Boolean'];
   removeMyCartItems: Scalars['Boolean'];
   removeRootSizeChart: Item;
-  removeSellerSizeChart: Item;
   removeVideo: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
   reportItem: Scalars['Boolean'];
@@ -1345,9 +1378,6 @@ export type Mutation = {
   updateCourier: Courier;
   updateDigest: Digest;
   updateDigestsExhibitionDigests: DigestsExhibition;
-  updateItem: Item;
-  updateItemOption: ItemOption;
-  updateItemPrice: Item;
   updateItemsExhibitionItems: ItemsExhibition;
   updateItemsPackageItems: ItemsPackage;
   updateLook: Look;
@@ -1355,8 +1385,16 @@ export type Mutation = {
   updateMeRefundAccount: RefundAccount;
   updateMeSeller: Seller;
   updateMeSellerInquiryAnswer: InquiryAnswer;
+  updateMeSellerItem: Item;
+  updateMeSellerItemByCrawl: Item;
+  updateMeSellerItemDetailImages: Item;
+  updateMeSellerItemImageUrl: Item;
+  updateMeSellerItemOption: ItemOption;
+  updateMeSellerItemPrice: Item;
   /** 주문상품 단건 운송장 수정 */
   updateMeSellerOrderItemTrackCode: OrderItem;
+  updateMeSellerProduct: Product;
+  updateMeSellerSizeChart: Item;
   updateMeShippingAddress: ShippingAddress;
   updateMyCartItem: CartItem;
   /** (!) 예전 비밀번호와 현재 비밀번호를 입력해주세요. */
@@ -1367,18 +1405,17 @@ export type Mutation = {
   /** 추가도 이거로 해주시면 됩니다! */
   updateMySellerSettlePolicy: SellerSettlePolicy;
   updateMySellerShippingPolicy: SellerShippingPolicy;
-  updateProduct: Product;
   updateRootInquiryAnswer: InquiryAnswer;
+  updateRootItem: Item;
   updateRootItemByCrawl: Item;
   updateRootItemDetailImages: Item;
   updateRootItemImageUrl: Item;
+  updateRootItemOption: ItemOption;
+  updateRootItemPrice: Item;
+  updateRootProduct: Product;
   updateRootSizeChart: Item;
-  updateSellerItemByCrawl: Item;
-  updateSellerItemDetailImages: Item;
-  updateSellerItemImageUrl: Item;
   /** Admin 이상의 권한이 필요합니다. */
   updateSellerSaleStrategy: Seller;
-  updateSellerSizeChart: Item;
   updateShippingReservePolicy: Product;
   updateVideo: Video;
 };
@@ -1442,9 +1479,14 @@ export type MutationBulkShipReadyMeSellerOrderItemsArgs = {
   merchantUids: Array<Scalars['String']>;
 };
 
-export type MutationBulkUpdateItemsArgs = {
-  bulkUpdateItemInput: BulkUpdateItemInput;
+export type MutationBulkUpdateMeSellerItemsArgs = {
   ids: Array<Scalars['Int']>;
+  input: BulkUpdateItemInput;
+};
+
+export type MutationBulkUpdateRootItemsArgs = {
+  ids: Array<Scalars['Int']>;
+  input: BulkUpdateItemInput;
 };
 
 export type MutationCancelMeSellerOrderItemArgs = {
@@ -1517,17 +1559,27 @@ export type MutationCreateItemByUrlArgs = {
   url: Scalars['String'];
 };
 
-export type MutationCreateItemOptionSetArgs = {
-  createItemOptionSetInput: CreateItemOptionSetInput;
-  id: Scalars['Int'];
-};
-
 export type MutationCreateLookArgs = {
   createLookInput: CreateLookInput;
 };
 
+export type MutationCreateMeSellerItemOptionSetArgs = {
+  id: Scalars['Int'];
+  input: CreateItemOptionSetInput;
+};
+
+export type MutationCreateMeSellerSizeChartArgs = {
+  input: CreateItemSizeChartInput;
+  itemId: Scalars['Int'];
+};
+
 export type MutationCreateMyCartItemArgs = {
   createCartItemInput: CreateCartItemInput;
+};
+
+export type MutationCreateRootItemOptionSetArgs = {
+  id: Scalars['Int'];
+  input: CreateItemOptionSetInput;
 };
 
 export type MutationCreateRootSizeChartArgs = {
@@ -1537,11 +1589,6 @@ export type MutationCreateRootSizeChartArgs = {
 
 export type MutationCreateSellerArgs = {
   createSellerInput: CreateSellerInput;
-};
-
-export type MutationCreateSellerSizeChartArgs = {
-  input: CreateItemSizeChartInput;
-  itemId: Scalars['Int'];
 };
 
 export type MutationCreateShippingReservePolicyArgs = {
@@ -1622,6 +1669,10 @@ export type MutationRemoveLookArgs = {
   id: Scalars['Int'];
 };
 
+export type MutationRemoveMeSellerSizeChartArgs = {
+  itemId: Scalars['Int'];
+};
+
 export type MutationRemoveMeShippingAddressArgs = {
   addressId: Scalars['Int'];
 };
@@ -1631,10 +1682,6 @@ export type MutationRemoveMyCartItemsArgs = {
 };
 
 export type MutationRemoveRootSizeChartArgs = {
-  itemId: Scalars['Int'];
-};
-
-export type MutationRemoveSellerSizeChartArgs = {
   itemId: Scalars['Int'];
 };
 
@@ -1714,21 +1761,6 @@ export type MutationUpdateDigestsExhibitionDigestsArgs = {
   id: Scalars['Int'];
 };
 
-export type MutationUpdateItemArgs = {
-  itemId: Scalars['Int'];
-  updateItemInput: UpdateItemInput;
-};
-
-export type MutationUpdateItemOptionArgs = {
-  id: Scalars['Int'];
-  updateItemOptionInput: UpdateItemOptionInput;
-};
-
-export type MutationUpdateItemPriceArgs = {
-  id: Scalars['Int'];
-  updateItemPriceInput: UpdateItemPriceInput;
-};
-
 export type MutationUpdateItemsExhibitionItemsArgs = {
   id: Scalars['Int'];
   itemIds: Array<Scalars['Int']>;
@@ -1761,9 +1793,46 @@ export type MutationUpdateMeSellerInquiryAnswerArgs = {
   updateInquiryAnswerInput: UpdateInquiryAnswerInput;
 };
 
+export type MutationUpdateMeSellerItemArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemInput;
+};
+
+export type MutationUpdateMeSellerItemByCrawlArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateMeSellerItemDetailImagesArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateMeSellerItemImageUrlArgs = {
+  itemId: Scalars['Int'];
+};
+
+export type MutationUpdateMeSellerItemOptionArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemOptionInput;
+};
+
+export type MutationUpdateMeSellerItemPriceArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemPriceInput;
+};
+
 export type MutationUpdateMeSellerOrderItemTrackCodeArgs = {
   merchantUid: Scalars['String'];
   trackCode: Scalars['String'];
+};
+
+export type MutationUpdateMeSellerProductArgs = {
+  id: Scalars['Int'];
+  input: UpdateProductInput;
+};
+
+export type MutationUpdateMeSellerSizeChartArgs = {
+  input: UpdateItemSizeChartInput;
+  itemId: Scalars['Int'];
 };
 
 export type MutationUpdateMeShippingAddressArgs = {
@@ -1801,14 +1870,14 @@ export type MutationUpdateMySellerShippingPolicyArgs = {
   updateSellerShippingPolicyInput: UpdateSellerShippingPolicyInput;
 };
 
-export type MutationUpdateProductArgs = {
-  id: Scalars['Int'];
-  updateProductInput: UpdateProductInput;
-};
-
 export type MutationUpdateRootInquiryAnswerArgs = {
   id: Scalars['Int'];
   updateInquiryAnswerInput: UpdateInquiryAnswerInput;
+};
+
+export type MutationUpdateRootItemArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemInput;
 };
 
 export type MutationUpdateRootItemByCrawlArgs = {
@@ -1823,31 +1892,29 @@ export type MutationUpdateRootItemImageUrlArgs = {
   itemId: Scalars['Int'];
 };
 
+export type MutationUpdateRootItemOptionArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemOptionInput;
+};
+
+export type MutationUpdateRootItemPriceArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemPriceInput;
+};
+
+export type MutationUpdateRootProductArgs = {
+  id: Scalars['Int'];
+  input: UpdateProductInput;
+};
+
 export type MutationUpdateRootSizeChartArgs = {
   input: UpdateItemSizeChartInput;
-  itemId: Scalars['Int'];
-};
-
-export type MutationUpdateSellerItemByCrawlArgs = {
-  itemId: Scalars['Int'];
-};
-
-export type MutationUpdateSellerItemDetailImagesArgs = {
-  itemId: Scalars['Int'];
-};
-
-export type MutationUpdateSellerItemImageUrlArgs = {
   itemId: Scalars['Int'];
 };
 
 export type MutationUpdateSellerSaleStrategyArgs = {
   sellerId: Scalars['Int'];
   updateSaleStrategyInput: FindSaleStrategyInput;
-};
-
-export type MutationUpdateSellerSizeChartArgs = {
-  input: UpdateItemSizeChartInput;
-  itemId: Scalars['Int'];
 };
 
 export type MutationUpdateShippingReservePolicyArgs = {
@@ -1976,6 +2043,8 @@ export type OrderItem = {
   refundedAt?: Maybe<Scalars['DateTime']>;
   seller?: Maybe<Seller>;
   sellerId?: Maybe<Scalars['Int']>;
+  settleAmount: Scalars['Int'];
+  settleStatus: OrderItemSettleStatus;
   settledAt?: Maybe<Scalars['DateTime']>;
   shipReadyAt?: Maybe<Scalars['DateTime']>;
   /** 예약발송 예정일 */
@@ -2045,6 +2114,13 @@ export type OrderItemSearchFilter = {
   status?: Maybe<OrderItemStatus>;
   statusIn?: Maybe<Array<OrderItemStatus>>;
 };
+
+/** 주문상품 정산상태입니다. */
+export enum OrderItemSettleStatus {
+  Completed = 'Completed',
+  Pending = 'Pending',
+  Ready = 'Ready',
+}
 
 /** 주문상품 상태입니다. 클레임상태와 무관하게 handling됩니다. */
 export enum OrderItemStatus {
@@ -2476,11 +2552,13 @@ export type Query = {
   /** refresh token을 받아서 새로운 JwtToken을 생성합니다. */
   refreshJwtToken: JwtToken;
   requestPin: Scalars['Boolean'];
+  rootExchangeRequests: Array<ExchangeRequest>;
   rootInquiries: Array<Inquiry>;
   /** [ROOT ADMIN] */
   rootInquiriesCount: InquiriesCountOutput;
   rootInquiry: Inquiry;
   rootOrderItems: Array<OrderItem>;
+  rootRefundRequests: Array<RefundRequest>;
   searchAllItem: Array<Item>;
   searchDigest: Array<Digest>;
   searchKeyword: Array<Keyword>;
@@ -2488,8 +2566,20 @@ export type Query = {
   searchMeSellerOrderItems: SearchOrderItemsOutput;
   searchMeSellerOrderItemsCount: Scalars['Int'];
   searchPurchasableItem: Array<Item>;
+  searchRootExchangeRequests: SearchExchangeRequestsOutput;
+  searchRootExchangeRequestsCount: Scalars['Int'];
+  searchRootInquiries: SearchInquiriesOutput;
+  searchRootInquiryCount: Scalars['Int'];
   searchRootOrderItems: SearchOrderItemsOutput;
   searchRootOrderItemsCount: Scalars['Int'];
+  searchRootRefundRequests: SearchRefundRequestsOutput;
+  searchRootRefundRequestsCount: Scalars['Int'];
+  searchSellerExchangeRequests: SearchExchangeRequestsOutput;
+  searchSellerExchangeRequestsCount: Scalars['Int'];
+  searchSellerInquiries: SearchInquiriesOutput;
+  searchSellerInquiryCount: Scalars['Int'];
+  searchSellerRefundRequests: SearchRefundRequestsOutput;
+  searchSellerRefundRequestsCount: Scalars['Int'];
   searchVideo: Array<Video>;
   seller: Seller;
   sellers: Array<Seller>;
@@ -2759,6 +2849,11 @@ export type QueryRequestPinArgs = {
   requestPinInput: RequestPinInput;
 };
 
+export type QueryRootExchangeRequestsArgs = {
+  exchangeRequestFilter?: Maybe<ExchangeRequestFilter>;
+  pageInput?: Maybe<PageInput>;
+};
+
 export type QueryRootInquiriesArgs = {
   filter?: Maybe<InquiryFilter>;
   pageInput?: Maybe<PageInput>;
@@ -2775,6 +2870,11 @@ export type QueryRootInquiryArgs = {
 export type QueryRootOrderItemsArgs = {
   orderItemFilter?: Maybe<OrderItemFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryRootRefundRequestsArgs = {
+  pageInput?: Maybe<PageInput>;
+  refundRequestFilter?: Maybe<RefundRequestFilter>;
 };
 
 export type QuerySearchAllItemArgs = {
@@ -2813,6 +2913,28 @@ export type QuerySearchPurchasableItemArgs = {
   query: Scalars['String'];
 };
 
+export type QuerySearchRootExchangeRequestsArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<ExchangeRequestSearchFilter>;
+};
+
+export type QuerySearchRootExchangeRequestsCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<ExchangeRequestSearchFilter>;
+};
+
+export type QuerySearchRootInquiriesArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<InquirySearchFilter>;
+};
+
+export type QuerySearchRootInquiryCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<InquirySearchFilter>;
+};
+
 export type QuerySearchRootOrderItemsArgs = {
   pageInput?: Maybe<PageInput>;
   query?: Maybe<Scalars['String']>;
@@ -2822,6 +2944,50 @@ export type QuerySearchRootOrderItemsArgs = {
 export type QuerySearchRootOrderItemsCountArgs = {
   query?: Maybe<Scalars['String']>;
   searchFilter?: Maybe<OrderItemSearchFilter>;
+};
+
+export type QuerySearchRootRefundRequestsArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<RefundRequestSearchFilter>;
+};
+
+export type QuerySearchRootRefundRequestsCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<RefundRequestSearchFilter>;
+};
+
+export type QuerySearchSellerExchangeRequestsArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<ExchangeRequestSearchFilter>;
+};
+
+export type QuerySearchSellerExchangeRequestsCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<ExchangeRequestSearchFilter>;
+};
+
+export type QuerySearchSellerInquiriesArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<InquirySearchFilter>;
+};
+
+export type QuerySearchSellerInquiryCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<InquirySearchFilter>;
+};
+
+export type QuerySearchSellerRefundRequestsArgs = {
+  pageInput?: Maybe<PageInput>;
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<RefundRequestSearchFilter>;
+};
+
+export type QuerySearchSellerRefundRequestsCountArgs = {
+  query?: Maybe<Scalars['String']>;
+  searchFilter?: Maybe<RefundRequestSearchFilter>;
 };
 
 export type QuerySearchVideoArgs = {
@@ -2868,6 +3034,8 @@ export type RefundRequest = {
   amount: Scalars['Int'];
   confirmedAt?: Maybe<Scalars['DateTime']>;
   faultOf: OrderClaimFaultOf;
+  /** [MODEL ONLY] */
+  id: Scalars['String'];
   isProcessDelaying: Scalars['Boolean'];
   isSettled: Scalars['Boolean'];
   /** (PK) YYMMDDHHmmssSSS + NN(00~99) + M */
@@ -2912,6 +3080,20 @@ export type RefundRequestFilter = {
 
 export type RefundRequestOrderFilter = {
   paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+};
+
+export type RefundRequestSearchFilter = {
+  confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  isProcessDelaying?: Maybe<Scalars['Boolean']>;
+  isSettled?: Maybe<Scalars['Boolean']>;
+  orderBuyerName?: Maybe<Scalars['String']>;
+  pickedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  rejectedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  requestedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  sellerId?: Maybe<Scalars['Int']>;
+  settledAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  status?: Maybe<RefundRequestStatus>;
+  statusIn?: Maybe<Array<RefundRequestStatus>>;
 };
 
 /** 반품요청 상태입니다. */
@@ -2977,8 +3159,23 @@ export type ReshipExchangeRequestInput = {
   trackCode: Scalars['String'];
 };
 
+export type SearchExchangeRequestsOutput = {
+  result: Array<ExchangeRequest>;
+  total: Scalars['Int'];
+};
+
+export type SearchInquiriesOutput = {
+  result: Array<Inquiry>;
+  total: Scalars['Int'];
+};
+
 export type SearchOrderItemsOutput = {
   result: Array<OrderItem>;
+  total: Scalars['Int'];
+};
+
+export type SearchRefundRequestsOutput = {
+  result: Array<RefundRequest>;
   total: Scalars['Int'];
 };
 
@@ -3133,11 +3330,11 @@ export type Shipment = {
   courier: Courier;
   courierId: Scalars['Int'];
   createdAt: Scalars['DateTime'];
+  histories: Array<ShipmentHistory>;
   id: Scalars['Int'];
   lastTrackedAt?: Maybe<Scalars['DateTime']>;
   ownerPk?: Maybe<Scalars['String']>;
   ownerType?: Maybe<ShipmentOwnerType>;
-  shipmentHistories: Array<ShipmentHistory>;
   status: ShipmentStatus;
   trackCode: Scalars['String'];
 };
