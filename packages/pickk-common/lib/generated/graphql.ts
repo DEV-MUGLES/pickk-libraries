@@ -152,6 +152,10 @@ export type BulkUpdateItemInput = {
   minorCategoryId?: Maybe<Scalars['Int']>;
 };
 
+export type BulkUpdateOrderItemInput = {
+  settleStatus?: Maybe<OrderItemSettleStatus>;
+};
+
 export type Campaign = {
   createdAt: Scalars['DateTime'];
   endAt: Scalars['DateTime'];
@@ -317,6 +321,14 @@ export type Courier = {
   phoneNumber: Scalars['String'];
   returnReserveUrl: Scalars['String'];
   updatedAt: Scalars['DateTime'];
+};
+
+export type CreateCampaignInput = {
+  endAt: Scalars['DateTime'];
+  /** 적용 정산률 (0~100) */
+  rate: Scalars['Int'];
+  startAt: Scalars['DateTime'];
+  title: Scalars['String'];
 };
 
 export type CreateCartItemInput = {
@@ -1095,9 +1107,18 @@ export type ItemUrl = {
 };
 
 export type ItemsExhibition = {
+  /** 최대 12자 */
+  backgroundColor?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
+  /** 최대 50자 */
+  description?: Maybe<Scalars['String']>;
   id: Scalars['Int'];
+  imageRight: Scalars['Float'];
+  imageTop: Scalars['Float'];
+  imageUrl?: Maybe<Scalars['String']>;
+  isVisible: Scalars['Boolean'];
   items: Array<Item>;
+  order: Scalars['Float'];
   /** 최대 50자 */
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
@@ -1296,21 +1317,27 @@ export type ManualCreateItemInput = {
 };
 
 export type Mutation = {
-  activateItemPrice: Item;
-  addItemDetailImages: Item;
+  activateMeSellerItemPrice: Item;
+  activateRootItemPrice: Item;
   addItemPrice: Item;
-  addItemUrl: ItemUrl;
   addMeRefundAccount: RefundAccount;
+  addMeSellerItemDetailImages: Item;
+  addMeSellerItemUrl: ItemUrl;
   addMeShippingAddress: ShippingAddress;
+  addRootItemDetailImages: Item;
+  addRootItemPrice: Item;
+  addRootItemUrl: ItemUrl;
   answerMeSellerInquiry: Inquiry;
   answerRootInquiry: Inquiry;
-  basifyPrice: Item;
+  basifyMeSellerPrice: Item;
+  basifyRootPrice: Item;
   bulkPickMeSellerExchangeRequests: Scalars['Boolean'];
   bulkPickMeSellerRefundRequests: Scalars['Boolean'];
   bulkShipMeSellerOrderItems: Scalars['Boolean'];
   bulkShipReadyMeSellerOrderItems: Scalars['Boolean'];
   bulkUpdateMeSellerItems: Scalars['Boolean'];
   bulkUpdateRootItems: Scalars['Boolean'];
+  bulkUpdateRootOrderItems: Scalars['Boolean'];
   /** 취소 사유는 "담당자 취소 처리"로 고정 */
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
@@ -1332,6 +1359,7 @@ export type Mutation = {
   createMeSellerItemOptionSet: Item;
   createMeSellerSizeChart: Item;
   createMyCartItem: CartItem;
+  createRootCampaign: Campaign;
   createRootItemOptionSet: Item;
   createRootSizeChart: Item;
   createSeller: Seller;
@@ -1350,13 +1378,16 @@ export type Mutation = {
   removeComment: Comment;
   removeDigest: Scalars['Boolean'];
   removeInquiry: Scalars['Boolean'];
-  removeItemDetailImage: Item;
   removeItemPrice: Item;
   removeLook: Scalars['Boolean'];
   removeMeRefundAccount: Scalars['Boolean'];
+  removeMeSellerItemDetailImage: Item;
   removeMeSellerSizeChart: Item;
   removeMeShippingAddress: Scalars['Boolean'];
   removeMyCartItems: Scalars['Boolean'];
+  removeRootCampaign: Scalars['Boolean'];
+  removeRootItemDetailImage: Item;
+  removeRootItemPrice: Item;
   removeRootSizeChart: Item;
   removeVideo: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
@@ -1405,6 +1436,8 @@ export type Mutation = {
   /** 추가도 이거로 해주시면 됩니다! */
   updateMySellerSettlePolicy: SellerSettlePolicy;
   updateMySellerShippingPolicy: SellerShippingPolicy;
+  updateRootCampaign: Campaign;
+  updateRootCampaignItems: Campaign;
   updateRootInquiryAnswer: InquiryAnswer;
   updateRootItem: Item;
   updateRootItemByCrawl: Item;
@@ -1420,14 +1453,14 @@ export type Mutation = {
   updateVideo: Video;
 };
 
-export type MutationActivateItemPriceArgs = {
+export type MutationActivateMeSellerItemPriceArgs = {
   itemId: Scalars['Int'];
   priceId: Scalars['Int'];
 };
 
-export type MutationAddItemDetailImagesArgs = {
-  createItemDetailImageInput: CreateItemDetailImageInput;
+export type MutationActivateRootItemPriceArgs = {
   itemId: Scalars['Int'];
+  priceId: Scalars['Int'];
 };
 
 export type MutationAddItemPriceArgs = {
@@ -1435,17 +1468,37 @@ export type MutationAddItemPriceArgs = {
   itemId: Scalars['Int'];
 };
 
-export type MutationAddItemUrlArgs = {
-  addItemUrlInput: AddItemUrlInput;
-  itemId: Scalars['Int'];
-};
-
 export type MutationAddMeRefundAccountArgs = {
   createRefundAccountInput: CreateRefundAccountInput;
 };
 
+export type MutationAddMeSellerItemDetailImagesArgs = {
+  id: Scalars['Int'];
+  input: CreateItemDetailImageInput;
+};
+
+export type MutationAddMeSellerItemUrlArgs = {
+  id: Scalars['Int'];
+  input: AddItemUrlInput;
+};
+
 export type MutationAddMeShippingAddressArgs = {
   createShippingAddressInput: CreateShippingAddressInput;
+};
+
+export type MutationAddRootItemDetailImagesArgs = {
+  id: Scalars['Int'];
+  input: CreateItemDetailImageInput;
+};
+
+export type MutationAddRootItemPriceArgs = {
+  id: Scalars['Int'];
+  input: AddItemPriceInput;
+};
+
+export type MutationAddRootItemUrlArgs = {
+  id: Scalars['Int'];
+  input: AddItemUrlInput;
 };
 
 export type MutationAnswerMeSellerInquiryArgs = {
@@ -1458,7 +1511,12 @@ export type MutationAnswerRootInquiryArgs = {
   id: Scalars['Int'];
 };
 
-export type MutationBasifyPriceArgs = {
+export type MutationBasifyMeSellerPriceArgs = {
+  itemId: Scalars['Int'];
+  priceId: Scalars['Int'];
+};
+
+export type MutationBasifyRootPriceArgs = {
   itemId: Scalars['Int'];
   priceId: Scalars['Int'];
 };
@@ -1487,6 +1545,11 @@ export type MutationBulkUpdateMeSellerItemsArgs = {
 export type MutationBulkUpdateRootItemsArgs = {
   ids: Array<Scalars['Int']>;
   input: BulkUpdateItemInput;
+};
+
+export type MutationBulkUpdateRootOrderItemsArgs = {
+  input: BulkUpdateOrderItemInput;
+  merchantUids: Array<Scalars['String']>;
 };
 
 export type MutationCancelMeSellerOrderItemArgs = {
@@ -1577,6 +1640,10 @@ export type MutationCreateMyCartItemArgs = {
   createCartItemInput: CreateCartItemInput;
 };
 
+export type MutationCreateRootCampaignArgs = {
+  input: CreateCampaignInput;
+};
+
 export type MutationCreateRootItemOptionSetArgs = {
   id: Scalars['Int'];
   input: CreateItemOptionSetInput;
@@ -1655,17 +1722,17 @@ export type MutationRemoveInquiryArgs = {
   id: Scalars['Int'];
 };
 
-export type MutationRemoveItemDetailImageArgs = {
-  detailImageKey: Scalars['String'];
-  itemId: Scalars['Int'];
-};
-
 export type MutationRemoveItemPriceArgs = {
   itemId: Scalars['Int'];
   priceId: Scalars['Int'];
 };
 
 export type MutationRemoveLookArgs = {
+  id: Scalars['Int'];
+};
+
+export type MutationRemoveMeSellerItemDetailImageArgs = {
+  detailImageKey: Scalars['String'];
   id: Scalars['Int'];
 };
 
@@ -1679,6 +1746,20 @@ export type MutationRemoveMeShippingAddressArgs = {
 
 export type MutationRemoveMyCartItemsArgs = {
   ids: Array<Scalars['Int']>;
+};
+
+export type MutationRemoveRootCampaignArgs = {
+  id: Scalars['Int'];
+};
+
+export type MutationRemoveRootItemDetailImageArgs = {
+  detailImageKey: Scalars['String'];
+  id: Scalars['Int'];
+};
+
+export type MutationRemoveRootItemPriceArgs = {
+  itemId: Scalars['Int'];
+  priceId: Scalars['Int'];
 };
 
 export type MutationRemoveRootSizeChartArgs = {
@@ -1870,6 +1951,16 @@ export type MutationUpdateMySellerShippingPolicyArgs = {
   updateSellerShippingPolicyInput: UpdateSellerShippingPolicyInput;
 };
 
+export type MutationUpdateRootCampaignArgs = {
+  id: Scalars['Int'];
+  input: UpdateCampaignInput;
+};
+
+export type MutationUpdateRootCampaignItemsArgs = {
+  id: Scalars['Int'];
+  itemIds: Array<Scalars['Int']>;
+};
+
 export type MutationUpdateRootInquiryAnswerArgs = {
   id: Scalars['Int'];
   updateInquiryAnswerInput: UpdateInquiryAnswerInput;
@@ -2002,7 +2093,7 @@ export type OrderItem = {
   delayedAt?: Maybe<Scalars['DateTime']>;
   /** 지연발송 예정일 */
   delayedShipExpectedAt?: Maybe<Scalars['DateTime']>;
-  exchangeRequest: ExchangeRequest;
+  exchangeRequest?: Maybe<ExchangeRequest>;
   exchangeRequestedAt?: Maybe<Scalars['DateTime']>;
   exchangedAt?: Maybe<Scalars['DateTime']>;
   failedAt?: Maybe<Scalars['DateTime']>;
@@ -2038,7 +2129,7 @@ export type OrderItem = {
   recommendDigestId?: Maybe<Scalars['Int']>;
   recommenderId?: Maybe<Scalars['Int']>;
   recommenderNickname?: Maybe<Scalars['String']>;
-  refundRequest: RefundRequest;
+  refundRequest?: Maybe<RefundRequest>;
   refundRequestedAt?: Maybe<Scalars['DateTime']>;
   refundedAt?: Maybe<Scalars['DateTime']>;
   seller?: Maybe<Seller>;
@@ -2101,12 +2192,15 @@ export type OrderItemSearchFilter = {
   claimStatusIn?: Maybe<Array<OrderItemClaimStatus>>;
   claimStatusIsNull?: Maybe<Scalars['Boolean']>;
   confirmedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
+  confirmedAtLte?: Maybe<Scalars['DateTime']>;
   isConfirmed?: Maybe<Scalars['Boolean']>;
   isProcessDelaying?: Maybe<Scalars['Boolean']>;
   isSettled?: Maybe<Scalars['Boolean']>;
   merchantUidMt?: Maybe<Scalars['String']>;
   paidAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   sellerId?: Maybe<Scalars['Int']>;
+  settleStatus?: Maybe<OrderItemSettleStatus>;
+  settleStatusIn?: Maybe<Array<OrderItemSettleStatus>>;
   settledAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   shipReadyAtBetween?: Maybe<Array<Scalars['DateTime']>>;
   shippedAtBetween?: Maybe<Array<Scalars['DateTime']>>;
@@ -2473,6 +2567,8 @@ export type ProductShippingReservePolicy = {
 export type Query = {
   brand: Brand;
   brands: Array<Brand>;
+  campaign: Campaign;
+  campaigns: Array<Campaign>;
   checkFollowing: Scalars['Boolean'];
   checkLiking: Scalars['Boolean'];
   /** 중복이면 true, 아니면 false를 반환한다. */
@@ -2500,6 +2596,7 @@ export type Query = {
   itemMinorCategories: Array<ItemCategory>;
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
+  itemsCount: Scalars['Int'];
   itemsExhibitions: Array<ItemsExhibition>;
   itemsGroupDigests: Array<Digest>;
   itemsGroupLooks: Array<Look>;
@@ -2534,6 +2631,7 @@ export type Query = {
   meSellerInquiriesCount: InquiriesCountOutput;
   meSellerInquiry: Inquiry;
   meSellerItems: Array<Item>;
+  meSellerItemsCount: Scalars['Int'];
   meSellerOrderItems: Array<OrderItem>;
   meSellerOrderItemsCount: OrderItemsCountOutput;
   meSellerRefundRequests: Array<RefundRequest>;
@@ -2590,6 +2688,10 @@ export type Query = {
 };
 
 export type QueryBrandArgs = {
+  id: Scalars['Int'];
+};
+
+export type QueryCampaignArgs = {
   id: Scalars['Int'];
 };
 
@@ -2681,6 +2783,10 @@ export type QueryItemPropertiesArgs = {
 export type QueryItemsArgs = {
   itemFilter?: Maybe<ItemFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryItemsCountArgs = {
+  itemFilter?: Maybe<ItemFilter>;
 };
 
 export type QueryItemsGroupDigestsArgs = {
@@ -2807,6 +2913,10 @@ export type QueryMeSellerInquiryArgs = {
 export type QueryMeSellerItemsArgs = {
   itemFilter?: Maybe<ItemFilter>;
   pageInput?: Maybe<PageInput>;
+};
+
+export type QueryMeSellerItemsCountArgs = {
+  itemFilter?: Maybe<ItemFilter>;
 };
 
 export type QueryMeSellerOrderItemsArgs = {
@@ -3408,6 +3518,14 @@ export type UpdateBrandInput = {
   nameKor?: Maybe<Scalars['String']>;
 };
 
+export type UpdateCampaignInput = {
+  endAt?: Maybe<Scalars['DateTime']>;
+  /** 적용 정산률 (0~100) */
+  rate?: Maybe<Scalars['Int']>;
+  startAt?: Maybe<Scalars['DateTime']>;
+  title?: Maybe<Scalars['String']>;
+};
+
 export type UpdateCartItemInput = {
   quantity: Scalars['Int'];
 };
@@ -3618,9 +3736,9 @@ export type UpdateVideoInput = {
 };
 
 export type User = {
-  /** [ResolveField] 활성화된 주문건들 개수 */
+  /** [ResolveField] */
   activeOrderItemsCount: Scalars['Int'];
-  /** [ResolveField] 사용가능 포인트 잔고 */
+  /** [ResolveField] */
   availablePoint: Scalars['Int'];
   avatarUrl?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
@@ -3628,9 +3746,15 @@ export type User = {
   /** 최대 255자 */
   description?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
-  /** [ResolveField] 적립예정 포인트 잔고 */
+  /** [ResolveField] */
   expectedPoint: Scalars['Int'];
   followCount: Scalars['Int'];
+  /** [ResolveField] */
+  hasLook: Scalars['Boolean'];
+  /** [ResolveField] */
+  hasRatedDigest: Scalars['Boolean'];
+  /** [ResolveField] */
+  hasVideo: Scalars['Boolean'];
   height?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
   instagramCode?: Maybe<Scalars['String']>;
@@ -3638,7 +3762,9 @@ export type User = {
   isFollowing?: Maybe<Scalars['Boolean']>;
   /** [MODEL ONLY] */
   isMe?: Maybe<Scalars['Boolean']>;
+  mainChannel?: Maybe<UserMainChannel>;
   name?: Maybe<Scalars['String']>;
+  naverCode?: Maybe<Scalars['String']>;
   /** 최대 11자 */
   nickname: Scalars['String'];
   oauthCode?: Maybe<Scalars['String']>;
@@ -3652,6 +3778,12 @@ export type User = {
   weight?: Maybe<Scalars['Int']>;
   youtubeUrl?: Maybe<Scalars['String']>;
 };
+
+export enum UserMainChannel {
+  Instagram = 'Instagram',
+  NaverBlog = 'NaverBlog',
+  Youtube = 'Youtube',
+}
 
 /** Oauth 제공 서비스입니다. */
 export enum UserProviderType {
