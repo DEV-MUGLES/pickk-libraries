@@ -421,6 +421,21 @@ export type CreateItemSizeChartInput = {
   sizes: Array<ItemSizeInput>;
 };
 
+export type CreateItemsExhibitionInput = {
+  /** 최대 12자 */
+  backgroundColor?: Maybe<Scalars['String']>;
+  /** 최대 50자 */
+  description?: Maybe<Scalars['String']>;
+  imageRight: Scalars['Float'];
+  imageTop: Scalars['Float'];
+  imageUrl?: Maybe<Scalars['String']>;
+  isVisible?: Maybe<Scalars['Boolean']>;
+  itemIds: Array<Scalars['Int']>;
+  order: Scalars['Float'];
+  /** 최대 50자 */
+  title: Scalars['String'];
+};
+
 export type CreateLookDigestInput = {
   itemId: Scalars['Int'];
   size: Scalars['String'];
@@ -1361,6 +1376,7 @@ export type Mutation = {
   createMyCartItem: CartItem;
   createRootCampaign: Campaign;
   createRootItemOptionSet: Item;
+  createRootItemsExhibition: ItemsExhibition;
   createRootSizeChart: Item;
   createSeller: Seller;
   createShippingReservePolicy: Product;
@@ -1409,7 +1425,6 @@ export type Mutation = {
   updateCourier: Courier;
   updateDigest: Digest;
   updateDigestsExhibitionDigests: DigestsExhibition;
-  updateItemsExhibitionItems: ItemsExhibition;
   updateItemsPackageItems: ItemsPackage;
   updateLook: Look;
   updateMe: User;
@@ -1445,6 +1460,7 @@ export type Mutation = {
   updateRootItemImageUrl: Item;
   updateRootItemOption: ItemOption;
   updateRootItemPrice: Item;
+  updateRootItemsExhibition: ItemsExhibition;
   updateRootProduct: Product;
   updateRootSizeChart: Item;
   /** Admin 이상의 권한이 필요합니다. */
@@ -1649,6 +1665,10 @@ export type MutationCreateRootItemOptionSetArgs = {
   input: CreateItemOptionSetInput;
 };
 
+export type MutationCreateRootItemsExhibitionArgs = {
+  input: CreateItemsExhibitionInput;
+};
+
 export type MutationCreateRootSizeChartArgs = {
   input: CreateItemSizeChartInput;
   itemId: Scalars['Int'];
@@ -1842,11 +1862,6 @@ export type MutationUpdateDigestsExhibitionDigestsArgs = {
   id: Scalars['Int'];
 };
 
-export type MutationUpdateItemsExhibitionItemsArgs = {
-  id: Scalars['Int'];
-  itemIds: Array<Scalars['Int']>;
-};
-
 export type MutationUpdateItemsPackageItemsArgs = {
   code: Scalars['String'];
   itemIds: Array<Scalars['Int']>;
@@ -1991,6 +2006,11 @@ export type MutationUpdateRootItemOptionArgs = {
 export type MutationUpdateRootItemPriceArgs = {
   id: Scalars['Int'];
   input: UpdateItemPriceInput;
+};
+
+export type MutationUpdateRootItemsExhibitionArgs = {
+  id: Scalars['Int'];
+  input: UpdateItemsExhibitionInput;
 };
 
 export type MutationUpdateRootProductArgs = {
@@ -2597,6 +2617,7 @@ export type Query = {
   itemProperties: Array<ItemProperty>;
   items: Array<Item>;
   itemsCount: Scalars['Int'];
+  itemsExhibition: ItemsExhibition;
   itemsExhibitions: Array<ItemsExhibition>;
   itemsGroupDigests: Array<Digest>;
   itemsGroupLooks: Array<Look>;
@@ -2787,6 +2808,10 @@ export type QueryItemsArgs = {
 
 export type QueryItemsCountArgs = {
   itemFilter?: Maybe<ItemFilter>;
+};
+
+export type QueryItemsExhibitionArgs = {
+  id: Scalars['Int'];
 };
 
 export type QueryItemsGroupDigestsArgs = {
@@ -3589,6 +3614,21 @@ export type UpdateItemSizeChartInput = {
   labels: Array<Scalars['String']>;
   recommendations?: Maybe<Array<ItemSizeRecommendationInput>>;
   sizes: Array<ItemSizeInput>;
+};
+
+export type UpdateItemsExhibitionInput = {
+  /** 최대 12자 */
+  backgroundColor?: Maybe<Scalars['String']>;
+  /** 최대 50자 */
+  description?: Maybe<Scalars['String']>;
+  imageRight?: Maybe<Scalars['Float']>;
+  imageTop?: Maybe<Scalars['Float']>;
+  imageUrl?: Maybe<Scalars['String']>;
+  isVisible?: Maybe<Scalars['Boolean']>;
+  itemIds?: Maybe<Array<Scalars['Int']>>;
+  order?: Maybe<Scalars['Float']>;
+  /** 최대 50자 */
+  title?: Maybe<Scalars['String']>;
 };
 
 export type UpdateLookDigestInput = {
