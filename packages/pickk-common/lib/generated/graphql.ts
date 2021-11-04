@@ -2143,6 +2143,7 @@ export type OrderItem = {
   processDelayedAt?: Maybe<Scalars['DateTime']>;
   product?: Maybe<Product>;
   productId?: Maybe<Scalars['Int']>;
+  productPriceVariant: Scalars['Int'];
   productVariantName: Scalars['String'];
   quantity: Scalars['Int'];
   recommendDigest?: Maybe<Digest>;
