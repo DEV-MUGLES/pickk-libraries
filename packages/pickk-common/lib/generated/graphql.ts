@@ -434,6 +434,7 @@ export type CreateItemsExhibitionInput = {
   order: Scalars['Float'];
   /** 최대 50자 */
   title: Scalars['String'];
+  videoId?: Maybe<Scalars['Int']>;
 };
 
 export type CreateLookDigestInput = {
@@ -1137,6 +1138,8 @@ export type ItemsExhibition = {
   /** 최대 50자 */
   title: Scalars['String'];
   updatedAt: Scalars['DateTime'];
+  video?: Maybe<Video>;
+  videoId?: Maybe<Scalars['Int']>;
 };
 
 export type ItemsGroup = {
@@ -3630,6 +3633,7 @@ export type UpdateItemsExhibitionInput = {
   order?: Maybe<Scalars['Float']>;
   /** 최대 50자 */
   title?: Maybe<Scalars['String']>;
+  videoId?: Maybe<Scalars['Int']>;
 };
 
 export type UpdateLookDigestInput = {
@@ -3799,6 +3803,7 @@ export type User = {
   height?: Maybe<Scalars['Int']>;
   id: Scalars['Int'];
   instagramCode?: Maybe<Scalars['String']>;
+  isCeleb: Scalars['Boolean'];
   /** [MODEL ONLY] */
   isFollowing?: Maybe<Scalars['Boolean']>;
   /** [MODEL ONLY] */
