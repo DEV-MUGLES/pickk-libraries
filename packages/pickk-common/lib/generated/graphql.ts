@@ -689,6 +689,9 @@ export type DigestsExhibition = {
 };
 
 export type ExchangeRequest = {
+  /** 255자 이내로 적어주세요 */
+  cancelReason?: Maybe<Scalars['String']>;
+  canceledAt?: Maybe<Scalars['DateTime']>;
   confirmedAt?: Maybe<Scalars['DateTime']>;
   convertedAt?: Maybe<Scalars['DateTime']>;
   faultOf: OrderClaimFaultOf;
@@ -767,6 +770,7 @@ export type ExchangeRequestSearchFilter = {
 
 /** 교한신청 상태입니다. */
 export enum ExchangeRequestStatus {
+  Canceled = 'Canceled',
   Converted = 'Converted',
   Pending = 'Pending',
   Picked = 'Picked',
@@ -1356,6 +1360,7 @@ export type Mutation = {
   bulkUpdateMeSellerItems: Scalars['Boolean'];
   bulkUpdateRootItems: Scalars['Boolean'];
   bulkUpdateRootOrderItems: Scalars['Boolean'];
+  cancelMeSellerExchangeRequest: ExchangeRequest;
   /** 취소 사유는 "담당자 취소 처리"로 고정 */
   cancelMeSellerOrderItem: OrderItem;
   cancelOrder: Order;
@@ -1409,6 +1414,7 @@ export type Mutation = {
   removeRootItemPrice: Item;
   removeRootSizeChart: Item;
   removeVideo: Scalars['Boolean'];
+  reportContent: Scalars['Boolean'];
   /** 정보에 오류가 있는 아이템을 신고합니다. */
   reportItem: Scalars['Boolean'];
   requestAppInstallPoint: Scalars['Boolean'];
@@ -1569,6 +1575,11 @@ export type MutationBulkUpdateRootItemsArgs = {
 export type MutationBulkUpdateRootOrderItemsArgs = {
   input: BulkUpdateOrderItemInput;
   merchantUids: Array<Scalars['String']>;
+};
+
+export type MutationCancelMeSellerExchangeRequestArgs = {
+  merchantUid: Scalars['String'];
+  reason: Scalars['String'];
 };
 
 export type MutationCancelMeSellerOrderItemArgs = {
@@ -1791,6 +1802,10 @@ export type MutationRemoveRootSizeChartArgs = {
 
 export type MutationRemoveVideoArgs = {
   id: Scalars['Int'];
+};
+
+export type MutationReportContentArgs = {
+  url: Scalars['String'];
 };
 
 export type MutationReportItemArgs = {
@@ -3865,6 +3880,8 @@ export type Video = {
   userId?: Maybe<Scalars['Int']>;
   /** 최대 길이 40 */
   youtubeCode: Scalars['String'];
+  youtubeDuration?: Maybe<Scalars['Int']>;
+  youtubeViewCount?: Maybe<Scalars['Int']>;
 };
 
 export type VideoFilter = {
